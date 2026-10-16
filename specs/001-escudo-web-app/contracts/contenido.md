@@ -2,6 +2,8 @@
 
 Este contrato define **la forma** en que el equipo entrega el contenido. Los valores reales (textos, puntajes, criticidades, números) los pone el equipo y **no se pueden inventar ni reformular** (constitución III). `tests/logic/contenido.test.js` verifica cada regla marcada con ✔.
 
+> **Excepción vigente (2026-10-16)**: `preguntas.js` usa puntajes y criticidades provisionales aprobados en la spec, y `descripcionHabito` y `recomendaciones.js` son borradores ([R13](../research.md)). Cumplen este contrato; solo cambian los valores cuando el equipo los defina.
+
 Todos los archivos son módulos ES con exportaciones con nombre y sin lógica.
 
 ## `preguntas.js`

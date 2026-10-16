@@ -17,6 +17,10 @@
 - Q: ¿Cómo se entra a Tips sin diagnóstico? → A: No se entra. Tips solo está disponible cuando hay un diagnóstico guardado; quien no lo tiene siempre empieza por la encuesta (tras el consentimiento). Emergencia sigue disponible desde inicio.
 - Q: ¿Qué nivel de accesibilidad debe cumplir la web app? → A: WCAG 2.1 nivel AA; el semáforo nunca depende solo del color.
 
+### Session 2026-10-16
+
+- Q: ¿Cuáles son las 14 preguntas y opciones del prediagnóstico y qué puntaje y criticidad tiene cada opción mientras el equipo define los definitivos? → A: El equipo entregó el texto de las 14 preguntas y sus opciones (ver "Banco de preguntas" en Assumptions). Puntajes y criticidades **provisionales (mock)**, iguales para todas las preguntas: a = 0 (sin criticidad), b = 1 (Importante), c = 2 (Urgente); puntaje máximo 28. Se reemplazan cuando el equipo defina los valores reales, sin cambiar el cálculo.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hacer el diagnóstico y conocer mi nivel de riesgo (Priority: P1)
@@ -153,7 +157,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 - **FR-014**: Los porcentajes MUST mostrarse redondeados al entero más cercano, y el nivel del semáforo MUST asignarse sobre el valor redondeado: Bajo 0–39 %, Medio 40–69 %, Alto 70 % en adelante.
 - **FR-015**: La pantalla de Resultado MUST mostrar el riesgo total en un indicador circular con el color y la etiqueta del semáforo, la leyenda de los tres rangos debajo del indicador y el porcentaje de riesgo de cada una de las cuatro dimensiones.
 - **FR-016**: La sección "Dónde estás en riesgo" MUST listar solo las respuestas con puntaje mayor a cero, ordenadas de mayor a menor puntaje (empates por número de pregunta ascendente). Cada ítem MUST mostrar el número de la pregunta, una descripción corta del hábito, su prioridad (Urgente, Importante o Revisa) y los puntos que suma.
-- **FR-017**: La prioridad de cada hábito (Urgente, Importante o Revisa) MUST tomarse del nivel de criticidad asignado a la opción elegida en el archivo de contenido. La criticidad crece de "a" (menor) a "c" (mayor); los valores concretos por pregunta y opción los define el equipo en el archivo de contenido.
+- **FR-017**: La prioridad de cada hábito (Urgente, Importante o Revisa) MUST tomarse del nivel de criticidad asignado a la opción elegida en el archivo de contenido. La criticidad crece de "a" (menor) a "c" (mayor); los valores concretos por pregunta y opción los define el equipo en el archivo de contenido. Mientras tanto se usan los valores provisionales del Banco de preguntas (b = Importante, c = Urgente).
 - **FR-018**: La pantalla de Resultado MUST incluir un botón que lleve al Plan de Acción.
 
 **Plan de acción**
@@ -200,7 +204,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 
 ### Key Entities
 
-- **Pregunta**: una de las 14 preguntas del prediagnóstico. Atributos: número (1–14), dimensión, texto, 3 opciones (a, b, c) con su texto y puntaje de riesgo, descripción corta del hábito de riesgo. Contenido fijo.
+- **Pregunta**: una de las 14 preguntas del prediagnóstico. Atributos: número (1–14), dimensión, texto, 3 opciones (a, b, c) con su texto, puntaje de riesgo y criticidad, descripción corta del hábito de riesgo. Contenido fijo; textos entregados (Banco de preguntas), puntajes y criticidades provisionales.
 - **Dimensión**: agrupación de preguntas (Phishing, Smishing, Vishing, Hábitos generales) con su rango de preguntas.
 - **Diagnóstico**: resultado de un prediagnóstico completo. Atributos: las 14 respuestas, fecha, riesgo total (%), riesgo por dimensión (%), nivel del semáforo, lista de hábitos de riesgo. Se guarda uno solo por dispositivo; uno nuevo reemplaza al anterior.
 - **Hábito de riesgo / Acción**: cada respuesta con puntaje mayor a cero. Atributos: número de pregunta, descripción corta, título de la acción, prioridad, puntos (y su equivalente en puntos porcentuales del riesgo total), "Qué hacer ahora", "Cómo prevenirlo", estado hecha / no hecha.
@@ -226,8 +230,28 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 
 ## Assumptions
 
-- **Contenido fijo como dependencia**: el texto de las 14 preguntas y sus opciones, los puntajes, las descripciones cortas de hábitos, los textos de acciones ("Qué hacer ahora" / "Cómo prevenirlo"), los textos de reconocimiento de cada tip, los pasos de las tres guías de emergencia, las líneas bancarias, los canales de denuncia y la política de privacidad serán entregados por el equipo del proyecto en los archivos de contenido. Esta especificación no inventa ni modifica ese contenido.
-- Cada opción (a, b, c) tiene un nivel de criticidad definido en el archivo de contenido (pendiente de definir por el equipo), de menor en "a" a mayor en "c"; ese nivel determina la prioridad mostrada.
+- **Contenido fijo como dependencia**: los puntajes definitivos, las descripciones cortas de hábitos, los textos de acciones ("Qué hacer ahora" / "Cómo prevenirlo"), los textos de reconocimiento de cada tip, los pasos de las tres guías de emergencia, las líneas bancarias, los canales de denuncia y la política de privacidad serán entregados por el equipo del proyecto en los archivos de contenido. Esta especificación no inventa ni modifica ese contenido.
+- Cada opción (a, b, c) tiene un nivel de criticidad definido en el archivo de contenido, de menor en "a" a mayor en "c"; ese nivel determina la prioridad mostrada. Los valores definitivos están pendientes del equipo.
+- **Puntajes provisionales (mock)**: hasta que el equipo los defina, todas las preguntas usan a = 0 (sin criticidad, no genera hábito), b = 1 (Importante) y c = 2 (Urgente). Puntaje máximo: 28 (8 por dimensión de 4 preguntas; 4 en Hábitos generales). Cambiarlos solo modifica el archivo de contenido.
+- **Banco de preguntas** (texto entregado por el equipo el 2026-10-16; se usa tal cual):
+  - **Phishing**
+    1. ¿Usas la misma contraseña para tu correo y para otras cuentas (redes sociales, bancos, tiendas en línea)? — a) No, cada cuenta tiene una contraseña distinta · b) En algunas cuentas sí la repito · c) Sí, uso la misma en casi todo
+    2. ¿Tienes activada la verificación en dos pasos en tu correo electrónico? — a) Sí, está activada · b) No · c) No sé qué es
+    3. ¿Cuándo fue la última vez que cambiaste la contraseña de tu correo? — a) Hace menos de 6 meses · b) Entre 6 meses y 2 años · c) Hace más de 2 años o nunca
+    4. Si recibes un correo de tu banco o de una entidad pidiéndote "actualizar tus datos" o "verificar tu cuenta", ¿qué haces? — a) Lo reporto o lo borro, y si tengo dudas entro yo mismo a la app o página oficial · b) Lo abro para ver qué dice · c) Hago clic en el enlace y actualizo mis datos
+  - **Smishing**
+    5. Cuando te llega un SMS o WhatsApp con un enlace de un número desconocido, ¿qué haces normalmente? — a) Lo borro o lo reporto sin abrirlo · b) Lo abro si parece de una empresa conocida · c) Lo abro para ver de qué se trata
+    6. ¿Has compartido alguna vez un código de verificación de 6 dígitos que te llegó por SMS porque alguien te lo pidió? — a) Nunca · b) No lo recuerdo · c) Sí
+    7. ¿Tienes activada la verificación en dos pasos (PIN) dentro de WhatsApp? — a) Sí · b) No · c) No sé
+    8. Si has recibido mensajes como "tu paquete está retenido, paga aquí", ¿qué hiciste? — a) Nunca he recibido uno, o no hice clic · b) Hice clic, pero no pagué ni di datos · c) Pagué o ingresé mis datos
+  - **Vishing**
+    9. Cuando recibes llamadas de números desconocidos que se cuelgan sin decir nada, ¿qué haces? — a) Las ignoro o bloqueo el número · b) Contesto y digo "aló" o "sí" · c) Devuelvo la llamada
+    10. Si alguien te llama diciendo ser de tu banco y te pide confirmar tu clave, número de tarjeta o código de seguridad, ¿qué haces? — a) Cuelgo y llamo yo a la línea oficial del banco · b) Doy algunos datos, pero no la clave · c) Doy lo que me piden para resolver el problema
+    11. ¿Sabías que tu banco nunca te pedirá contraseñas ni códigos de seguridad por teléfono? — a) Sí, lo sabía · b) No estaba seguro · c) Creía que sí pueden pedirlos
+    12. Ante una llamada sospechosa, ¿cuelgas y llamas tú mismo a la línea oficial de la entidad para confirmar? — a) Siempre · b) A veces · c) Nunca
+  - **Hábitos generales**
+    13. ¿Publicas en redes sociales información personal como tu celular, dirección, fecha de nacimiento o lugar de trabajo? — a) No · b) Algunos de esos datos · c) Sí, varios de ellos
+    14. Si sospecharas que fuiste víctima de una estafa digital, ¿sabrías a quién acudir? — a) Sí, sé exactamente qué hacer · b) Tengo una idea general · c) No sabría a quién acudir
 - La opción "a" de cada pregunta corresponde al comportamiento seguro y "c" al de mayor riesgo, según la constitución; una opción con puntaje cero no genera hábito de riesgo ni acción.
 - Solo se guarda un diagnóstico por dispositivo; repetirlo y completarlo reemplaza el anterior y reinicia el progreso del plan. No hay historial de diagnósticos.
 - El consentimiento se pide cada vez que se inicia un diagnóstico (incluida la repetición).

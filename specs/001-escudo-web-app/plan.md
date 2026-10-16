@@ -36,7 +36,7 @@ Las reglas de negocio viven en cuatro clases de `/src/logic` probadas con Vitest
 
 **Scale/Scope**: 6 pantallas (Inicio, Diagnóstico, Resultado, Mi plan, Tips, Emergencia con 3 guías + bancos + denuncia), 14 preguntas, 8 tips, 4 clases de dominio; un solo usuario por dispositivo
 
-Ningún punto queda en NEEDS CLARIFICATION: todo está resuelto en [research.md](./research.md). El único pendiente externo es la **entrega del contenido** por parte del equipo (ver Riesgos).
+Ningún punto queda en NEEDS CLARIFICATION: todo está resuelto en [research.md](./research.md). El único pendiente externo es el **contenido**: el equipo debe validar los valores provisionales de las preguntas y entregar el contenido que falta (ver Riesgos).
 
 ## Constitution Check
 
@@ -46,7 +46,7 @@ Ningún punto queda en NEEDS CLARIFICATION: todo está resuelto en [research.md]
 |---|---|---|---|
 | I | Privacidad ante todo (NO NEGOCIABLE) | Sin backend, `fetch` ni analítica; en localStorage solo van respuestas (a/b/c), fecha y acciones hechas; CSP `connect-src 'none'` en build; fuentes del sistema; ningún campo de texto libre (FR-038, FR-039) | ✅ |
 | II | Consentimiento y Ley 1581 | La pantalla Diagnóstico solo se abre con `consentimientoAceptado`; el resultado solo se crea con 14 respuestas válidas y consentimiento (el constructor de `Diagnostico` rechaza respuestas incompletas); sin cuentas (FR-002, FR-003, FR-012) | ✅ |
-| III | Contenido fijo y cálculo determinista | Contenido en `/src/data` sin modificar; `Diagnostico` calcula suma ÷ máximo con constantes `LIMITE_RIESGO_MEDIO`/`LIMITE_RIESGO_ALTO`; la prueba de contenido valida la estructura; las pruebas de lógica cubren semáforo, redondeo y empates | ✅ |
+| III | Contenido fijo y cálculo determinista | Contenido en `/src/data` sin modificar; `Diagnostico` calcula suma ÷ máximo con constantes `LIMITE_RIESGO_MEDIO`/`LIMITE_RIESGO_ALTO`; la prueba de contenido valida la estructura; las pruebas de lógica cubren semáforo, redondeo y empates. Los puntajes provisionales son una excepción temporal aprobada en la spec (Clarifications 2026-10-16, [R13](./research.md)) | ✅ (anotado) |
 | IV | Solo navegador, sin código sombra | Hosting estático; sin react-router ni librerías de estado; se construye solo lo de la spec; estructura plana | ✅ |
 | V | Código limpio y verificado | Clases POO en `/src/logic` con JSDoc; componentes funcionales que no calculan riesgo; nombres en español; Vitest + ESLint + Prettier desde la primera tarea | ✅ |
 | VI | Lenguaje sencillo, ayuda siempre disponible | Emergencia accesible desde Inicio sin consentimiento ni diagnóstico; errores traducidos a avisos amigables (`AvisoAlmacenamiento`); sin *stack traces* | ✅ |
@@ -138,7 +138,8 @@ tests/
 
 | Riesgo | Impacto | Mitigación |
 |---|---|---|
-| El contenido (preguntas, puntajes, criticidades, textos, bancos, denuncia, política) no se ha entregado | No se puede publicar ni validar SC-003 con datos reales | La lógica y la UI se construyen y prueban con fixtures; `contenido.test.js` falla hasta que llegue un contenido válido; **no se inventa contenido** |
+| Puntajes, criticidades, descripciones de hábitos y recomendaciones son provisionales ([R13](./research.md)) | El riesgo mostrado no refleja pesos validados; no se puede publicar | Los valores provisionales están aprobados en la spec y marcados `PROVISIONAL` en `/src/data`; reemplazarlos solo toca el contenido, porque el máximo se calcula (R4) |
+| Falta el contenido de tips, guías de emergencia, bancos, denuncia y política | Esas pantallas se ven vacías; `contenido.test.js` falla en esas reglas | La lógica y la UI se prueban con fixtures; **no se inventa ese contenido** |
 | El contenido trae textos de acción distintos por opción (b vs c) | El contrato de contenido cambia | Se resuelve agregando un campo opcional por opción ([contracts/contenido.md](./contracts/contenido.md)); las clases no cambian |
 | Navegador con localStorage bloqueado | Se pierde el progreso al cerrar | Modo sin guardar + aviso (FR-040), cubierto en las pruebas de `Almacenamiento` |
 | La rama git activa es `plan` y no `001-escudo-web-app` | Confusión al crear los commits de implementación | Cambiar o crear la rama `001-escudo-web-app` antes de implementar |

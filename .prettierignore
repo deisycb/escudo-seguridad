@@ -1,0 +1,6 @@
+dist/
+package-lock.json
+specs/
+.specify/
+.claude/
+constitucion.md

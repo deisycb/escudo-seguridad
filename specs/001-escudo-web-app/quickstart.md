@@ -7,7 +7,7 @@
 - Node.js 22 LTS o superior y npm.
 - Un navegador moderno (Chrome o Edge para las DevTools y Lighthouse) y, si es posible, un celular real.
 - La extensión axe DevTools (opcional) y un lector de pantalla (VoiceOver en macOS o NVDA en Windows).
-- Los archivos de contenido de `/src/data` entregados por el equipo. Sin ellos, `contenido.test.js` falla y los escenarios con datos reales no se pueden validar.
+- Los archivos de contenido de `/src/data`. `preguntas.js` y `recomendaciones.js` ya tienen contenido provisional ([R13](./research.md)), así que el diagnóstico, el resultado y el plan se pueden validar de punta a punta. Mientras falte el resto (tips, emergencias, política), `contenido.test.js` falla en esas reglas y esas pantallas no se pueden validar con datos reales.
 
 ## Instalación y comandos
 

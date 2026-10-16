@@ -98,6 +98,19 @@ El stack lo fija la constitución (React + Vite + Tailwind CSS + JavaScript + lo
 - **Decisión**: Node.js 22 LTS (o superior) + npm; React 19; Vite 7 con `@vitejs/plugin-react`; Tailwind CSS 4 con `@tailwindcss/vite`; Vitest 3; ESLint 9 (configuración *flat*) con `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh` y `eslint-plugin-jsx-a11y`; Prettier 3 con `eslint-config-prettier`. Las versiones exactas quedan fijadas en `package-lock.json` al instalar.
 - **Justificación**: son las versiones estables vigentes de lo que fija la constitución. Tailwind 4 se integra como plugin de Vite, sin archivo de configuración de PostCSS.
 
-## Dependencia abierta (no bloquea el plan, sí la implementación del contenido)
+## R13. Contenido provisional de preguntas y recomendaciones (2026-10-16)
 
-Los archivos de contenido (textos de preguntas y opciones, puntajes, criticidades, descripciones de hábitos, recomendaciones, textos de tips, pasos de las guías, líneas bancarias, canales de denuncia y política de privacidad) **todavía no existen** y debe entregarlos el equipo. El plan define su forma en [contracts/contenido.md](./contracts/contenido.md). Hasta recibirlos se puede implementar y probar toda la lógica y la interfaz con fixtures, pero **no se debe poner contenido inventado en `/src/data`**.
+- **Decisión**:
+  - `preguntas.js` lleva los **textos reales** de las 14 preguntas y opciones (spec, "Banco de preguntas").
+  - Los puntajes y criticidades son **provisionales**, aprobados en la spec (Clarifications 2026-10-16): a = 0 / `null`, b = 1 / `"importante"`, c = 2 / `"urgente"`. El puntaje máximo calculado es 28.
+  - `descripcionHabito` y `recomendaciones.js` son **borradores** para poder probar el plan de acción.
+  - Cada archivo indica en un comentario `PROVISIONAL` qué partes falta validar.
+- **Justificación**: el equipo pidió poder empezar a evaluar mientras define los valores. La constitución III prohíbe inventar puntajes, así que la excepción quedó registrada primero en `spec.md`, como exigen las reglas del agente. Como el puntaje máximo y el riesgo de cada acción se calculan desde el contenido (R4), reemplazar los valores no cambia ninguna clase.
+- **Alternativas consideradas**: dejar `/src/data` vacío hasta tener los valores definitivos (bloquea las pruebas de punta a punta); puntajes distintos por pregunta (sería inventar pesos sin criterio del equipo).
+
+## Dependencia abierta (no bloquea el plan, sí la publicación)
+
+- **Pendiente de validar**: los puntajes y criticidades definitivos, las descripciones de hábitos y las recomendaciones (hoy son provisionales, R13).
+- **Pendiente de entregar**: los textos de los tips ("cómo reconocerla" y "qué hacer"), los pasos de las tres guías, el aviso "No borres nada", las líneas bancarias, los canales de denuncia y la política de privacidad.
+
+La forma de todo este contenido está en [contracts/contenido.md](./contracts/contenido.md). Fuera de lo aprobado en R13, **no se debe poner contenido inventado en `/src/data`**. No se publica hasta que el equipo valide el contenido provisional.
