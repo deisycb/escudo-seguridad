@@ -1,26 +1,18 @@
+import { Lightbulb, ListChecks, ShieldCheck, TriangleAlert } from "lucide-react";
+
 const SECCIONES = [
-  { pantalla: "resultado", etiqueta: "Resultado", icono: "M3 13h4v8H3zm7-6h4v14h-4zm7 3h4v11h-4z" },
-  {
-    pantalla: "plan",
-    etiqueta: "Mi plan",
-    icono: "M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z",
-  },
-  {
-    pantalla: "tips",
-    etiqueta: "Tips",
-    icono: "M9 21h6v-1H9zm3-19a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z",
-  },
-  {
-    pantalla: "emergencia",
-    etiqueta: "Emergencia",
-    icono: "M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z",
-  },
+  { pantalla: "resultado", etiqueta: "Resultado", Icono: ShieldCheck },
+  { pantalla: "plan", etiqueta: "Mi plan", Icono: ListChecks },
+  { pantalla: "tips", etiqueta: "Tips", Icono: Lightbulb },
+  { pantalla: "emergencia", etiqueta: "Emergencia", Icono: TriangleAlert },
 ];
 
+// Emergencia va siempre en peligro; el resto en primario solo si está activa (constitución §7.5).
 function claseBoton(pantalla, activa) {
-  const color = pantalla === "emergencia" ? "text-red-700" : "text-gray-800";
-  const indicador = activa ? "border-current font-bold" : "border-transparent";
-  return `flex min-h-11 min-w-11 flex-1 flex-col items-center justify-center gap-0.5 border-t-4 py-1 text-xs ${color} ${indicador}`;
+  let color = activa ? "text-primario" : "text-texto-suave";
+  if (pantalla === "emergencia") color = "text-peligro";
+  const peso = activa ? "font-bold" : "font-semibold";
+  return `relative flex min-h-11 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-xs ${color} ${peso}`;
 }
 
 /** Barra inferior con las 4 secciones; solo se muestra cuando hay diagnóstico. */
@@ -28,10 +20,10 @@ export default function BarraNavegacion({ pantallaActual, onNavegar }) {
   return (
     <nav
       aria-label="Secciones"
-      className="fixed inset-x-0 bottom-0 border-t border-gray-300 bg-white"
+      className="fixed inset-x-0 bottom-0 mx-auto h-barra max-w-columna border-t border-borde bg-fondo min-[560px]:border-x"
     >
-      <ul className="mx-auto flex max-w-2xl">
-        {SECCIONES.map(({ pantalla, etiqueta, icono }) => {
+      <ul className="flex h-full">
+        {SECCIONES.map(({ pantalla, etiqueta, Icono }) => {
           const activa = pantalla === pantallaActual;
           return (
             <li key={pantalla} className="flex flex-1">
@@ -41,9 +33,14 @@ export default function BarraNavegacion({ pantallaActual, onNavegar }) {
                 onClick={() => onNavegar(pantalla)}
                 className={claseBoton(pantalla, activa)}
               >
-                <svg viewBox="0 0 24 24" className="size-6 fill-current" aria-hidden="true">
-                  <path d={icono} />
-                </svg>
+                {/* Indicador de forma de la sección activa: no depende solo del color (FR-036a). */}
+                {activa && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-4 top-0 h-[3px] rounded-b-full bg-current"
+                  />
+                )}
+                <Icono size={24} strokeWidth={2} aria-hidden="true" />
                 {etiqueta}
               </button>
             </li>

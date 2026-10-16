@@ -31,6 +31,17 @@ function recogerTextos(valor) {
   return [];
 }
 
+describe("DIMENSIONES", () => {
+  it("cada dimensión tiene su etiqueta visible", () => {
+    expect(DIMENSIONES.map((d) => d.etiqueta)).toEqual([
+      "Correo (Phishing)",
+      "SMS y WhatsApp (Smishing)",
+      "Llamadas (Vishing)",
+      "Hábitos generales",
+    ]);
+  });
+});
+
 describe("preguntas.js", () => {
   it("tiene exactamente 14 preguntas numeradas 1..14 en orden", () => {
     expect(PREGUNTAS).toHaveLength(TOTAL_PREGUNTAS);

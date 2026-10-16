@@ -1,25 +1,19 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
-body {
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-  overflow-x: hidden;
+@layer base {
+  body {
+    @apply bg-fondo font-sans text-base leading-normal text-texto;
+    overflow-x: hidden;
+  }
 }
 
 :focus-visible {
-  outline: 3px solid;
-  outline-offset: 2px;
+  @apply outline-3 outline-offset-2 outline-primario;
+  outline-style: solid;
 }
 
 /* Los títulos reciben el foco por programa al cambiar de pantalla; no necesitan anillo. */
 h1[tabindex="-1"]:focus {
   outline: none;
-}
-
-body {
-  background-color: #fff;
 }

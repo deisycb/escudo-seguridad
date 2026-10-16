@@ -1,4 +1,6 @@
+import { X } from "lucide-react";
 import { useEffect, useId, useRef } from "react";
+import { TITULO_SECCION } from "./estilos.js";
 
 /** Diálogo modal sobre el <dialog> nativo (foco y Esc los maneja el navegador). */
 export default function Dialogo({ abierto, titulo, onCerrar, children, acciones }) {
@@ -21,16 +23,24 @@ export default function Dialogo({ abierto, titulo, onCerrar, children, acciones 
     <dialog
       ref={referencia}
       aria-labelledby={idTitulo}
-      className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg p-0 text-gray-900 shadow-xl backdrop:bg-black/50"
+      className="m-auto w-[calc(100%-48px)] max-w-columna rounded-tarjeta border border-borde bg-fondo p-0 text-texto backdrop:bg-texto/50"
     >
       <div className="flex max-h-[80vh] flex-col">
-        <h2 id={idTitulo} className="px-5 pt-5 text-xl font-bold">
-          {titulo}
-        </h2>
-        <div className="overflow-y-auto px-5 py-3">{children}</div>
-        <div className="flex flex-wrap justify-end gap-3 border-t border-gray-200 px-5 py-4">
-          {acciones}
+        <div className="flex items-start gap-3 px-6 pt-6">
+          <h2 id={idTitulo} className={`${TITULO_SECCION} flex-1`}>
+            {titulo}
+          </h2>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={onCerrar}
+            className="-mt-2 -mr-2 inline-flex size-11 items-center justify-center rounded-boton text-texto-suave"
+          >
+            <X size={24} strokeWidth={2} aria-hidden="true" />
+          </button>
         </div>
+        <div className="overflow-y-auto px-6 py-3 text-texto-secundario">{children}</div>
+        <div className="flex flex-col gap-3 border-t border-borde px-6 py-4">{acciones}</div>
       </div>
     </dialog>
   );

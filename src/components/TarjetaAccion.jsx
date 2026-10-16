@@ -1,7 +1,9 @@
+import { ChevronDown, ListChecks, ShieldCheck, Zap } from "lucide-react";
 import { useId, useState } from "react";
 import Prioridad from "./Prioridad.jsx";
 import TextoContenido from "./TextoContenido.jsx";
 import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "./botones.js";
+import { ETIQUETA_SUAVE, TARJETA, TEXTO_LECTURA } from "./estilos.js";
 
 /** Una acción del plan con su detalle desplegable y el botón "Ya lo hice". */
 export default function TarjetaAccion({ accion, onAlternar }) {
@@ -9,9 +11,7 @@ export default function TarjetaAccion({ accion, onAlternar }) {
   const idDetalle = useId();
 
   return (
-    <article
-      className={`rounded-lg border-2 p-4 ${accion.hecha ? "border-green-700 bg-green-50" : "border-gray-300"}`}
-    >
+    <article className={`${TARJETA} flex flex-col gap-3`}>
       <button
         type="button"
         aria-expanded={abierta}
@@ -19,40 +19,51 @@ export default function TarjetaAccion({ accion, onAlternar }) {
         onClick={() => setAbierta(!abierta)}
         className="flex min-h-11 w-full items-start justify-between gap-3 text-left"
       >
-        <span>
-          <span className="block font-semibold">{accion.titulo}</span>
-          <span className="mt-1 flex flex-wrap items-center gap-3">
+        <span className="flex flex-col gap-2">
+          <span className="font-bold text-texto">{accion.titulo}</span>
+          <span className="flex flex-wrap items-center gap-3">
             <Prioridad prioridad={accion.prioridad} />
-            <span>Baja {accion.bajaPorcentaje} %</span>
+            <span className={ETIQUETA_SUAVE}>Baja {accion.bajaPorcentaje} %</span>
           </span>
         </span>
-        <svg
-          viewBox="0 0 24 24"
-          className={`mt-1 size-5 shrink-0 fill-current transition-transform ${abierta ? "rotate-180" : ""}`}
+        <ChevronDown
+          size={20}
+          strokeWidth={2}
           aria-hidden="true"
-        >
-          <path d="M7 10l5 5 5-5z" />
-        </svg>
+          className={`mt-1 shrink-0 text-texto-suave transition-transform ${abierta ? "rotate-180" : ""}`}
+        />
       </button>
 
-      <div id={idDetalle} hidden={!abierta} className="mt-3 space-y-3">
+      <div id={idDetalle} hidden={!abierta} className={`space-y-4 ${TEXTO_LECTURA}`}>
         <section>
-          <h3 className="font-bold">Qué hacer ahora</h3>
+          <h3 className="flex items-center gap-2 font-bold text-texto">
+            <Zap size={20} strokeWidth={2} aria-hidden="true" className="text-primario" />
+            Qué hacer ahora
+          </h3>
           <TextoContenido valor={accion.queHacerAhora} />
         </section>
         <section>
-          <h3 className="font-bold">Cómo prevenirlo</h3>
+          <h3 className="flex items-center gap-2 font-bold text-texto">
+            <ShieldCheck size={20} strokeWidth={2} aria-hidden="true" className="text-primario" />
+            Cómo prevenirlo
+          </h3>
           <TextoContenido valor={accion.comoPrevenirlo} />
         </section>
       </div>
 
+      {accion.hecha && (
+        <p className="flex items-center gap-2 font-bold text-exito">
+          <ListChecks size={20} strokeWidth={2} aria-hidden="true" />
+          Acción hecha
+        </p>
+      )}
       <button
         type="button"
         aria-pressed={accion.hecha}
         onClick={() => onAlternar(accion.numeroPregunta)}
-        className={`mt-3 ${accion.hecha ? BOTON_SECUNDARIO : BOTON_PRINCIPAL}`}
+        className={accion.hecha ? BOTON_SECUNDARIO : BOTON_PRINCIPAL}
       >
-        {accion.hecha ? "Hecho ✓ · Desmarcar" : "Ya lo hice"}
+        {accion.hecha ? "Desmarcar" : "Ya lo hice"}
       </button>
     </article>
   );

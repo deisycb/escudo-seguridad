@@ -301,3 +301,198 @@ Task: "Crear src/components/TarjetaAccion.jsx"
 
 - [X] T064 Impedir en `src/pages/Diagnostico.jsx` que el diagnóstico se complete con respuestas faltantes: en `siguiente()`, si es la pregunta 14 y alguna respuesta es `null`, navegar a la primera pregunta sin responder en lugar de llamar a `onCompletar`; así, saltar preguntas con el botón "adelante" del navegador ya no provoca el error de `new Diagnostico` ni una pantalla en blanco per FR-012, SC-008 (contradicts)
 - [X] T065 Corregir en `src/App.jsx` que una entrada vieja del historial `{ pantalla: "diagnostico" }` (por ejemplo, tocar "atrás" desde Resultado) reabra la encuesta al marcar la casilla: cuando `resolverPantalla` redirige a otra pantalla, reemplazar la entrada con `reemplazar` de `useNavegacion` para que `estado.pantalla` coincida con la pantalla mostrada, y que la encuesta solo empiece con "Empezar diagnóstico" en la pregunta 1 per FR-003, US1/AC2 (contradicts)
+
+---
+
+# Rediseño 2026-10-16 — Sistema de diseño "Confianza institucional"
+
+**Input**: constitución §7 (v1.1.0), spec FR-008, FR-015, FR-035, FR-036, FR-036b–FR-036d (Clarifications 2026-10-16), research R14–R18, [contracts/pantallas.md](./contracts/pantallas.md) (tabla "Sistema de diseño").
+
+**Alcance**: solo la capa visual. Las clases de `src/logic/` (`Pregunta`, `Diagnostico`, `PlanAccion`, `Almacenamiento`) y sus pruebas **no cambian**; el único cambio fuera de la UI es el campo `etiqueta` de `DIMENSIONES`. Rama de trabajo: `cambio_de_diseño`.
+
+**Reglas extra para estas tareas**:
+
+- Colores SOLO con las clases de los tokens de `tailwind.config.js` (`bg-superficie`, `text-peligro`, `border-borde`…). Prohibido escribir hex (`#…`) o clases de la paleta de Tailwind (`gray-`, `blue-`, `red-`, `amber-`, `green-`) en `src/components/` y `src/pages/` (§7.2).
+- Íconos SOLO de `lucide-react`, importados uno por uno, `size` 20–24 (16 en chips), `strokeWidth={2}`, `aria-hidden="true"` cuando acompañan texto y `aria-label` en botones solo-ícono (§7.7, §7.9). Se eliminan todos los `<svg>` escritos a mano.
+- Sin sombras, degradados, emojis ni ilustraciones (§7.4, §7.8). Solo tema claro.
+- Ningún componente calcula riesgo: porcentajes y niveles vienen de `Diagnostico` / `PlanAccion` (incluido `Diagnostico.clasificarNivel(porcentaje)` para el nivel de cada canal).
+- Si un elemento no está cubierto por §7 ni por [contracts/pantallas.md](./contracts/pantallas.md), avisar antes de inventarlo (§7.1).
+
+## Phase 10: Setup del rediseño
+
+- [X] T066 Instalar las dependencias del sistema de diseño con `npm install lucide-react @fontsource/plus-jakarta-sans` (quedan en `dependencies` de `package.json` y fijadas en `package-lock.json`; ambas gratuitas, sin conexiones externas, R17)
+- [X] T067 [P] Crear `tailwind.config.js` en la raíz (`export default { theme: { extend: { … } } }`) con: `colors` exactamente iguales a §7.2 → `fondo: "#FFFFFF"`, `superficie: "#F2F5FA"`, `borde: "#E1E7F0"`, `pista: "#E9EEF5"`, `texto: "#0B1B33"`, `"texto-secundario": "#3A4A63"`, `"texto-suave": "#5B6B82"`, `primario: "#1D4ED8"`, `"primario-oscuro": "#1E3A8A"`, `peligro: "#B42318"`, `"peligro-suave": "#FDECEA"`, `advertencia: "#B45309"`, `"advertencia-texto": "#7A3E06"`, `"advertencia-suave": "#FCEBD3"`, `exito: "#15803D"`; `fontFamily.sans: ["\"Plus Jakarta Sans\"", "system-ui", "sans-serif"]`; `borderRadius: { boton: "12px", tarjeta: "16px", etiqueta: "6px" }`; `maxWidth.columna: "560px"`; `spacing.barra: "72px"`; `fontSize: { bienvenida: ["38px", { lineHeight: "1.15", letterSpacing: "-0.03em", fontWeight: "800" }], pantalla: ["28px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "800" }], riesgo: ["64px", { lineHeight: "1", letterSpacing: "-0.03em", fontWeight: "800" }] }`. Con comentario JSDoc que remita a la constitución §7 (R14)
+- [X] T068 Actualizar `src/index.css`: después de `@import "tailwindcss";` añadir `@config "../tailwind.config.js";`; borrar la pila de fuentes del sistema y el `body { background-color: #fff; }`; dejar en `@layer base` `body` con `@apply bg-fondo font-sans text-base leading-normal text-texto;` y `overflow-x: hidden`; cambiar `:focus-visible` a `outline: 3px solid var(--color-primario); outline-offset: 2px;` (comprobar el nombre de la variable que genera Tailwind; si no existe, usar `@apply outline-3 outline-primario outline-offset-2`). Mantener la regla `h1[tabindex="-1"]:focus { outline: none; }`. Depende de T067
+- [X] T069 [P] Importar la fuente empaquetada en `src/main.jsx`, antes de `./index.css`: `@fontsource/plus-jakarta-sans/latin-400.css`, `latin-500.css`, `latin-600.css`, `latin-700.css` y `latin-800.css` (solo subconjunto latino, R17; ninguna URL de Google Fonts en `index.html`). Depende de T066
+- [X] T070 [P] Añadir a `eslint.config.js` un bloque para `files: ["src/components/**/*.{js,jsx}", "src/pages/**/*.{js,jsx}"]` con la regla `no-restricted-syntax` que marque como error: (a) `Literal[value=/#[0-9a-fA-F]{3,8}\\b/]` y `TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}\\b/]` con mensaje "Usa un token de tailwind.config.js (constitución §7.2)"; (b) `Literal[value=/\\b(bg|text|border|fill|stroke|accent|divide|ring|outline)-(gray|slate|blue|red|amber|green)-\\d/]` y su equivalente `TemplateElement` con el mismo mensaje. `npm run lint` debe reportar los colores viejos (se corrigen en las fases siguientes)
+
+---
+
+## Phase 11: Foundational del rediseño (bloquea todas las historias)
+
+**⚠️ CRÍTICO**: estas piezas las usan todas las pantallas.
+
+- [X] T071 Añadir el campo `etiqueta` a cada objeto de `DIMENSIONES` en `src/logic/constantes.js`, sin tocar `id`, `nombre`, `desde` ni `hasta`: `phishing` → `"Correo (Phishing)"`, `smishing` → `"SMS y WhatsApp (Smishing)"`, `vishing` → `"Llamadas (Vishing)"`, `habitos` → `"Hábitos generales"` (data-model: "nombre visible en la interfaz: canal + término técnico, spec FR-008"). Actualizar el JSDoc de la constante
+- [X] T072 [P] Añadir en `tests/logic/contenido.test.js` una prueba "cada dimensión tiene su etiqueta visible" que compruebe las 4 etiquetas exactas de T071 en orden. `npm test` en verde
+- [X] T073 [P] Reescribir `src/components/botones.js` con tokens (§7.4, §7.5): `BASE` = `inline-flex items-center justify-center gap-2 rounded-boton px-4 font-bold disabled:cursor-not-allowed disabled:opacity-50`; `BOTON_PRINCIPAL` = `${BASE} h-14 w-full bg-primario text-white hover:bg-primario-oscuro active:bg-primario-oscuro`; `BOTON_SECUNDARIO` = `${BASE} h-14 w-full border border-primario bg-fondo text-primario`; `BOTON_EMERGENCIA` = `${BASE} h-[52px] w-full border-[1.5px] border-peligro bg-fondo text-peligro`; `BOTON_ENLACE` = `min-h-11 font-semibold text-primario underline underline-offset-2`. Renombrar `BOTON_ALERTA` → `BOTON_EMERGENCIA` y actualizar sus importaciones (`grep -rn BOTON_ALERTA src`). Actualizar el comentario de cabecera (ya no "tonos 700")
+- [X] T074 [P] Crear `src/components/estilos.js` con las clases compartidas (sin hex): `TARJETA` = `rounded-tarjeta border border-borde bg-fondo p-5`; `LISTA_TARJETAS` = `flex flex-col gap-3`; `CHIP` = `inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold`; `TITULO_PANTALLA` = `text-pantalla text-texto`; `TITULO_SECCION` = `text-lg font-extrabold text-texto`; `TEXTO_LECTURA` = `text-base leading-normal text-texto-secundario`; `ETIQUETA_SUAVE` = `text-xs font-semibold text-texto-suave`. Comentario de cabecera que remita a la constitución §7.3–§7.4
+- [X] T075 [P] Reescribir `src/components/Prioridad.jsx` (§7.5): `ESTILOS` = `Urgente: "bg-peligro text-white"`, `Importante: "bg-advertencia-suave text-advertencia-texto"`, `Revisa: "bg-pista text-texto-secundario"`; `<span className="inline-block rounded-etiqueta px-2 py-0.5 text-xs font-bold …">{prioridad}</span>`, sin borde. El texto sigue visible (no solo color, §7.7)
+- [X] T076 Reescribir `src/components/Semaforo.jsx` según R16 y §7.5, eliminando el anillo SVG y las formas: props `{ porcentaje, nivel, etiquetaAccesible, compacto = false }`; contenedor `role="img"` con `aria-label={etiquetaAccesible ?? \`Riesgo total ${porcentaje} %, nivel ${nivel}\`}`; porcentaje con clase `text-riesgo` (o `text-4xl font-extrabold` si `compacto`); chip `CHIP` con `"Riesgo " + nivel.toLowerCase()` e ícono 16px (Alto: `TriangleAlert`, fondo `peligro-suave`, texto `peligro`; Medio: `TriangleAlert`, `advertencia-suave` / `advertencia-texto`; Bajo: `ShieldCheck`, `bg-fondo border border-borde` / `exito`); barra `relative flex h-3 w-full` con 3 tramos de ancho `LIMITE_RIESGO_MEDIO %`, `(LIMITE_RIESGO_ALTO − LIMITE_RIESGO_MEDIO) %` y `(100 − LIMITE_RIESGO_ALTO) %` (importar de `constantes.js`, sin números mágicos) en `bg-exito`, `bg-advertencia`, `bg-peligro`, el del nivel con `opacity-100` y los demás `opacity-35`; marcador `absolute` de 4px × 20px `bg-texto rounded-full` con `style={{ left: \`${porcentaje}%\` }}` y `-translate-x-1/2`; debajo de cada tramo, en `ETIQUETA_SUAVE`, "Bajo 0–39 %", "Medio 40–69 %", "Alto 70 %+" (construidos con las constantes). Todo el interior con `aria-hidden="true"`. Depende de T074
+- [X] T077 [P] Crear `src/components/RiesgoPorCanal.jsx` (§7.5, R16): props `{ canales }` = arreglo `[{ id, etiqueta, porcentaje, nivel }]` ya calculado; `<ul>` con `LISTA_TARJETAS`; cada `<li>`: fila superior con ícono 20px (`phishing`: `Mail`, `smishing`: `MessageSquare`, `vishing`: `Phone`, `habitos`: `Lock`), la `etiqueta` en `font-semibold text-texto` y el porcentaje `font-bold` a la derecha; debajo, barra `h-2 rounded-full bg-pista` con relleno `rounded-full` de ancho `${porcentaje}%` en `bg-exito` / `bg-advertencia` / `bg-peligro` según `nivel`. La barra es decorativa (`aria-hidden`); el nombre y el porcentaje van en texto. Depende de T074
+- [X] T078 Rehacer el diseño general en `src/App.jsx` (§7.6, FR-036, FR-036d): constante `PANTALLAS_EN_SUPERFICIE = ["resultado", "plan", "tips", "emergencia"]`; envolver todo en `<div className={\`min-h-dvh ${PANTALLAS_EN_SUPERFICIE.includes(pantalla) ? "bg-superficie" : "bg-fondo"}\`}>`; `<main>` con `mx-auto w-full max-w-columna px-6 py-6 text-texto` y, si `mostrarBarra`, `pb-[calc(theme(spacing.barra)+24px)]` (o `pb-24` equivalente ≥ 96px); quitar `max-w-2xl`, `px-4`, `text-gray-900`. Emergencia usa `superficie` también sin diagnóstico
+- [X] T079 Reescribir `src/components/BarraNavegacion.jsx` (§7.5, FR-035): `SECCIONES` con íconos de `lucide-react` (`resultado`: `ShieldCheck`, `plan`: `ListChecks`, `tips`: `Lightbulb`, `emergencia`: `TriangleAlert`), eliminando los `path` SVG; `<nav aria-label="Secciones" className="fixed inset-x-0 bottom-0 h-barra border-t border-borde bg-fondo">`; `<ul className="mx-auto flex h-full max-w-columna">`; cada botón `min-h-11 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-xs`, ícono 24px `strokeWidth={2}`; color: `emergencia` siempre `text-peligro`, el resto `text-primario` si está activa y `text-texto-suave` si no; activa además `font-bold` y `aria-current="page"` (no solo color, FR-036a); inactiva `font-semibold`. Sin `border-t-4`
+
+**Checkpoint**: `npm test` en verde; la app arranca con la fuente nueva, la columna de 560px y los fondos por pantalla; `npm run lint` todavía puede señalar colores viejos en páginas y tarjetas.
+
+---
+
+## Phase 12: User Story 1 — Diagnóstico y resultado (Priority: P1) 🎯 MVP
+
+**Goal**: Inicio, encuesta y Resultado con el sistema de diseño (FR-001…FR-018, FR-036b).
+
+**Independent Test**: `quickstart.md` escenarios 1 y 10 (fuente, colores, fondo blanco en Inicio y preguntas, semáforo de barra con "52 %" → chip "Riesgo medio", 4 barras por canal con sus etiquetas).
+
+- [X] T080 [P] [US1] Rediseñar `src/pages/Inicio.jsx` (§7.3, §7.5, §7.9, contracts/pantallas.md "Inicio"): encabezado con `ShieldCheck` 24px `text-primario` y `<h1 tabIndex={-1} className="text-bienvenida text-texto">Escudo</h1>`; frase en `TEXTO_LECTURA`; garantías como `<ul>` con íconos 20px `text-primario` (`Lock` "Nunca te pedimos contraseñas", `User` "Respuestas anónimas", `Smartphone` "No accedemos a tu celular ni a tus cuentas") en lugar del SVG de check; bloque de consentimiento en `TARJETA` con la casilla `size-5 accent-primario` y el botón "Ver política" con `BOTON_ENLACE`; "Empezar diagnóstico" con `BOTON_PRINCIPAL`; "Tengo una emergencia ahora" con `BOTON_EMERGENCIA` y `<TriangleAlert size={20} strokeWidth={2} aria-hidden="true" />` antes del texto. Separación vertical `gap-6`. Textos exactos sin cambios
+- [X] T081 [P] [US1] Rediseñar `src/components/TarjetaPregunta.jsx`: cambiar la prop `nombreDimension` por `dimension` (`{ id, etiqueta }`); `<h1>` con `ETIQUETA_SUAVE` grande o `text-sm font-semibold text-texto-suave` para "Pregunta X de 14" (es el `<h1>` que recibe el foco; mantener `tabIndex={-1}`); `<progress>` con `h-2 w-full appearance-none rounded-full [&::-webkit-progress-bar]:bg-pista [&::-webkit-progress-value]:bg-primario [&::-moz-progress-bar]:bg-primario bg-pista`; línea de dimensión con su ícono 20px (`Mail`/`MessageSquare`/`Phone`/`Lock`, mismo mapa que T077) y `dimension.etiqueta` en `font-semibold text-primario`; `<legend>` en `text-pantalla` o `text-xl font-extrabold text-texto`; cada opción `<label>` como tarjeta `min-h-11 rounded-boton border border-texto-suave bg-fondo p-4 has-checked:border-2 has-checked:border-primario` con radio `size-5 accent-primario` (borde con contraste ≥ 3:1, R15)
+- [X] T082 [US1] Actualizar `src/pages/Diagnostico.jsx`: reemplazar `nombreDimension(id)` por una función que devuelva el objeto de `DIMENSIONES` (`{ id, etiqueta }`) y pasarlo como `dimension` a `TarjetaPregunta`; botones "Siguiente" con `BOTON_PRINCIPAL`, "Anterior" con `BOTON_SECUNDARIO` e ícono `ChevronLeft`, "Salir" con `BOTON_ENLACE` e ícono `X` (con texto visible "Salir"); quitar cualquier clase de paleta. Depende de T081
+- [X] T083 [P] [US1] Rediseñar `src/components/Dialogo.jsx`: panel `rounded-tarjeta border border-borde bg-fondo p-6 max-w-columna w-[calc(100%-48px)]`, `backdrop:bg-texto/50`, título `TITULO_SECCION`, botón de cierre solo-ícono `X` 24px con `aria-label="Cerrar"` y área ≥ 44×44 px; sin sombras
+- [X] T084 [US1] Rediseñar `src/pages/Resultado.jsx` (FR-015, FR-016, R16): borrar `LEYENDA` y su `<ul>`; `<h1>` con `TITULO_PANTALLA`; `<Semaforo>` dentro de una `TARJETA`; reemplazar la lista "Riesgo por dimensión" por `<RiesgoPorCanal canales={DIMENSIONES.map(({ id, etiqueta }) => ({ id, etiqueta, porcentaje: riesgoPorDimension[id], nivel: Diagnostico.clasificarNivel(riesgoPorDimension[id]) }))} />` bajo el título "Riesgo por canal" (`TITULO_SECCION`), importando la clase `Diagnostico` de `src/logic/Diagnostico.js`; cada hábito de "Dónde estás en riesgo" como `TARJETA` con "Pregunta N" en `ETIQUETA_SUAVE`, descripción en `font-semibold text-texto`, `<Prioridad>` y los puntos en `text-texto-secundario`; mensaje positivo con ícono `ShieldCheck` `text-exito`; "Ver mi plan de acción" con `BOTON_PRINCIPAL` y "Repetir diagnóstico" con `BOTON_SECUNDARIO`, apilados (`flex-col gap-3`). Depende de T076, T077
+- [ ] T085 [US1] Validar US1 con `quickstart.md` escenarios 1 y 10 (partes de Inicio, preguntas y Resultado) en 390px y 1440px; `npm test` y `npm run lint` sin errores en los archivos tocados
+
+**Checkpoint**: el MVP se ve con el sistema de diseño de punta a punta.
+
+---
+
+## Phase 13: User Story 2 — Emergencia (Priority: P1)
+
+**Goal**: Primeros auxilios con fondo `superficie`, íconos y botones del sistema (FR-030…FR-034).
+
+**Independent Test**: `quickstart.md` escenario 3 y la parte de Emergencia del escenario 10, sin diagnóstico (fondo `superficie`, sin barra).
+
+- [X] T086 [US2] Rediseñar `src/pages/Emergencia.jsx` (contracts/pantallas.md "Emergencia"): `<h1>` "Respira. Vamos paso a paso." con `TITULO_PANTALLA`; las 3 situaciones como botones-tarjeta (`TARJETA` + `w-full min-h-11 text-left flex items-center gap-3`) con íconos 24px `CreditCard` ("Bloquear mis tarjetas"), `MessageCircle` ("Reportar fraude en WhatsApp"), `Mail` ("Fui víctima de phishing") y `ChevronRight` al final; aviso "No borres nada" en `TARJETA` con ícono `FileText` `text-peligro`; "Llamar a la línea de mi banco" con `BOTON_PRINCIPAL` e ícono `Phone`; "Cómo denunciar en Colombia" con `BOTON_SECUNDARIO`; pasos de cada guía en `<ol>` numerada dentro de `TARJETA` con `TEXTO_LECTURA`; enlaces `tel:` con el número visible en `font-bold text-primario`; botón volver con `ChevronLeft`; "Volver al inicio" con `BOTON_SECUNDARIO`. Reemplazar los 6 colores de paleta y cualquier SVG a mano
+- [ ] T087 [US2] Validar US2 con `quickstart.md` escenario 3 (2 toques hasta la guía, SC-002) y comprobar fondo `superficie` y botón de emergencia de Inicio (borde rojo 1.5px, 52px)
+
+---
+
+## Phase 14: User Story 3 — Mi plan (Priority: P2)
+
+**Goal**: plan de acción con `Semaforo` compacto, etiquetas de prioridad y acordeones con íconos (FR-019…FR-024).
+
+**Independent Test**: `quickstart.md` escenario 4; la tarjeta resumen muestra porcentaje + chip + barra y el riesgo baja al marcar acciones.
+
+- [X] T088 [P] [US3] Rediseñar `src/components/TarjetaAccion.jsx`: tarjeta `TARJETA`; cabecera `<button aria-expanded aria-controls>` con título `font-bold text-texto`, `<Prioridad>`, "Baja N %" en `ETIQUETA_SUAVE` y `ChevronDown` 20px (rotado `rotate-180` cuando está abierta) en lugar del SVG; bloques "Qué hacer ahora" (ícono `Zap` `text-primario`) y "Cómo prevenirlo" (ícono `ShieldCheck`) con `TITULO_SECCION` pequeño y `TEXTO_LECTURA`; botón "Ya lo hice" con `BOTON_SECUNDARIO` y `aria-pressed`; cuando está hecha, ícono `ListChecks` o `ShieldCheck` y texto en `text-exito` (con el texto del estado visible, no solo color)
+- [X] T089 [US3] Rediseñar `src/pages/PlanAccion.jsx`: `<h1>` "Mi plan" con `TITULO_PANTALLA`; tarjeta resumen `TARJETA` con `<Semaforo compacto porcentaje={riesgo} nivel={nivel} etiquetaAccesible={…} />` y "X de N hechas" en `font-bold text-texto`; lista con `LISTA_TARJETAS`; mensaje positivo con `ShieldCheck` `text-exito` si N = 0. Depende de T076, T088
+- [ ] T090 [US3] Validar US3 con `quickstart.md` escenario 4 (marcar, desmarcar, recargar) en 390px
+
+---
+
+## Phase 15: User Story 4 — Tips (Priority: P3)
+
+**Goal**: Tips con Regla de oro destacada, filtros píldora e íconos por canal (FR-025…FR-029).
+
+**Independent Test**: `quickstart.md` escenario 5 (parte de Tips) y escenario 10.
+
+- [X] T091 [P] [US4] Rediseñar `src/components/TarjetaTip.jsx`: `TARJETA`; ícono de canal 20px (`SMS`: `MessageSquare`, `Llamada`: `Phone`, `Correo`: `Mail`, `WhatsApp`: `MessageCircle`) con "canal · tipo de ataque" en `ETIQUETA_SUAVE`; título `font-bold text-texto`; `ChevronDown` en lugar del SVG del acordeón; detalle en `TEXTO_LECTURA`
+- [X] T092 [US4] Rediseñar `src/pages/Tips.jsx`: `<h1>` con `TITULO_PANTALLA`; Regla de oro en `TARJETA` con borde izquierdo `border-l-4 border-l-primario` e ícono `Lightbulb` `text-primario`; filtros como `CHIP` dentro de botones `min-h-11` con `aria-pressed` (activo `bg-primario text-white`, inactivo `border border-borde bg-fondo text-texto-secundario`) — interpretación de §7 anotada en R18; lista con `LISTA_TARJETAS`; "¿Ya caíste en una? Ve a primeros auxilios" con `BOTON_EMERGENCIA` e ícono `TriangleAlert`. Depende de T091
+- [ ] T093 [US4] Validar US4 con `quickstart.md` escenario 5 (parte de Tips): Regla de oro, 8 tarjetas, cada filtro muestra 2
+
+---
+
+## Phase 16: User Story 5 — Navegación y avisos (Priority: P3)
+
+**Goal**: barra inferior y avisos globales con el sistema de diseño (FR-035, FR-040).
+
+**Independent Test**: `quickstart.md` escenarios 5 y 7, y la parte de barra del escenario 10.
+
+- [X] T094 [P] [US5] Rediseñar `src/components/AvisoAlmacenamiento.jsx`: `TARJETA` con `bg-advertencia-suave border-advertencia text-advertencia-texto`, ícono `TriangleAlert` 20px, texto en `font-semibold`, botón de cierre solo-ícono `X` con `aria-label="Cerrar aviso"` (área ≥ 44×44 px); se mantiene `role="status"`
+- [ ] T095 [US5] Validar US5 con `quickstart.md` escenario 5 (navegación y repetición) y escenario 10 (barra de 72px, activo en `primario`, Emergencia siempre en `peligro`, barra centrada en 560px a 1440px)
+
+---
+
+## Phase 17: Polish del rediseño
+
+- [X] T096 [P] Revisar con `grep -rnE "#[0-9a-fA-F]{3,6}\b|(bg|text|border|fill|accent|divide)-(gray|slate|blue|red|amber|green)-[0-9]|<svg" src/components src/pages src/App.jsx` que no quede ningún color suelto ni SVG a mano; `npm run lint` sin errores (incluida la regla de T070)
+- [ ] T097 [P] Pasada de accesibilidad del rediseño (FR-036a, §7.7, R15): solo las combinaciones de contraste de R15; foco visible `primario` en todos los controles; áreas táctiles ≥ 44×44 px; botones solo-ícono con `aria-label`; Lighthouse Accessibility = 100 y axe sin incumplimientos en las 6 pantallas (`quickstart.md` escenario 9)
+- [X] T098 Ejecutar `npm run build` y comprobar en `dist/` que los `.woff2` de Plus Jakarta Sans se sirven desde el propio origen, que la meta CSP sigue presente y que JS + CSS quedan por debajo de 150 KB gzip; con `npm run preview`, `quickstart.md` escenario 8 sin peticiones a `fonts.googleapis.com` ni `fonts.gstatic.com` (SC-004)
+- [ ] T099 Recorrer `quickstart.md` escenario 10 completo y el escenario 9 (360, 768, 1024 y 1440px), y ejecutar `npm run lint`, `npm run format:check` y `npm test` en verde
+
+---
+
+## Dependencias del rediseño
+
+- **Phase 10 (Setup)**: T066 → T069; T067 → T068. T070 es independiente.
+- **Phase 11 (Foundational)**: depende de Phase 10. T071 → T072. T074 → T076, T077. T073, T074, T075 en paralelo. T078 y T079 después de T067/T068.
+- **Phase 12 (US1)**: depende de Phase 11. T081 → T082. T076 + T077 → T084.
+- **Phase 13 (US2)**, **Phase 14 (US3)**, **Phase 15 (US4)**, **Phase 16 (US5)**: dependen solo de Phase 11; se pueden hacer en paralelo con US1 (archivos distintos). En US3: T088 → T089. En US4: T091 → T092.
+- **Phase 17 (Polish)**: al final.
+
+### Ejemplo en paralelo (tras Phase 11)
+
+```text
+T080 [US1] src/pages/Inicio.jsx
+T081 [US1] src/components/TarjetaPregunta.jsx
+T083 [US1] src/components/Dialogo.jsx
+T088 [US3] src/components/TarjetaAccion.jsx
+T091 [US4] src/components/TarjetaTip.jsx
+T094 [US5] src/components/AvisoAlmacenamiento.jsx
+```
+
+### Estrategia
+
+1. **MVP del rediseño**: Phases 10 + 11 + 12 (US1). Validar con los escenarios 1 y 10 y hacer commit.
+2. Luego US2 (Emergencia, también P1), US3, US4 y US5, cada una validada por separado.
+3. Polish al final. Hacer commit tras cada fase con `npm test` y `npm run lint` en verde.
+
+---
+
+## Phase 18: Convergence
+
+- [X] T100 Añadir en `src/components/BarraNavegacion.jsx` un indicador de forma para la sección activa además del color y el peso (por ejemplo, una barra superior de 3px en el color de la sección o una píldora `bg-superficie` detrás del ícono), de modo que Emergencia activa se distinga de Emergencia inactiva sin depender del color per FR-036a, US5/AC1 (partial)
+- [X] T101 Limitar el `<nav>` de `src/components/BarraNavegacion.jsx` a la columna centrada (`mx-auto max-w-columna`, con borde superior `borde` y, en pantallas mayores a 560px, bordes laterales) para que la barra no se estire a todo el ancho del monitor per contracts/pantallas.md "Diseño adaptable", Constitution §7.6 (partial)
+- [X] T102 Incluir los rangos del semáforo en el nombre accesible de `src/components/Semaforo.jsx` (por ejemplo, "Riesgo total 54 %, nivel Medio. Rangos: Bajo 0–39 %, Medio 40–69 %, Alto 70 % o más"), construidos con `LIMITE_RIESGO_MEDIO` y `LIMITE_RIESGO_ALTO`, para que el lector de pantalla también los anuncie per FR-015, FR-036a (partial)
+- [X] T103 Documentar `src/components/iconosDimension.js` (mapa de íconos por dimensión, §7.9) y `src/components/TextoContenido.jsx` (texto o lista del contenido) en la estructura de `specs/001-escudo-web-app/plan.md`, justificándolos por evitar duplicación (principio V) per plan: Project Structure (unrequested)
+
+---
+
+# Rediseño de Inicio 2026-10-16 — Pantalla de bienvenida
+
+**Input**: spec FR-001, FR-002 y escenario 1 de la US1 (Clarifications 2026-10-16: referencia de Inicio, textos de garantías, "Ver política" y relleno de las tarjetas), constitución §7.3–§7.9, [contracts/pantallas.md](./contracts/pantallas.md) "Inicio".
+
+**Alcance**: solo la capa visual de Inicio. **No cambian** la lógica del consentimiento (`consentimiento`, `onCambiarConsentimiento`, casilla siempre desmarcada al entrar, `disabled` de "Empezar diagnóstico"), la navegación (`onEmpezar`, `onEmergencia`, guardas de `App.jsx`) ni el diálogo de la política (`Dialogo` + `POLITICA_PRIVACIDAD`). Ningún archivo de `src/data/` cambia: los textos de Inicio son textos de la UI fijados por la spec y viven en `src/pages/Inicio.jsx` (no existen en `src/data/`). No hay pruebas automáticas de UI (R11); se valida con `quickstart.md` y con `npm test` / `npm run lint`.
+
+**Reglas extra**: las mismas del rediseño anterior (solo tokens de `tailwind.config.js`, nada de hex ni clases de paleta, íconos de `lucide-react` con `strokeWidth={2}` y `aria-hidden="true"`). Los tamaños sin token (13px, 17px, 22px, 36px, 10px) se escriben como valores arbitrarios de Tailwind (`text-[13px]`, `rounded-[10px]`…), nunca como `style`. El mockup `docs/diseno/01-inicio.png` no existe: la referencia es la estructura de FR-001/FR-002; si el PNG se agrega después, manda (§7.1).
+
+## Phase 19: User Story 1 — Rediseño de la pantalla de Inicio (Priority: P1)
+
+**Goal**: Inicio muestra, de arriba a abajo, encabezado (logo + "Escudo" + chip "Gratis · 5 min"), etiqueta "DIAGNÓSTICO DE SEGURIDAD DIGITAL", título "¿Qué tan fácil sería estafarte?", párrafo, tres tarjetas de garantías en una fila, espacio flexible, consentimiento en tarjeta, botón primario, botón de emergencia y pie "Basado en NIST CSF 2.0 y CIS Controls v8.1".
+
+**Independent Test**: `quickstart.md` escenario 1 (parte de Inicio) en 390px y 1440px: orden y textos exactos de FR-001; "Empezar diagnóstico" deshabilitado hasta marcar la casilla; tocar "Ver política" abre el diálogo y **no** cambia la casilla; al cerrarlo, la casilla conserva su estado; "Tengo una emergencia ahora" lleva a Emergencia sin consentimiento; sin desplazamiento horizontal.
+
+- [X] T104 [US1] Hacer que la columna ocupe todo el alto de la pantalla en `src/App.jsx`, sin tocar `resolverPantalla`, la navegación ni las props: el contenedor externo pasa de `min-h-dvh ${fondo}` a `flex min-h-dvh flex-col ${fondo}` y el `<main>` añade `flex-1` a sus clases actuales (`mx-auto flex w-full max-w-columna flex-col gap-4 px-6 py-6 text-texto …`). Así el espacio flexible de Inicio (T105) puede empujar el consentimiento y los botones hacia abajo. Comprobar que las demás pantallas se ven igual que antes
+- [X] T105 [US1] Reestructurar la raíz y la cabecera de `src/pages/Inicio.jsx` (FR-001, §7.3, §7.9): la raíz pasa a `<div className="flex flex-1 flex-col gap-6">`. (1) Encabezado `<header className="flex items-center justify-between">`: a la izquierda `<div className="flex items-center gap-2.5">` con un cuadro `<span className="flex size-9 items-center justify-center rounded-[10px] bg-primario">` que contiene `<ShieldCheck size={20} strokeWidth={2} aria-hidden="true" className="text-white" />` y el texto `<span className="text-xl font-extrabold text-texto">Escudo</span>` (ya **no** es el `<h1>`); a la derecha el chip `<span className="rounded-full bg-pista px-3 py-1 text-xs font-semibold text-texto-secundario">Gratis · 5 min</span>`. (2) Bloque de presentación `<div className="flex flex-col gap-3">` con: la etiqueta `<p className="text-[13px] font-bold uppercase tracking-[0.08em] text-primario">Diagnóstico de seguridad digital</p>` (mayúsculas por CSS para que el lector de pantalla no deletree); el título `<h1 tabIndex={-1} className="text-bienvenida text-texto">¿Qué tan fácil sería estafarte?</h1>` (conserva `tabIndex={-1}`, es el elemento que recibe el foco al navegar); y el párrafo `<p className="text-[17px] leading-normal text-texto-secundario">Responde 14 preguntas sobre tus hábitos y te mostramos tu nivel de riesgo y qué corregir primero.</p>`. Quitar la importación de `TEXTO_LECTURA` si queda sin uso
+- [X] T106 [US1] Reemplazar la lista de garantías de `src/pages/Inicio.jsx` por tres tarjetas en una fila (FR-001, Clarifications 2026-10-16): `GARANTIAS` = `[{ texto: "Nunca pedimos contraseñas", Icono: Lock }, { texto: "Respuestas anónimas", Icono: User }, { texto: "No entramos a tu celular", Icono: Smartphone }]`; `<ul className="grid grid-cols-3 gap-2.5">`, cada `<li className="flex flex-col gap-2 rounded-tarjeta border border-borde bg-superficie p-3">` con `<Icono size={22} strokeWidth={2} aria-hidden="true" className="text-primario" />` arriba y `<span className="text-[13px] font-semibold leading-snug text-texto">{texto}</span>` abajo. Esquinas 16px y borde 1px `borde` según §7.4; relleno 12px (excepción aprobada a §7.4). **No** usar `break-all`, `break-words` ni `hyphens-auto`: las palabras no se parten. Mantener 3 columnas también en celular. Depende de T105 (mismo archivo)
+- [X] T107 [US1] Añadir el espacio flexible y rehacer el consentimiento en `src/pages/Inicio.jsx` (FR-002, Clarifications 2026-10-16), sin cambiar su lógica: después de las tarjetas, `<div className="flex-1" aria-hidden="true" />`; luego un `<div className="flex flex-col gap-3">` con: (a) la tarjeta `<div className="rounded-tarjeta border border-borde bg-superficie p-5">` que contiene `<div className="flex items-start gap-3">` con la tarjeta `relative` y un `<p className="pl-8 text-sm text-texto">` que contiene `<label className="-my-3 cursor-pointer py-3">` con la casilla `<input type="checkbox" checked={consentimiento} onChange={(evento) => onCambiarConsentimiento(evento.target.checked)} className="absolute top-5 left-5 size-5 accent-primario" />` y el texto "Acepto el tratamiento de mis respuestas según la Ley 1581 de 2012.", seguido de `{" "}<button type="button" className="-my-3 inline-block py-3 font-semibold text-primario underline underline-offset-2" onClick={() => setPoliticaAbierta(true)}>Ver política</button>` (una etiqueta vacía alrededor de la casilla incumple `jsx-a11y/label-has-associated-control`; por eso la casilla va dentro de la etiqueta del texto). El botón queda **fuera** del `<label>` (abrirlo no marca ni desmarca la casilla) y su área táctil llega a 44px de alto sin separar las líneas (§7.7); (b) "Empezar diagnóstico" con `BOTON_PRINCIPAL`, `disabled={!consentimiento}` y `onClick={onEmpezar}` como hoy; (c) "Tengo una emergencia ahora" con `BOTON_EMERGENCIA`, `<TriangleAlert size={20} strokeWidth={2} aria-hidden="true" />` y `onClick={onEmergencia}` como hoy. Quitar las importaciones de `TARJETA` y `BOTON_ENLACE` si quedan sin uso. El `<Dialogo>` de la política no cambia. Depende de T106 (mismo archivo)
+- [X] T108 [US1] Añadir el pie al final de `src/pages/Inicio.jsx`, después de los botones y antes del `<Dialogo>`: `<footer className="text-center text-xs text-texto-suave">Basado en NIST CSF 2.0 y CIS Controls v8.1</footer>` (texto respaldado por la constitución, línea 22). Depende de T107 (mismo archivo)
+- [X] T109 [P] [US1] Actualizar la sección "Inicio" de `specs/001-escudo-web-app/contracts/pantallas.md` para que coincida con FR-001/FR-002: encabezado (cuadro 36px `primario` con ShieldCheck blanco + "Escudo" 20px/800 + chip "Gratis · 5 min" en `pista`), etiqueta "DIAGNÓSTICO DE SEGURIDAD DIGITAL", `<h1>` "¿Qué tan fácil sería estafarte?" (38px/800), párrafo, tres tarjetas de garantías en una fila con los textos nuevos ("Nunca pedimos contraseñas", "Respuestas anónimas", "No entramos a tu celular"; relleno 12px), espacio flexible, consentimiento en tarjeta con "Ver política" fuera del `<label>`, botones y pie "Basado en NIST CSF 2.0 y CIS Controls v8.1". Quitar los textos viejos ("Nunca te pedimos contraseñas", "No accedemos a tu celular ni a tus cuentas", `<h1>` "Escudo")
+- [ ] T110 [US1] Validar Inicio con `quickstart.md` escenario 1 en 390px, 360px y 1440px: orden y textos exactos; foco de teclado visible en la casilla, "Ver política" y los dos botones; tocar "Ver política" no cambia la casilla; columna centrada de 560px en computador; fondo `fondo`; sin desplazamiento horizontal. Si en 360px "contraseñas" no cabe en su tarjeta, **detenerse y avisar al equipo** (no partir la palabra ni cambiar el relleno por cuenta propia). Ejecutar `npm test`, `npm run lint` y `npm run format:check` en verde, y confirmar con `grep -nE "#[0-9a-fA-F]{3,6}\b" src/pages/Inicio.jsx src/App.jsx` que no hay hexadecimales. Depende de T104–T108
+
+**Checkpoint**: Inicio se ve con el diseño nuevo; consentimiento, "Empezar diagnóstico", "Ver política" y "Tengo una emergencia ahora" se comportan igual que antes.
+
+### Dependencias de la Phase 19
+
+- T104 (`App.jsx`) es independiente de T105–T108 y se puede hacer en paralelo con ellas, pero el espacio flexible solo se nota cuando ambas están hechas.
+- T105 → T106 → T107 → T108: mismo archivo (`src/pages/Inicio.jsx`), en orden.
+- T109 (documentación) es [P]: archivo distinto, sin dependencias.
+- T110 al final.
+
+```text
+En paralelo: T104 (src/App.jsx) · T105…T108 (src/pages/Inicio.jsx) · T109 (contracts/pantallas.md)
+```
+
+**Estrategia**: es un incremento pequeño de la US1 (MVP). Hacer T104–T108, validar con T110 y hacer commit solo cuando el equipo lo pida.
+
+---
+
+## Phase 20: Convergence
+
+- [X] T111 Eliminar la zona muerta entre la casilla de consentimiento y su texto en `src/pages/Inicio.jsx`: hoy la casilla (`absolute top-5 left-5 size-5`) solo mide 20×20 px y entre ella y el texto hay ~12 px que no responden al toque, de modo que el control no alcanza el área táctil de 44×44 px que exigen §7.7 y FR-036a (y que ya afirma `contracts/pantallas.md` "Inicio"). Añadir al `<label>` inline `-ml-8 pl-8` (además de `-my-3 py-3`) para que su caja en la primera línea empiece en la casilla y cubra casilla + hueco + texto con ≥ 44 px de alto, sin mover el texto ni sacar "Ver política" del `<p>`; comprobar con capturas en 360 y 390px que el diseño no cambia y que tocar "Ver política" sigue sin cambiar la casilla per FR-036a, Constitution §7.7 (partial) — Hecho con `-ml-8 pl-8 py-[13px]` (el `py-3` daba 42px de alto; `-my-3` no tiene efecto en un elemento inline y se quitó). Medido en 360 y 390px: etiqueta y "Ver política" de 44px; casilla, hueco y zona superior responden; "Ver política" abre el diálogo sin cambiar la casilla

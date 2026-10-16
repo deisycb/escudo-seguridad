@@ -24,8 +24,27 @@ export default [
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.configs.recommended.rules,
-      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      // Componentes en PascalCase usados solo en JSX (también los desestructurados, como `Icono`).
+      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]", argsIgnorePattern: "^[A-Z_]" }],
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+    },
+  },
+  {
+    // Constitución §7.2: los colores solo salen de los tokens de tailwind.config.js.
+    files: ["src/components/**/*.{js,jsx}", "src/pages/**/*.{js,jsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        ...[
+          "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+          "TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}\\b/]",
+          "Literal[value=/\\b(bg|text|border|fill|stroke|accent|divide|ring|outline)-(gray|slate|blue|red|amber|green)-\\d/]",
+          "TemplateElement[value.raw=/\\b(bg|text|border|fill|stroke|accent|divide|ring|outline)-(gray|slate|blue|red|amber|green)-\\d/]",
+        ].map((selector) => ({
+          selector,
+          message: "Usa un token de tailwind.config.js (constitución §7.2).",
+        })),
+      ],
     },
   },
   {

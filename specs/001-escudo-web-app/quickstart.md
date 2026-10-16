@@ -65,7 +65,7 @@ El escenario 8 se hace sobre `npm run preview`, porque ahí está activa la CSP;
 
 ### 8. Privacidad de red (SC-004, FR-038)
 - En `npm run preview`, abre DevTools → Network, marca "Preserve log" y recorre todos los escenarios 1, 3, 4 y 5.
-- **Esperado**: solo hay peticiones a `localhost:4173` por archivos estáticos (HTML, JS, CSS, íconos). No hay ninguna petición con respuestas, resultados o progreso, ni ningún dominio externo.
+- **Esperado**: solo hay peticiones a `localhost:4173` por archivos estáticos (HTML, JS, CSS, fuentes `.woff2` de Plus Jakarta Sans). Ninguna a `fonts.googleapis.com` ni `fonts.gstatic.com`. No hay ninguna petición con respuestas, resultados o progreso, ni ningún dominio externo.
 - En la consola, `fetch('https://example.com')` debe quedar bloqueado por la CSP.
 
 ### 9. Diseño adaptable y accesibilidad (SC-006, SC-006a, FR-036a)
@@ -73,6 +73,17 @@ El escenario 8 se hace sobre `npm run preview`, porque ahí está activa la CSP;
 - Recorre toda la app **solo con teclado** (Tab, Shift+Tab, Espacio, Enter, flechas en los radios, Esc en los diálogos). El foco siempre es visible y al cambiar de pantalla pasa al título.
 - Con el lector de pantalla: el semáforo se anuncia como "Riesgo total N %, nivel X"; la prioridad y la sección activa se anuncian como texto.
 - Lighthouse → Accessibility = 100, y axe DevTools sin incumplimientos, en cada pantalla.
+
+### 10. Sistema de diseño (constitución §7, FR-036b–FR-036d)
+Compara cada pantalla con la tabla "Sistema de diseño" de [contracts/pantallas.md](./contracts/pantallas.md):
+- **Fuente**: DevTools → Elements → Computed → `font-family` renderiza "Plus Jakarta Sans".
+- **Colores**: `grep -rnE "#[0-9a-fA-F]{3,6}" src/components src/pages` no devuelve nada; los colores solo vienen de `tailwind.config.js`.
+- **Fondos**: Inicio y preguntas en blanco; Resultado, Mi plan, Tips y Emergencia en `superficie` (#F2F5FA).
+- **Semáforo**: con un riesgo de 52 % se ve "52 %", el chip "Riesgo medio", la barra 40/30/30 con el tramo Medio pleno, el marcador a la mitad del tramo Medio y las etiquetas "Bajo 0–39 %", "Medio 40–69 %", "Alto 70 %+". No hay anillo circular.
+- **Dimensiones**: la pregunta 6 muestra "SMS y WhatsApp (Smishing)"; Resultado muestra 4 barras con "Correo (Phishing)", "SMS y WhatsApp (Smishing)", "Llamadas (Vishing)", "Hábitos generales".
+- **Barra inferior**: 72px; ítem activo azul; Emergencia en rojo aunque no esté activa.
+- **Columna**: a 1440px el contenido y la barra miden como máximo 560px y quedan centrados.
+- **Botones**: primario de 56px y emergencia de 52px con borde rojo; sin sombras ni degradados; sin emojis.
 
 ## Criterio de aceptación global
 

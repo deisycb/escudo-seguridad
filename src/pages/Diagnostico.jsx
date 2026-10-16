@@ -1,11 +1,12 @@
+import { ChevronLeft, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Dialogo from "../components/Dialogo.jsx";
 import TarjetaPregunta from "../components/TarjetaPregunta.jsx";
-import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
+import { BOTON_ENLACE, BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
 import { DIMENSIONES, TOTAL_PREGUNTAS } from "../logic/constantes.js";
 
-function nombreDimension(id) {
-  return DIMENSIONES.find((dimension) => dimension.id === id)?.nombre;
+function buscarDimension(id) {
+  return DIMENSIONES.find((dimension) => dimension.id === id);
 }
 
 export default function Diagnostico({
@@ -53,24 +54,26 @@ export default function Diagnostico({
       <TarjetaPregunta
         pregunta={pregunta}
         numero={numero}
-        nombreDimension={nombreDimension(pregunta.dimension)}
+        dimension={buscarDimension(pregunta.dimension)}
         respuesta={respuesta}
         onResponder={responder}
       />
-      <div className="flex flex-wrap gap-3">
-        {numero > 1 && (
-          <button type="button" className={BOTON_SECUNDARIO} onClick={() => history.back()}>
-            Anterior
-          </button>
-        )}
+      <div className="flex flex-col gap-3">
         <button type="button" className={BOTON_PRINCIPAL} disabled={!respuesta} onClick={siguiente}>
           Siguiente
         </button>
+        {numero > 1 && (
+          <button type="button" className={BOTON_SECUNDARIO} onClick={() => history.back()}>
+            <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
+            Anterior
+          </button>
+        )}
         <button
           type="button"
-          className={`${BOTON_SECUNDARIO} ml-auto`}
+          className={`${BOTON_ENLACE} self-center`}
           onClick={() => setConfirmarSalida(true)}
         >
+          <X size={20} strokeWidth={2} aria-hidden="true" />
           Salir
         </button>
       </div>

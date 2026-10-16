@@ -1,21 +1,15 @@
 <!--
 Sync Impact Report
-- Cambio de versión: plantilla (sin versión) → 1.0.0 (adopción inicial)
-- Fuente: constitucion.md (raíz del proyecto), adaptado a la estructura de la plantilla Spec Kit
-- Principios definidos:
-  - [PRINCIPLE_1_NAME] → I. Privacidad Ante Todo (NO NEGOCIABLE)
-  - [PRINCIPLE_2_NAME] → II. Consentimiento y Cumplimiento Legal
-  - [PRINCIPLE_3_NAME] → III. Contenido Fijo y Cálculo de Riesgo Determinista
-  - [PRINCIPLE_4_NAME] → IV. Simplicidad: Solo Navegador, Sin Código Sombra
-  - [PRINCIPLE_5_NAME] → V. Código Limpio y Verificado
-  - Añadido: VI. Lenguaje Sencillo y Ayuda Siempre Disponible
-- Secciones añadidas: Stack Tecnológico y Restricciones; Estructura de Código y Flujo de Trabajo
+- Cambio de versión: 1.0.0 → 1.1.0 (MINOR: se añade una sección nueva; nada se elimina ni redefine)
+- Principios modificados: ninguno
+- Secciones añadidas: 7. Sistema de Diseño (Reglas de UI)
 - Secciones eliminadas: ninguna
-- Ajustes respecto a constitucion.md:
-  - Sección 5 (Manejo de Errores) contenía texto de otro proyecto ("La cancha ya fue reservada",
-    códigos HTTP de backend) y caracteres mal codificados. Se reemplazó por reglas coherentes con
-    una app sin backend. Revisar y confirmar.
-- TODOs diferidos: ninguno
+- Historial:
+  - 1.1.0 (2026-10-16): se cambió el sistema de diseño a "Confianza institucional" (paleta,
+    tipografía, formas, componentes base, responsive, accesibilidad, tono visual e íconos).
+    Sección añadida también en constitucion.md (raíz).
+  - 1.0.0 (2026-10-15): adopción inicial a partir de constitucion.md.
+- TODOs diferidos: ninguno. Nota: los mockups de /docs/diseno/ aún no existen en el repositorio.
 -->
 
 # Escudo — Web App de Seguridad Digital para Personas Naturales Constitution
@@ -151,6 +145,99 @@ componentes y sus archivos; `MAYUSCULAS_CON_GUION` para constantes.
 - **Explicaciones claras:** al terminar cada tarea, explicar en lenguaje sencillo qué archivos
   cambiaron y por qué, pensando en un desarrollador principiante.
 
+## 7. Sistema de Diseño (Reglas de UI)
+
+**Estilo:** "Confianza institucional". Limpio, sobrio y claro, como una app bancaria seria. Transmite seguridad sin asustar.
+
+### 7.1 Fuente de la verdad
+- Los mockups de `/docs/diseno/` mandan sobre cualquier interpretación. Si el código y el mockup no coinciden, se corrige el código.
+- Si una pantalla no tiene mockup, se construye con estas reglas y se avisa antes de inventar elementos nuevos.
+
+### 7.2 Paleta de colores (valores exactos)
+Todos los colores se definen como tokens en `tailwind.config.js`. Prohibido escribir códigos hexadecimales sueltos en los componentes.
+
+| Token | Hex | Uso |
+|---|---|---|
+| `fondo` | #FFFFFF | Fondo de pantallas de inicio y formularios |
+| `superficie` | #F2F5FA | Fondo de pantallas de resultado, tarjetas informativas |
+| `borde` | #E1E7F0 | Bordes de tarjetas y separadores |
+| `pista` | #E9EEF5 | Fondo de barras de progreso, chip "Revisa" |
+| `texto` | #0B1B33 | Títulos y texto principal |
+| `texto-secundario` | #3A4A63 | Párrafos y descripciones |
+| `texto-suave` | #5B6B82 | Etiquetas, leyendas, íconos inactivos |
+| `primario` | #1D4ED8 | Botón principal, enlaces, ítem activo de navegación |
+| `primario-oscuro` | #1E3A8A | Hover y estado presionado del primario |
+| `peligro` | #B42318 | Riesgo alto, prioridad Urgente, emergencia |
+| `peligro-suave` | #FDECEA | Fondo del chip "Riesgo alto" |
+| `advertencia` | #B45309 | Riesgo medio en barras y gráficos |
+| `advertencia-texto` | #7A3E06 | Texto del chip "Importante" |
+| `advertencia-suave` | #FCEBD3 | Fondo del chip "Importante" |
+| `exito` | #15803D | Riesgo bajo, acciones completadas |
+
+### 7.3 Tipografía
+- Fuente única: **Plus Jakarta Sans** (Google Fonts), pesos 400, 500, 600, 700 y 800.
+- Escala:
+  - Título de bienvenida: 38px, peso 800
+  - Título de pantalla: 28px, peso 800
+  - Porcentaje de riesgo: 64px, peso 800
+  - Título de sección: 16–18px, peso 700–800
+  - Texto de lectura: mínimo 16px, peso 400–500, interlineado 1.5
+  - Etiquetas, chips y leyendas: mínimo 12px, peso 600–700
+- Los títulos grandes llevan espaciado de letras ligeramente negativo (−0.02em a −0.03em).
+
+### 7.4 Formas y espaciado
+- Bordes redondeados: botones y campos 12px; tarjetas 16px; chips de estado 999px (píldora); etiquetas de prioridad 6px.
+- Márgenes laterales de pantalla: 24px.
+- Separación entre tarjetas: 10–14px. Relleno interno de tarjetas: 20–22px.
+- Tarjetas con borde de 1px color `borde`. Sin sombras ni degradados.
+
+### 7.5 Componentes base
+- **Botón primario:** fondo `primario`, texto blanco, 56px de alto, ancho completo, peso 700.
+- **Botón de emergencia:** fondo blanco, borde 1.5px `peligro`, texto `peligro`, ícono TriangleAlert, 52px de alto. Visible en la pantalla de inicio.
+- **Semáforo de riesgo:** porcentaje grande + chip con el nivel en texto ("Riesgo alto") + barra segmentada 40/30/30 (Bajo / Medio / Alto) con un marcador oscuro en la posición del puntaje. El tramo activo va en color pleno y los demás al 35 % de opacidad.
+- **Riesgo por canal:** lista de barras de progreso, una por dimensión (Correo, SMS y WhatsApp, Llamadas, Hábitos), con nombre y porcentaje encima.
+- **Etiquetas de prioridad:**
+  - Urgente: fondo `peligro`, texto blanco
+  - Importante: fondo `advertencia-suave`, texto `advertencia-texto`
+  - Revisa: fondo `pista`, texto `texto-secundario`
+- **Barra de navegación inferior:** 72px de alto, fondo blanco, borde superior `borde`, 4 secciones (Resultado, Mi plan, Tips, Emergencia). El ítem activo va en `primario`. "Emergencia" va siempre en `peligro`, esté activa o no.
+
+### 7.6 Diseño responsive
+- Mobile-first: se diseña primero para 390px de ancho.
+- En pantallas grandes el contenido se centra en una columna de máximo 560px. No se estiran tarjetas ni botones a todo el ancho del monitor.
+- Solo tema claro en esta versión.
+
+### 7.7 Accesibilidad (obligatorio)
+- El color nunca es la única señal: todo nivel de riesgo y prioridad lleva su texto ("Riesgo alto", "Urgente").
+- Contraste mínimo 4.5:1 para texto normal y 3:1 para texto de 24px o más.
+- Áreas táctiles de mínimo 44×44px.
+- Elementos interactivos reales: `<button>`, `<a>`, `<input>` con `<label>`. Nunca `onClick` sobre un `<div>`.
+- Botones que solo tienen ícono llevan `aria-label`.
+
+### 7.8 Tono visual y de contenido
+- Calmado y directo. Se informa el riesgo sin dramatizar.
+- Sin emojis, ilustraciones infantiles ni imágenes de hackers encapuchados.
+
+### 7.9 Íconos
+- Solo **lucide-react**. Tamaño 20–24px (16px dentro de chips), `strokeWidth` 2.
+- Mapa de uso:
+  - ShieldCheck: logo, sección Resultado
+  - Lock: privacidad, contraseñas, hábitos
+  - User: anonimato
+  - Smartphone: no acceso al celular
+  - TriangleAlert: emergencia, riesgo alto
+  - Mail: correo (phishing)
+  - MessageSquare: SMS (smishing)
+  - MessageCircle: WhatsApp
+  - Phone: llamadas (vishing)
+  - ListChecks: Mi plan
+  - Lightbulb: Tips
+  - Zap: "Qué hacer ahora"
+  - CreditCard: bloquear tarjetas
+  - FileText: guardar evidencias
+  - X: cerrar
+  - ChevronLeft / ChevronRight / ChevronDown: navegación y acordeones
+
 ## Governance
 
 - Esta constitución prevalece sobre cualquier otra práctica o instrucción del proyecto.
@@ -162,4 +249,4 @@ componentes y sus archivos; `MAYUSCULAS_CON_GUION` para constantes.
   DEBE verificar los principios I (privacidad) y III (contenido y cálculo). Toda complejidad
   adicional DEBE justificarse por escrito.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-15
+**Version**: 1.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-16

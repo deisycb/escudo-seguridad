@@ -20,7 +20,7 @@ Las reglas de negocio viven en clases de `/src/logic`. Su API pública está en 
 | `LIMITE_RIESGO_MEDIO` | `40` | Semáforo: Medio desde 40 % |
 | `LIMITE_RIESGO_ALTO` | `70` | Semáforo: Alto desde 70 % |
 | `NIVELES_SEMAFORO` | `{ BAJO: "Bajo", MEDIO: "Medio", ALTO: "Alto" }` | FR-014 |
-| `DIMENSIONES` | `[{ id: "phishing", nombre: "Phishing", desde: 1, hasta: 4 }, { id: "smishing", nombre: "Smishing", desde: 5, hasta: 8 }, { id: "vishing", nombre: "Vishing", desde: 9, hasta: 12 }, { id: "habitos", nombre: "Hábitos generales", desde: 13, hasta: 14 }]` | FR-008 |
+| `DIMENSIONES` | `[{ id: "phishing", nombre: "Phishing", etiqueta: "Correo (Phishing)", desde: 1, hasta: 4 }, { id: "smishing", nombre: "Smishing", etiqueta: "SMS y WhatsApp (Smishing)", desde: 5, hasta: 8 }, { id: "vishing", nombre: "Vishing", etiqueta: "Llamadas (Vishing)", desde: 9, hasta: 12 }, { id: "habitos", nombre: "Hábitos generales", etiqueta: "Hábitos generales", desde: 13, hasta: 14 }]` | FR-008 |
 | `PRIORIDADES` | `{ urgente: { etiqueta: "Urgente", orden: 3 }, importante: { etiqueta: "Importante", orden: 2 }, revisa: { etiqueta: "Revisa", orden: 1 } }` | FR-016, FR-017 |
 | `CLAVE_ALMACENAMIENTO` | `"escudo.v1"` | R2 |
 | `VERSION_ALMACENAMIENTO` | `1` | R2 |
@@ -28,7 +28,7 @@ Las reglas de negocio viven en clases de `/src/logic`. Su API pública está en 
 ## Entidades de contenido (solo lectura)
 
 ### Dimensión
-- `id`, `nombre`, `desde`, `hasta` (rango inclusivo de números de pregunta). Se definen en `DIMENSIONES`.
+- `id`, `nombre`, `etiqueta` (nombre visible en la interfaz: canal + término técnico, spec FR-008), `desde`, `hasta` (rango inclusivo de números de pregunta). Se definen en `DIMENSIONES`.
 - Cada pregunta pertenece a exactamente una dimensión, según su número.
 
 ### Pregunta → clase `Pregunta`

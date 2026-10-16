@@ -1,3 +1,5 @@
+import { TriangleAlert, X } from "lucide-react";
+
 const TEXTOS = {
   corrupto: "No pudimos recuperar tu diagnóstico anterior. Puedes hacerlo de nuevo.",
   "no-disponible":
@@ -9,15 +11,17 @@ export default function AvisoAlmacenamiento({ tipo, onCerrar }) {
   return (
     <div
       role="status"
-      className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border-2 border-amber-700 bg-amber-50 p-4 text-gray-900"
+      className="flex items-start gap-3 rounded-tarjeta border border-advertencia bg-advertencia-suave p-4 text-advertencia-texto"
     >
-      <p className="flex-1">{TEXTOS[tipo]}</p>
+      <TriangleAlert size={20} strokeWidth={2} aria-hidden="true" className="mt-0.5 shrink-0" />
+      <p className="flex-1 font-semibold">{TEXTOS[tipo]}</p>
       <button
         type="button"
+        aria-label="Cerrar aviso"
         onClick={onCerrar}
-        className="min-h-11 min-w-11 rounded-md border-2 border-amber-700 px-3 font-semibold text-amber-900"
+        className="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-boton"
       >
-        Cerrar aviso
+        <X size={20} strokeWidth={2} aria-hidden="true" />
       </button>
     </div>
   );

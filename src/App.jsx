@@ -13,6 +13,9 @@ import Tips from "./pages/Tips.jsx";
 
 const REQUIEREN_DIAGNOSTICO = ["resultado", "plan", "tips"];
 
+/** Pantallas con fondo `superficie`; Inicio y Diagnóstico van en `fondo` (FR-036d). */
+const PANTALLAS_EN_SUPERFICIE = ["resultado", "plan", "tips", "emergencia"];
+
 /** Guardas de contracts/pantallas.md: decide qué pantalla se muestra realmente. */
 function resolverPantalla(pantalla, { hayDiagnostico, consentimiento, hayPreguntas }) {
   if (REQUIEREN_DIAGNOSTICO.includes(pantalla) && !hayDiagnostico) return "inicio";
@@ -118,13 +121,18 @@ export default function App() {
 
   const mostrarBarra = hayDiagnostico && pantalla !== "diagnostico";
 
+  // pb-24 = 96px: deja libre la barra inferior de 72px más 24px de margen.
+  const fondo = PANTALLAS_EN_SUPERFICIE.includes(pantalla) ? "bg-superficie" : "bg-fondo";
+
   return (
-    <>
-      <main className={`mx-auto max-w-2xl px-4 py-6 text-gray-900 ${mostrarBarra ? "pb-28" : ""}`}>
+    <div className={`flex min-h-dvh flex-col ${fondo}`}>
+      <main
+        className={`mx-auto flex w-full max-w-columna flex-1 flex-col gap-4 px-6 py-6 text-texto ${mostrarBarra ? "pb-24" : ""}`}
+      >
         {escudo.aviso && <AvisoAlmacenamiento tipo={escudo.aviso} onCerrar={escudo.cerrarAviso} />}
         {renderizarPantalla()}
       </main>
       {mostrarBarra && <BarraNavegacion pantallaActual={pantalla} onNavegar={navegarDesdeBarra} />}
-    </>
+    </div>
   );
 }

@@ -13,12 +13,39 @@ export const LIMITE_RIESGO_ALTO = 70;
 /** Etiquetas de los niveles del semáforo (FR-014). */
 export const NIVELES_SEMAFORO = Object.freeze({ BAJO: "Bajo", MEDIO: "Medio", ALTO: "Alto" });
 
-/** Dimensiones de riesgo con su rango inclusivo de números de pregunta (FR-008). */
+/**
+ * Dimensiones de riesgo con su rango inclusivo de números de pregunta (FR-008).
+ * `etiqueta` es el nombre visible en la interfaz: canal + término técnico (spec, Clarifications 2026-10-16).
+ */
 export const DIMENSIONES = Object.freeze([
-  Object.freeze({ id: "phishing", nombre: "Phishing", desde: 1, hasta: 4 }),
-  Object.freeze({ id: "smishing", nombre: "Smishing", desde: 5, hasta: 8 }),
-  Object.freeze({ id: "vishing", nombre: "Vishing", desde: 9, hasta: 12 }),
-  Object.freeze({ id: "habitos", nombre: "Hábitos generales", desde: 13, hasta: 14 }),
+  Object.freeze({
+    id: "phishing",
+    nombre: "Phishing",
+    etiqueta: "Correo (Phishing)",
+    desde: 1,
+    hasta: 4,
+  }),
+  Object.freeze({
+    id: "smishing",
+    nombre: "Smishing",
+    etiqueta: "SMS y WhatsApp (Smishing)",
+    desde: 5,
+    hasta: 8,
+  }),
+  Object.freeze({
+    id: "vishing",
+    nombre: "Vishing",
+    etiqueta: "Llamadas (Vishing)",
+    desde: 9,
+    hasta: 12,
+  }),
+  Object.freeze({
+    id: "habitos",
+    nombre: "Hábitos generales",
+    etiqueta: "Hábitos generales",
+    desde: 13,
+    hasta: 14,
+  }),
 ]);
 
 /** Prioridades según la criticidad de la opción elegida (FR-016, FR-017). */
