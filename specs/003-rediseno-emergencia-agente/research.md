@@ -30,7 +30,7 @@ El stack ya está fijado por la constitución y la feature 001 (React 19 + Vite 
   - Los mensajes del asistente quedan vacíos (`""`) con comentario `PENDIENTE`. La clase usa `MENSAJES_ASISTENTE.contenidoPendiente` cuando un texto, una guía, las líneas o los canales están vacíos; si ese mensaje también está vacío, la pantalla muestra un respaldo fijo de la interfaz.
 - **Estado**: aprobado en la spec (Clarifications 2026-10-20 y FR-013), con el límite descrito arriba.
 - **Justificación**: el principio III prohíbe inventar contenido, pero la conversación debe poder recorrerse para probarla (igual que R13 de la 001). Los textos de las situaciones salen de la spec aprobada, no se inventan. Que una situación quede sin texto o un mensaje vacío nunca rompe la pantalla (Edge Case "Contenido pendiente").
-- **Respaldo fijo**: "Esta parte de la guía aún no está lista. Usa los botones de abajo para llamar a tu banco o ver cómo denunciar." Es un texto de interfaz y se avisa al equipo para que lo apruebe o lo reemplace con `contenidoPendiente`.
+- **Respaldo fijo**: "Esta parte de la guía aún no está lista. Usa los botones de abajo para llamar a tu banco o ver cómo denunciar." Es un texto de interfaz, aprobado por el equipo el 2026-10-20; si el equipo llena `contenidoPendiente`, ese texto lo reemplaza.
 - **Alternativas consideradas**: dejar las situaciones sin texto (la conversación no se puede probar); escribir saludo y pasos de ejemplo (viola el principio III).
 
 ## R4. Acciones rápidas al pie: "Llamar" + "Más ayuda" (actualizado tras la clarificación del 2026-10-20)
@@ -64,21 +64,21 @@ El stack ya está fijado por la constitución y la feature 001 (React 19 + Vite 
 
 - **Decisión**:
   - La pantalla `emergencia` deja de usar `vista` (`menu`, `guia:<id>`, `bancos`, `denuncia`). La conversación vive en el estado local de la página y se descarta al desmontarse (FR-027). `irAEmergencia()` navega a `{ pantalla: "emergencia" }`. "Atrás" nunca deshace pasos.
-  - **Una sola guarda de salida** para las tres vías de FR-031:
+  - **Una sola guarda de salida** para las tres vías de FR-041:
     - Emergencia registra con `registrarInterceptorAtras(fn)`, que ya existe en `useNavegacion` y usa Diagnóstico, una función `interceptarSalida(destino)`. Si `conversacion.tieneProgreso()` es verdadero, guarda `destino`, abre el diálogo y devuelve `true`; si no, devuelve `false`.
     - "Atrás": `useNavegacion` ya llama al interceptor en `popstate` y, si devuelve `true`, vuelve a poner el estado actual en el historial.
     - Barra inferior: `useNavegacion` expone `navegarConGuarda(destino)`, que consulta el mismo interceptor antes de `navegar`. `App.navegarDesdeBarra` pasa a usarla. Es seguro porque la barra no se muestra durante el Diagnóstico.
     - "Volver al inicio": la misma `interceptarSalida({ pantalla: "inicio" })`, llamada dentro de la página.
   - **Diálogo** (componente `Dialogo` existente): título "¿Salir del asistente?", texto "Perderás el paso en que vas.", botones "Salir" (secundario) y "Seguir aquí" (primario, con el foco inicial). "Salir" navega al destino guardado; "Seguir aquí", la X o Esc cierran el diálogo sin cambios.
   - `tieneProgreso()` es verdadero en cuanto existe algún mensaje de la persona, incluido tocar "Llamar a la línea de mi banco" o "Cómo denunciar en Colombia": hay algo en pantalla que se perdería. Solo con el saludo, se sale sin preguntar.
-  - Recargar o cerrar la pestaña no pide confirmación (spec FR-031): no se usa `beforeunload`.
+  - Recargar o cerrar la pestaña no pide confirmación (spec FR-041): no se usa `beforeunload`.
 - **Justificación**: reutiliza el mecanismo de "atrás" de la 001 en lugar de crear otro, y una sola función decide para las tres vías, así se comportan igual (clarificación 2026-10-20). "Seguir aquí" lleva el estilo primario y el foco inicial porque es la opción segura para alguien nervioso.
 - **Alternativas consideradas**: un estado del historial por mensaje (deja la conversación en `history.state`); `beforeunload` (solo permite el aviso genérico del navegador y la spec lo excluye); una guarda aparte para la barra en `App` (duplicaría la regla).
 
 ## R12. Confirmación de "Empezar de nuevo" (clarificación del 2026-10-20)
 
 - **Decisión**: "Empezar de nuevo", dentro de "Más ayuda", abre el mismo `Dialogo` con el título "¿Empezar de nuevo?", el texto "Perderás el paso en que vas." y los botones "Empezar de nuevo" (secundario) y "Seguir aquí" (primario, con el foco inicial). Al confirmar: `reiniciar()`, panel cerrado y foco en la primera situación. Si `tieneProgreso()` es falso, no hace nada (ya está en el saludo).
-- **Justificación**: FR-018 la pide igual a la de FR-031. Un solo estado `confirmacion` (`null | { tipo: "salir", destino } | { tipo: "reiniciar" }`) y un solo `Dialogo` en la página cubren los dos casos sin duplicar código.
+- **Justificación**: FR-018 la pide igual a la de FR-041. Un solo estado `confirmacion` (`null | { tipo: "salir", destino } | { tipo: "reiniciar" }`) y un solo `Dialogo` en la página cubren los dos casos sin duplicar código.
 
 ## R8. Botón de emergencia de dos líneas
 
@@ -87,7 +87,7 @@ El stack ya está fijado por la constitución y la feature 001 (React 19 + Vite 
 
 ## R9. Estilo de burbujas, opciones y chip
 
-- **Decisión** (interpretación de §7 que se avisa al equipo, como pide §7.1):
+- **Decisión** (interpretación de §7, aprobado por el equipo el 2026-10-20 según §7.1):
   - **Burbuja del asistente**: alineada a la izquierda, ancho máximo 88 %, fondo `fondo`, borde 1 px `borde`, radio 16 px (`rounded-tarjeta`), relleno 16 px, texto 16 px `texto`, interlineado 1,5.
   - **Burbuja de la persona**: alineada a la derecha, ancho máximo 80 %, fondo `primario`, texto blanco 16 px/600, mismo radio y relleno. El contraste blanco sobre `primario` es 6,7:1.
   - **Opciones**: debajo de la última burbuja del asistente, botones de ancho completo de la columna, fondo `fondo`, borde 1 px `borde`, radio 12 px, alto mínimo 52 px, texto 16 px/600 `texto` a la izquierda y ChevronRight 20 px `texto-suave` a la derecha; foco visible con anillo `primario`.
@@ -126,4 +126,4 @@ El stack ya está fijado por la constitución y la feature 001 (React 19 + Vite 
   - los mensajes del asistente;
   - el texto del aviso "No borres nada";
   - las líneas bancarias y los canales de denuncia.
-- **Pendiente de aprobar**: el respaldo fijo de R3, la interpretación visual de R4 y R9, y los textos de los botones de los diálogos de R7 y R12 ("Salir", "Seguir aquí").
+- **Aprobado** (aprobado por el equipo el 2026-10-20): el respaldo fijo de R3, la interpretación visual de R4 y R9, y los textos de los botones de los diálogos de R7 y R12 ("Salir", "Seguir aquí").

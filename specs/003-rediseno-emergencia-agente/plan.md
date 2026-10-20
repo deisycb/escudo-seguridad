@@ -137,7 +137,7 @@ specs/001-escudo-web-app/               # documentos de la 001 que quedan desfas
 | Orden de anuncios entre la región viva y el foco varía por lector de pantalla (R5) | Lecturas dobles o en orden raro | Validar con VoiceOver y NVDA (quickstart 14); alternativa documentada: enfocar el mensaje |
 | Las acciones fijas restan altura útil en celulares pequeños (R4) | Menos conversación visible | Una sola fila (unos 68 px); el panel "Más ayuda" solo ocupa espacio mientras está abierto; relleno inferior y `scroll-margin` |
 | `navegarConGuarda` comparte el interceptor con Diagnóstico (R7) | Una guarda podría actuar en la pantalla equivocada | Cada página registra y libera su interceptor al montarse y desmontarse (patrón existente); la barra no existe durante el Diagnóstico |
-| Elementos visuales nuevos sin mockup (R9) | El equipo puede querer otro estilo | Interpretación de §7 documentada; cambiarla solo toca clases de Tailwind |
+| Elementos visuales nuevos sin mockup (R9) | ~~El equipo puede querer otro estilo~~ Resuelto: aprobado por el equipo el 2026-10-20 | Si llega un mockup a `/docs/diseno/`, manda; cambiarlo solo toca clases de Tailwind |
 | La rama activa es `conexion-n8n`, no `003-rediseno-emergencia-agente` | Mezcla con el trabajo de n8n | Decidir con el equipo si se crea una rama propia antes de `/speckit-implement` |
 | La constitución 2.0.0 prevé un chat de IA en Emergencia | Posible choque de diseño cuando se agregue | Este asistente es la ayuda que funciona sin conexión; el chat de IA será un complemento aparte (spec, Assumptions) |
 

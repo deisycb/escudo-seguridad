@@ -47,7 +47,7 @@ export function useNavegacion(inicial) {
 
   /**
    * Navega salvo que la pantalla actual lo intercepte con el mismo interceptor de "atrás"
-   * (por ejemplo, Emergencia pide confirmación antes de salir: spec 003, FR-031).
+   * (por ejemplo, Emergencia pide confirmación antes de salir: spec 003, FR-041).
    * @param {object} destino Estado al que se quiere ir.
    */
   const navegarConGuarda = useCallback(

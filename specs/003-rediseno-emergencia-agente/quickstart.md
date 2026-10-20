@@ -29,9 +29,9 @@ Esperado: todas las pruebas de [contracts/logica-conversacion.md](./contracts/lo
 | 7 | A mitad de una guía, "Más ayuda" → "Empezar de nuevo"; primero "Seguir aquí", luego repetir y confirmar | "¿Empezar de nuevo?" con el foco en "Seguir aquí"; al cancelar sigue el mismo paso; al confirmar, solo el saludo y las 7 situaciones. Con solo el saludo en pantalla, no aparece diálogo | FR-018 |
 | 8 | Tocar dos veces rápido "Listo, ¿qué sigue?" | Avanza un solo paso | FR-012 |
 | 9 | Desplazar una conversación larga, con el panel "Más ayuda" cerrado y abierto | "Llamar" y "Más ayuda" siempre visibles sin tapar la última opción; con diagnóstico, quedan encima de la barra inferior | FR-014 |
-| 9a | A mitad de una guía: (a) "atrás" del navegador o gesto de Android, (b) Tips en la barra inferior, (c) "Volver al inicio" sin diagnóstico. En cada uno, primero "Seguir aquí" y luego "Salir" | "¿Salir del asistente? Perderás el paso en que vas."; al cancelar, mismo paso y foco de vuelta; al salir, va al destino (la pantalla anterior en el caso de "atrás") y al volver la conversación empieza de cero | FR-031 |
-| 9b | Abrir Emergencia y, sin tocar nada, usar "atrás" o la barra | Sale sin diálogo | FR-031 |
-| 9c | A mitad de una guía, recargar la página | Sin diálogo; la conversación empieza de cero | FR-031, FR-027 |
+| 9a | A mitad de una guía: (a) "atrás" del navegador o gesto de Android, (b) Tips en la barra inferior, (c) "Volver al inicio" sin diagnóstico. En cada uno, primero "Seguir aquí" y luego "Salir" | "¿Salir del asistente? Perderás el paso en que vas."; al cancelar, mismo paso y foco de vuelta; al salir, va al destino (la pantalla anterior en el caso de "atrás") y al volver la conversación empieza de cero | FR-041 |
+| 9b | Abrir Emergencia y, sin tocar nada, usar "atrás" o la barra | Sale sin diálogo | FR-041 |
+| 9c | A mitad de una guía, recargar la página | Sin diálogo; la conversación empieza de cero | FR-041, FR-027 |
 | 10 | DevTools → Network en "Offline" tras cargar; recorrer todo | Funciona; cero peticiones en Network | FR-028, SC-004 |
 | 11 | Salir de Emergencia y volver; revisar Application → Local Storage | La conversación empieza de cero; nada nuevo guardado | FR-027, SC-004 |
 | 12 | Activar "reducir movimiento" en el sistema | Sin desplazamientos suaves ni animaciones | FR-023 |

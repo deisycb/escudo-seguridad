@@ -38,7 +38,7 @@ Todas las pantallas usan los tokens, la tipografía y los componentes base de la
 |---|---|
 | Pregunta k > 1 | Va a la pregunta k−1 con la respuesta conservada |
 | Pregunta 1 | Vuelve a empujar el estado y abre el diálogo "¿Salir del diagnóstico?" (igual que "Salir") |
-| Emergencia con una guía a medias | Confirmación de salida (spec 003, FR-031); también desde la barra inferior |
+| Emergencia con una guía a medias | Confirmación de salida (spec 003, FR-041); también desde la barra inferior |
 | Otra pantalla | Vuelve a la pantalla anterior del historial, aplicando las guardas |
 
 ## Elementos y textos fijos por pantalla

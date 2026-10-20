@@ -7,7 +7,7 @@ Complementa [../../001-escudo-web-app/contracts/pantallas.md](../../001-escudo-w
 | Pantalla | Antes | Ahora |
 |---|---|---|
 | `emergencia` | `+ vista: menu \| guia:<id> \| bancos \| denuncia` | Sin `vista`: `{ pantalla: "emergencia" }`. La conversación es estado local de la página (R7) |
-| "atrás" en Emergencia | Vista interna → `menu` | Sin progreso: sale a la pantalla anterior. Con progreso: diálogo "¿Salir del asistente?" (R7, FR-031) |
+| "atrás" en Emergencia | Vista interna → `menu` | Sin progreso: sale a la pantalla anterior. Con progreso: diálogo "¿Salir del asistente?" (R7, FR-041) |
 | Barra inferior desde Emergencia | Navega directo | Pasa por `navegarConGuarda`: misma confirmación que "atrás" |
 
 ## Cambio en `useNavegacion`

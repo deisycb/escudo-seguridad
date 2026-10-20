@@ -69,7 +69,7 @@ export default function App() {
     navegar({ pantalla: "emergencia" });
   }
 
-  // La barra pasa por la guarda: Emergencia pide confirmar si hay una guía a medias (FR-031).
+  // La barra pasa por la guarda: Emergencia pide confirmar si hay una guía a medias (FR-041).
   function navegarDesdeBarra(destino) {
     navegarConGuarda({ pantalla: destino });
   }

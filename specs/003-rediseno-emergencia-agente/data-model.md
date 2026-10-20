@@ -73,7 +73,7 @@ cualquier etapa ──mostrarLineasBancarias / mostrarCanalesDenuncia──► m
 cualquier etapa ──reiniciar──► situaciones con historial vacío (solo saludo)
 ```
 
-**Progreso**: la conversación "tiene progreso" en cuanto existe algún mensaje de la persona (elección o acción rápida). Con progreso, salir de la pantalla y "Empezar de nuevo" piden confirmación (spec FR-018, FR-031). Esa confirmación es estado de la pantalla, no de la clase.
+**Progreso**: la conversación "tiene progreso" en cuanto existe algún mensaje de la persona (elección o acción rápida). Con progreso, salir de la pantalla y "Empezar de nuevo" piden confirmación (spec FR-018, FR-041). Esa confirmación es estado de la pantalla, no de la clase.
 
 Cada elección válida agrega primero un mensaje `eleccion` de la persona y después los mensajes del asistente. Un id que no está entre las opciones pendientes no cambia nada (devuelve la misma instancia). Una guía sin pasos lleva directamente al mensaje de contenido pendiente y a la etapa `cierre`.
 

@@ -61,7 +61,7 @@ const CONFIRMACIONES = {
 };
 
 /**
- * Confirmación de salida (FR-031) o de "Empezar de nuevo" (FR-018). Un solo diálogo para ambas;
+ * Confirmación de salida (FR-041) o de "Empezar de nuevo" (FR-018). Un solo diálogo para ambas;
  * "Seguir aquí" es la opción segura.
  */
 function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {

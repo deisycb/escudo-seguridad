@@ -52,7 +52,7 @@ class ConversacionEmergencia {
   obtenerMensajes(): Mensaje[]        // copia; ver data-model.md
   obtenerOpciones(): Opcion[]         // copia; [] si terminada
   estaTerminada(): boolean
-  tieneProgreso(): boolean            // true si hay algún mensaje de la persona (decide las confirmaciones de FR-018 y FR-031)
+  tieneProgreso(): boolean            // true si hay algún mensaje de la persona (decide las confirmaciones de FR-018 y FR-041)
 }
 
 export function validarContenidoEmergencias(contenido): { errores: string[], pendientes: string[] }
@@ -76,6 +76,6 @@ export function validarContenidoEmergencias(contenido): { errores: string[], pen
 | Acción rápida repetida o tras terminar | Se agrega cada vez; opciones siguen iguales (o `[]`) | Edge cases |
 | Elegir id no pendiente u opción ya usada | Devuelve la misma instancia | FR-012 |
 | `reiniciar` | Igual que `iniciar` (la confirmación es de la pantalla, no de la clase) | FR-018 |
-| `tieneProgreso` | `false` tras `iniciar` y `reiniciar`; `true` tras cualquier elección o acción rápida | FR-018, FR-031 |
+| `tieneProgreso` | `false` tras `iniciar` y `reiniciar`; `true` tras cualquier elección o acción rápida | FR-018, FR-041 |
 | Guía vacía / líneas vacías / canales vacíos / mensaje vacío | Se usa `contenidoPendiente` (o `respaldoPendiente`); nunca mensaje vacío | Edge case |
 | Ninguna acción | No escribe en almacenamiento ni hace peticiones | FR-027, FR-028 |

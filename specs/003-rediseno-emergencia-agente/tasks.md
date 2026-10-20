@@ -92,7 +92,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ## Phase 3: User Story 1 - Recibir una guía paso a paso para lo que me pasó (Priority: P1) 🎯 MVP
 
-**Goal**: botón de dos líneas en Inicio; la pantalla de Emergencia como conversación con 7 situaciones, seguimiento, pasos "Paso N de M" y cierre; confirmación al salir a mitad de la conversación (FR-031).
+**Goal**: botón de dos líneas en Inicio; la pantalla de Emergencia como conversación con 7 situaciones, seguimiento, pasos "Paso N de M" y cierre; confirmación al salir a mitad de la conversación (FR-041).
 
 **Independent Test**: desde Inicio sin consentimiento, tocar el botón, elegir cada situación (y cada respuesta de seguimiento) y recorrer la guía hasta las tres opciones de cierre (quickstart 1, 2, 3, 6 y 8). A mitad de una guía, salir con "atrás", con la barra y con "Volver al inicio" y verificar la confirmación (quickstart 9a, 9b y 9c).
 
@@ -149,13 +149,13 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
   - Sin `<input>`, `<textarea>` ni retardos (spec FR-004 a FR-012, FR-023).
 - [X] T015 [US1] En `src/App.jsx`, cambiar `irAEmergencia()` a `navegar({ pantalla: "emergencia" })` sin `vista`, y dejar de pasar `vista` y `navegar` a `<Emergencia>`. Pasar `hayDiagnostico`, `onVolverAlInicio` y `registrarInterceptorAtras` ([R7](./research.md)).
 - [X] T016 [US1] Agregar `navegarConGuarda(destino)` a `src/hooks/useNavegacion.js`: si `interceptorAtras.current?.(destino)` devuelve `true`, no navega; si no, llama a `navegar(destino)`. Con `useCallback`, devolverla junto a las demás y documentarla con JSDoc ([contracts/pantallas.md](./contracts/pantallas.md), "Cambio en `useNavegacion`").
-- [X] T017 [US1] En `src/App.jsx`, hacer que `navegarDesdeBarra` use `navegarConGuarda` en lugar de `navegar` (también al ir a Emergencia), para que la barra inferior pase por la guarda de salida (spec FR-031).
+- [X] T017 [US1] En `src/App.jsx`, hacer que `navegarDesdeBarra` use `navegarConGuarda` en lugar de `navegar` (también al ir a Emergencia), para que la barra inferior pase por la guarda de salida (spec FR-041).
 - [X] T018 [US1] Implementar la guarda de salida en `src/pages/Emergencia.jsx` ([R7](./research.md), [contracts/pantallas.md](./contracts/pantallas.md) punto 8):
   - Estado `confirmacion` (`null | { tipo: "salir", destino }`).
   - `useEffect` que registra con `registrarInterceptorAtras` una función `interceptarSalida(destino)`: devuelve `false` si `!conversacion.tieneProgreso()`; si no, guarda `{ tipo: "salir", destino }` y devuelve `true`. Debe depender de `conversacion` y liberar el interceptor al desmontarse, igual que `src/pages/Diagnostico.jsx`.
   - "Volver al inicio" llama a `interceptarSalida({ pantalla: "inicio" })` y, si devuelve `false`, a `onVolverAlInicio()`.
   - Un `Dialogo` con título `TEXTOS_ASISTENTE.confirmarSalirTitulo`, texto `confirmarTexto` y acciones "Seguir aquí" (`BOTON_PRINCIPAL`, cierra) y "Salir" (`BOTON_SECUNDARIO`, navega al `destino` guardado). La X y Esc cierran sin cambios.
-  - No usar `beforeunload` (spec FR-031).
+  - No usar `beforeunload` (spec FR-041).
 - [ ] T019 [US1] Validar US1 con [quickstart.md](./quickstart.md) escenarios 1, 2, 3, 6, 8, 9a, 9b y 9c en un celular de 390 px (DevTools), anotando cualquier desviación como tarea nueva
 
 **Checkpoint**: la guía completa funciona de punta a punta con el ratón y la salida pide confirmación. Es el MVP que se puede demostrar.
@@ -230,7 +230,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 - [X] T033 [P] Actualizar `specs/001-escudo-web-app/contracts/pantallas.md`:
   - Cambiar la fila `emergencia` de la tabla a `{ pantalla: "emergencia" }`, sin `vista`, y con "FR-030…FR-034 → spec 003".
-  - Cambiar la fila "Vista interna de Emergencia" de la tabla de "atrás" a "Confirmación de salida (spec 003, FR-031)".
+  - Cambiar la fila "Vista interna de Emergencia" de la tabla de "atrás" a "Confirmación de salida (spec 003, FR-041)".
   - Agregar en la sección de Emergencia un enlace a `../../003-rediseno-emergencia-agente/contracts/pantallas.md`.
 - [X] T034 [P] Actualizar `specs/001-escudo-web-app/contracts/contenido.md`: reemplazar el bloque `## \`emergencias.js\`` por una línea que remita a `../../003-rediseno-emergencia-agente/contracts/contenido-emergencias.md`.
 - [X] T035 [P] Actualizar en `specs/001-escudo-web-app/tasks.md` las tareas T036 y T087 para que validen "3 toques o menos" (SC-002 aclarado el 2026-10-20, spec 003 SC-001).
@@ -247,7 +247,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
   - SC-006: 360 px sin desplazamiento horizontal, incluido el botón de dos líneas con zoom de texto al 200 %.
 - [X] T039 Escribir el resumen para el equipo (en la descripción del commit o del PR) con:
   - lo que queda pendiente de entregar en `src/data/emergencias.js` (salida de `validarContenidoEmergencias` contra el contenido real);
-  - lo que queda pendiente de aprobar: el respaldo de R3, el estilo de R4 y R9, y los textos "Salir" / "Seguir aquí".
+  - lo que queda pendiente de aprobar: el respaldo de R3, el estilo de R4 y R9, y los textos "Salir" / "Seguir aquí" (aprobados por el equipo el 2026-10-20).
 
   Recordar que no se publica con contenido `PROVISIONAL` ni `PENDIENTE` (spec FR-013).
 
