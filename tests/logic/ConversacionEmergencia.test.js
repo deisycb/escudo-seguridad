@@ -346,3 +346,40 @@ describe("ConversacionEmergencia — acciones rápidas", () => {
     expect(reiniciada.tieneProgreso()).toBe(false);
   });
 });
+
+describe("ConversacionEmergencia — escritura (spec 004)", () => {
+  function iniciarEscritura() {
+    return ConversacionEmergencia.iniciarEscritura(PRUEBA);
+  }
+
+  it("iniciarEscritura empieza sin mensajes, sin opciones y sin progreso", () => {
+    const c = iniciarEscritura();
+    expect(c.obtenerMensajes()).toEqual([]);
+    expect(c.obtenerOpciones()).toEqual([]);
+    expect(c.tieneProgreso()).toBe(false);
+    expect(c.estaEsperandoIA()).toBe(false);
+  });
+
+  it("abrirGuias agrega el saludo y las 7 situaciones sin borrar nada", () => {
+    const c = iniciarEscritura().abrirGuias();
+    expect(c.obtenerMensajes()).toEqual(iniciar().obtenerMensajes());
+    expect(c.obtenerOpciones()).toEqual(iniciar().obtenerOpciones());
+    const despues = c.elegir("situacion:tarjeta-banco").abrirGuias();
+    expect(despues.obtenerMensajes()).toHaveLength(c.obtenerMensajes().length + 3);
+  });
+
+  it("volverAEscribir quita las opciones sin borrar mensajes", () => {
+    const enGuias = iniciarEscritura().abrirGuias().elegir("situacion:tarjeta-banco");
+    const c = enGuias.volverAEscribir();
+    expect(c.obtenerMensajes()).toEqual(enGuias.obtenerMensajes());
+    expect(c.obtenerOpciones()).toEqual([]);
+  });
+
+  it("reiniciar vuelve al modo inicial: escritura o guías", () => {
+    const desdeEscritura = iniciarEscritura().abrirGuias().elegir("situacion:tarjeta-banco");
+    expect(desdeEscritura.reiniciar().obtenerMensajes()).toEqual([]);
+    expect(desdeEscritura.reiniciar().obtenerOpciones()).toEqual([]);
+    const desdeGuias = iniciar().elegir("situacion:tarjeta-banco").volverAEscribir();
+    expect(desdeGuias.reiniciar().obtenerMensajes()).toEqual(iniciar().obtenerMensajes());
+  });
+});

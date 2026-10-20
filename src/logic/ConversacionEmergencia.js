@@ -126,7 +126,14 @@ const ETAPA = {
   CIERRE: "cierre",
   CIERRE_TRAS_DENUNCIA: "cierreTrasDenuncia",
   TERMINADA: "terminada",
+  // Escritura libre con el asistente de IA (spec 004).
+  ESCRITURA: "escritura",
+  ESPERANDO_IA: "esperandoIA",
+  FALLO_IA: "falloIA",
 };
+
+/** Con qué empieza la conversación; "Empezar de nuevo" vuelve a ese modo (spec 004 R5). */
+const MODO = { GUIAS: "guias", ESCRITURA: "escritura" };
 
 const OPCION_SIGUIENTE = { id: "siguiente", texto: TEXTOS_ASISTENTE.siguiente };
 const OPCION_DENUNCIAR = { id: "denunciar", texto: TEXTOS_ASISTENTE.denunciar };
@@ -144,15 +151,16 @@ function pasosDe(guia) {
 }
 
 /**
- * Conversación guiada del asistente de emergencia (spec 003). Solo funciona con opciones fijas
- * del contenido; es inmutable: cada acción devuelve una conversación nueva, o la misma si la
- * acción no aplica. Vive solo en memoria: nunca se guarda ni se envía.
+ * Conversación de Emergencia: las guías del asistente guiado (spec 003) y la escritura libre con
+ * el asistente de IA (spec 004) en una sola línea de mensajes. Es inmutable: cada acción devuelve
+ * una conversación nueva, o la misma si la acción no aplica. Vive solo en memoria.
  */
 export class ConversacionEmergencia {
   #contenido;
   #mensajes;
   #opciones;
   #posicion;
+  #modoInicial;
 
   /**
    * Usar {@link ConversacionEmergencia.iniciar}; el constructor es para uso interno.
@@ -160,12 +168,14 @@ export class ConversacionEmergencia {
    * @param {object[]} mensajes Historial con ids ya asignados.
    * @param {{ id: string, texto: string }[]} opciones Opciones pendientes.
    * @param {{ etapa: string, situacionId?: string, guiaId?: string, numero?: number }} posicion
+   * @param {string} [modoInicial="guias"] "guias" o "escritura".
    */
-  constructor(contenido, mensajes, opciones, posicion) {
+  constructor(contenido, mensajes, opciones, posicion, modoInicial = MODO.GUIAS) {
     this.#contenido = contenido;
     this.#mensajes = mensajes;
     this.#opciones = opciones;
     this.#posicion = posicion;
+    this.#modoInicial = modoInicial;
   }
 
   /**
@@ -176,6 +186,42 @@ export class ConversacionEmergencia {
     return new ConversacionEmergencia(contenido, [], [], { etapa: ETAPA.SITUACIONES }).#conSaludo(
       [],
     );
+  }
+
+  /**
+   * Conversación que empieza en la escritura libre, sin mensajes (spec 004 FR-001).
+   * @param {object} contenido { mensajes, situaciones, guias, lineas, canales } de emergencias.js.
+   * @returns {ConversacionEmergencia}
+   */
+  static iniciarEscritura(contenido) {
+    return new ConversacionEmergencia(
+      contenido,
+      [],
+      [],
+      { etapa: ETAPA.ESCRITURA },
+      MODO.ESCRITURA,
+    );
+  }
+
+  /**
+   * Abre las guías dentro de la misma conversación, sin borrar nada (spec 004 FR-014, FR-021).
+   * @returns {ConversacionEmergencia} Con el saludo y las 7 situaciones como opciones.
+   */
+  abrirGuias() {
+    return this.#conSaludo([]);
+  }
+
+  /**
+   * Vuelve a la escritura libre desde las guías, sin borrar nada (spec 004 FR-014).
+   * @returns {ConversacionEmergencia}
+   */
+  volverAEscribir() {
+    return this.#continuar([], [], { etapa: ETAPA.ESCRITURA });
+  }
+
+  /** @returns {boolean} Si se espera la respuesta del asistente de IA. */
+  estaEsperandoIA() {
+    return this.#posicion.etapa === ETAPA.ESPERANDO_IA;
   }
 
   /**
@@ -234,9 +280,12 @@ export class ConversacionEmergencia {
 
   /**
    * "Empezar de nuevo" (la confirmación es de la pantalla, spec 003 FR-018).
-   * @returns {ConversacionEmergencia} Conversación nueva con solo el saludo.
+   * @returns {ConversacionEmergencia} Conversación nueva en su modo inicial: solo el saludo (guías) o vacía (escritura).
    */
   reiniciar() {
+    if (this.#modoInicial === MODO.ESCRITURA) {
+      return ConversacionEmergencia.iniciarEscritura(this.#contenido);
+    }
     return ConversacionEmergencia.iniciar(this.#contenido);
   }
 
@@ -371,6 +420,7 @@ export class ConversacionEmergencia {
       [...this.#mensajes, ...conIds],
       opciones,
       posicion,
+      this.#modoInicial,
     );
   }
 }

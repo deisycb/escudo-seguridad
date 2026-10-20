@@ -30,8 +30,8 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ## Phase 1: Setup
 
-- [ ] T001 Crear la rama `004-asistente-ia-emergencia` desde `003-rediseno-emergencia-agente`, después de hacer commit local de los cambios de specs pendientes (`specs/001-escudo-web-app/spec.md`, `specs/003-rediseno-emergencia-agente/spec.md` y `specs/004-asistente-ia-emergencia/`). Correr `npm test` y `npm run lint` y confirmar que solo fallan las 6 pruebas de contenido pendiente registradas en la spec 003.
-- [ ] T002 Confirmar con el equipo si se aprueba `scripts/webhook-prueba.mjs` (servidor local solo para desarrollo, nunca publicado; riesgo del principio IV en `specs/004-asistente-ia-emergencia/plan.md`) y anotar la decisión al final de este archivo, en una sección "Decisiones". Si no se aprueba, T020 se omite y las pruebas manuales con respuesta esperan al flujo real (T037).
+- [X] T001 Crear la rama `004-asistente-ia-emergencia` desde `003-rediseno-emergencia-agente`, después de hacer commit local de los cambios de specs pendientes (`specs/001-escudo-web-app/spec.md`, `specs/003-rediseno-emergencia-agente/spec.md` y `specs/004-asistente-ia-emergencia/`). Correr `npm test` y `npm run lint` y confirmar que solo fallan las 6 pruebas de contenido pendiente registradas en la spec 003.
+- [X] T002 Confirmar con el equipo si se aprueba `scripts/webhook-prueba.mjs` (servidor local solo para desarrollo, nunca publicado; riesgo del principio IV en `specs/004-asistente-ia-emergencia/plan.md`) y anotar la decisión al final de este archivo, en una sección "Decisiones". Si no se aprueba, T020 se omite y las pruebas manuales con respuesta esperan al flujo real (T037).
 
 ---
 
@@ -41,7 +41,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 **⚠️ CRITICAL**: ninguna historia empieza antes de terminar esta fase.
 
-- [ ] T003 [P] Escribir `tests/logic/FiltroDatosSensibles.test.js` con la tabla de [contracts/logica.md](./contracts/logica.md):
+- [X] T003 [P] Escribir `tests/logic/FiltroDatosSensibles.test.js` con la tabla de [contracts/logica.md](./contracts/logica.md):
   - **Bloquea como tarjeta:** "mi tarjeta 4111 1111 1111 1111"; "4111-1111-1111-1111"; "4111111111111111"; "cuenta 0123456789012" (13 dígitos); un número de 19 dígitos.
   - **Bloquea como código:** "me llegó el 482913", "código 1234", "me robaron 500000" y un número de 8 dígitos.
   - **Devuelve `null`:** "500.000", "500 mil", "3001234567" (10 dígitos), "el 20 de octubre", "123", 20 dígitos seguidos (fuera de los dos rangos).
@@ -49,12 +49,12 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
   - **Resultado:** incluye `fragmento`, `inicio` y `fin` correctos para poder resaltarlo.
 
   Las pruebas deben fallar antes de T004.
-- [ ] T004 Crear `src/logic/FiltroDatosSensibles.js`:
+- [X] T004 Crear `src/logic/FiltroDatosSensibles.js`:
   - `LIMITES_TARJETA = { minimo: 13, maximo: 19 }` y `LIMITES_CODIGO = { minimo: 4, maximo: 8 }`.
   - `detectarDatoSensible(texto)` con las dos expresiones de [research.md](./research.md) R3. Revisa primero la tarjeta y luego el código, y devuelve `null | { tipo: "tarjeta" | "codigo", fragmento, inicio, fin }`.
   - Si se usan las expresiones con lookbehind, verificar que sigan cumpliendo los límites al construirlas desde las constantes. Con JSDoc.
   - Hacer pasar T003.
-- [ ] T005 [P] Crear `src/logic/AsistenteIA.js` solo con:
+- [X] T005 [P] Crear `src/logic/AsistenteIA.js` solo con:
   - Constantes: `TIEMPO_ESPERA_MS = 20000`, `MAXIMO_CARACTERES_MENSAJE = 1000`, `MAXIMO_CARACTERES_RESPUESTA = 4000` y `MAXIMO_MENSAJES_ENVIADOS = 20`.
   - `TEXTOS_IA`, con los textos exactos de la spec y los contratos:
     - Escritura: invitación "Cuéntame con tus palabras qué te pasó", aviso "No escribas contraseñas, números de tarjeta o de cuenta, ni códigos de verificación", botones "Acepto y quiero escribir", "No, prefiero ver las guías" y "Enviar", enlaces "No puedo o no quiero escribir: ver guías" y "Prefiero escribirlo".
@@ -62,15 +62,15 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
     - Bloqueos de tarjeta y de código (este con el ejemplo "500 mil" / "20 de octubre").
     - Fallos `general` y `limite`, y "Ver guías".
   - `escrituraConfigurada(url)`, que devuelve `true` solo si `url` empieza por `https://` (o `http://localhost` / `http://127.0.0.1` en desarrollo), con JSDoc. Agregar sus casos en `tests/logic/AsistenteIA.test.js`.
-- [ ] T006 [P] Crear `src/data/asistenteIA.js` con `CONSENTIMIENTO_IA = { titulo: "", parrafos: [] }` y el comentario `// PENDIENTE: lo redacta y aprueba el equipo (spec 004 FR-004, Ley 1581 de 2012)`, que liste lo que debe explicar: n8n, proveedor de IA posiblemente fuera de Colombia, que no se guarda, para qué se usa y la alternativa de las guías. Agregar en `tests/logic/contenido.test.js` una prueba "CONSENTIMIENTO_IA tiene título y al menos 1 párrafo" (queda como fallo permitido) e incluir `CONSENTIMIENTO_IA` en la prueba de prohibiciones.
-- [ ] T007 [P] Ampliar `cspSoloEnBuild` en `vite.config.js` ([research.md](./research.md) R2):
+- [X] T006 [P] Crear `src/data/asistenteIA.js` con `CONSENTIMIENTO_IA = { titulo: "", parrafos: [] }` y el comentario `// PENDIENTE: lo redacta y aprueba el equipo (spec 004 FR-004, Ley 1581 de 2012)`, que liste lo que debe explicar: n8n, proveedor de IA posiblemente fuera de Colombia, que no se guarda, para qué se usa y la alternativa de las guías. Agregar en `tests/logic/contenido.test.js` una prueba "CONSENTIMIENTO_IA tiene título y al menos 1 párrafo" (queda como fallo permitido) e incluir `CONSENTIMIENTO_IA` en la prueba de prohibiciones.
+- [X] T007 [P] Ampliar `cspSoloEnBuild` en `vite.config.js` ([research.md](./research.md) R2):
   - Leer `VITE_URL_ASISTENTE_IA` con `loadEnv`.
   - Si existe y empieza por `https://`, `connect-src` pasa a ser `new URL(url).origin`.
   - Si existe y no es `https://`, lanzar un error con el mensaje "VITE_URL_ASISTENTE_IA debe usar https://".
   - Si no existe, se queda en `'none'`.
 
   Documentar la variable en un `.env.example` nuevo, comentado y sin URL real.
-- [ ] T008 Escribir en `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — escritura (spec 004)")` que cubra:
+- [X] T008 Escribir en `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — escritura (spec 004)")` que cubra:
   - `iniciarEscritura` deja la conversación sin mensajes, sin opciones, sin progreso y con `estaEsperandoIA()` en falso.
   - `abrirGuias()` agrega el saludo y las 7 situaciones sin borrar nada.
   - `volverAEscribir()` quita las opciones sin borrar mensajes.
@@ -78,7 +78,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
   - Las pruebas de la 003 siguen pasando sin cambios.
 
   Deben fallar antes de T009.
-- [ ] T009 Ampliar `src/logic/ConversacionEmergencia.js` ([contracts/logica.md](./contracts/logica.md), [data-model.md](./data-model.md)):
+- [X] T009 Ampliar `src/logic/ConversacionEmergencia.js` ([contracts/logica.md](./contracts/logica.md), [data-model.md](./data-model.md)):
   - Campo privado `#modoInicial` (`"escritura" | "guias"`); `iniciar` lo fija en `"guias"`.
   - `static iniciarEscritura(contenido)`: etapa `escritura`, sin mensajes ni opciones.
   - `abrirGuias()` reutiliza `#conSaludo([])`.
@@ -240,7 +240,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
   - con una URL `https://`: `connect-src` igual a su origen;
   - con `http://`: el build debe fallar.
 - [ ] T035 Validar los escenarios 17 (revisión de red con la URL real) y 15 (almacenamiento) de [quickstart.md](./quickstart.md) en un build de producción (`npm run build && npm run preview`).
-- [ ] T036 [P] Agregar a `.gitignore` las líneas `.env` y `.env.*` excepto `.env.example`, para que nunca se suba una URL de webhook privada.
+- [X] T036 [P] Agregar a `.gitignore` las líneas `.env` y `.env.*` excepto `.env.example`, para que nunca se suba una URL de webhook privada.
 - [ ] T037 Cuando el equipo defina proveedor y alojamiento (TODOs de la constitución): configurar el flujo en n8n según [contracts/n8n-flujo.md](./contracts/n8n-flujo.md), verificar el escenario 18 de [quickstart.md](./quickstart.md) y exportar el flujo **sin credenciales** a `n8n/asistente-emergencia.json`.
 - [ ] T038 Escribir el resumen para el equipo en el mensaje del commit final. Debe incluir lo pendiente para publicar: el proveedor y el alojamiento, `CONSENTIMIENTO_IA` y el contenido de emergencias de la 003. Y lo que hay que aprobar: los elementos visuales nuevos de R7 y R8 (tarjeta de consentimiento, campo y chip de IA) y los textos de interfaz de `TEXTOS_IA`.
 
@@ -326,3 +326,10 @@ Sin `VITE_URL_ASISTENTE_IA`, la app se puede publicar en cualquier momento: Emer
 - Commits locales por tarea o grupo; el push lo hace el equipo.
 - Ante una contradicción con la constitución o la spec, detenerse y avisar antes de tocar código.
 - Nunca escribir contenido, ni el consentimiento ni las guías, para hacer pasar una prueba.
+
+---
+
+## Decisiones
+
+- 2026-10-20 (T002): se aprueba `scripts/webhook-prueba.mjs`, solo para desarrollo, fuera de `src/` y del build. T020 sigue.
+- 2026-10-20 (T001): rama `004-asistente-ia-emergencia`. Fallos permitidos: los 6 de contenido pendiente de la spec 003, más el de `CONSENTIMIENTO_IA` (T006).

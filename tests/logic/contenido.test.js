@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import { PREGUNTAS } from "../../src/data/preguntas.js";
+import { CONSENTIMIENTO_IA } from "../../src/data/asistenteIA.js";
 import { POLITICA_PRIVACIDAD } from "../../src/data/politica.js";
 import {
   AVISO_NO_BORRES,
@@ -227,6 +228,14 @@ describe("tips.js", () => {
   });
 });
 
+describe("asistenteIA.js", () => {
+  it("CONSENTIMIENTO_IA tiene título y al menos 1 párrafo", () => {
+    expect(esTextoNoVacio(CONSENTIMIENTO_IA.titulo)).toBe(true);
+    expect(CONSENTIMIENTO_IA.parrafos.length).toBeGreaterThanOrEqual(1);
+    CONSENTIMIENTO_IA.parrafos.forEach((p) => expect(esTextoNoVacio(p)).toBe(true));
+  });
+});
+
 describe("prohibiciones (constitución I)", () => {
   it("ningún texto de contenido contiene <script ni http://", () => {
     const textos = recogerTextos({
@@ -235,6 +244,7 @@ describe("prohibiciones (constitución I)", () => {
       GUIAS_EMERGENCIA,
       MENSAJES_ASISTENTE,
       SITUACIONES_EMERGENCIA,
+      CONSENTIMIENTO_IA,
       AVISO_NO_BORRES,
       LINEAS_BANCARIAS,
       CANALES_DENUNCIA,
