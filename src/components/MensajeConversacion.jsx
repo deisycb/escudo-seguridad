@@ -1,4 +1,5 @@
 import { Phone } from "lucide-react";
+import { TEXTOS_IA } from "../logic/AsistenteIA.js";
 import { CHIP } from "./estilos.js";
 
 const BURBUJA_ASISTENTE =
@@ -51,7 +52,19 @@ function CanalesDenuncia({ canales }) {
   );
 }
 
+/** Respuesta de la IA: siempre texto plano y marcada como generada por IA (spec 004 FR-011). */
+function RespuestaIA({ texto }) {
+  return (
+    <>
+      <span className={`${CHIP} mb-2 bg-pista text-texto-secundario`}>{TEXTOS_IA.etiquetaIA}</span>
+      <p className="whitespace-pre-line">{texto}</p>
+      <p className="mt-2 text-xs text-texto-suave">{TEXTOS_IA.noReemplaza}</p>
+    </>
+  );
+}
+
 function ContenidoAsistente({ mensaje }) {
+  if (mensaje.tipo === "respuestaIA") return <RespuestaIA texto={mensaje.texto} />;
   return (
     <>
       {mensaje.tipo === "paso" && (
@@ -75,7 +88,9 @@ export default function MensajeConversacion({ mensaje, ref }) {
   if (mensaje.autor === "persona") {
     return (
       <li className={BURBUJA_PERSONA}>
-        <span className="sr-only">Tú elegiste: </span>
+        <span className="sr-only">
+          {mensaje.tipo === "escrito" ? "Tú escribiste: " : "Tú elegiste: "}
+        </span>
         {mensaje.texto}
       </li>
     );

@@ -2,6 +2,7 @@ import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AccionesRapidas from "../components/AccionesRapidas.jsx";
 import Dialogo from "../components/Dialogo.jsx";
+import EscrituraIA from "../components/EscrituraIA.jsx";
 import MensajeConversacion from "../components/MensajeConversacion.jsx";
 import OpcionesConversacion from "../components/OpcionesConversacion.jsx";
 import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
@@ -14,7 +15,9 @@ import {
   MENSAJES_ASISTENTE,
   SITUACIONES_EMERGENCIA,
 } from "../data/emergencias.js";
+import { AsistenteIA, escrituraConfigurada } from "../logic/AsistenteIA.js";
 import { ConversacionEmergencia, TEXTOS_ASISTENTE } from "../logic/ConversacionEmergencia.js";
+import { detectarDatoSensible } from "../logic/FiltroDatosSensibles.js";
 
 const CONTENIDO = {
   mensajes: MENSAJES_ASISTENTE,
@@ -23,6 +26,18 @@ const CONTENIDO = {
   lineas: LINEAS_BANCARIAS,
   canales: CANALES_DENUNCIA,
 };
+
+// Sin webhook configurado no hay escritura: Emergencia abre en las guías (spec 004 R1).
+const URL_ASISTENTE_IA = import.meta.env.VITE_URL_ASISTENTE_IA;
+const ASISTENTE_IA = escrituraConfigurada(URL_ASISTENTE_IA)
+  ? new AsistenteIA({ url: URL_ASISTENTE_IA })
+  : null;
+
+/** Escritura con conexión; si no, las guías, que funcionan sin internet (spec 004 R6). */
+function iniciarConversacion() {
+  if (ASISTENTE_IA && navigator.onLine) return ConversacionEmergencia.iniciarEscritura(CONTENIDO);
+  return ConversacionEmergencia.iniciar(CONTENIDO);
+}
 
 function PresentacionAsistente() {
   return (
@@ -115,8 +130,11 @@ export default function Emergencia({
   registrarInterceptorAtras,
   onVolverAlInicio,
 }) {
-  const [conversacion, setConversacion] = useState(() => ConversacionEmergencia.iniciar(CONTENIDO));
+  const [conversacion, setConversacion] = useState(iniciarConversacion);
   const [confirmacion, setConfirmacion] = useState(null);
+  // El consentimiento vale solo en esta visita: nunca se guarda (spec 004 FR-005).
+  const [consentimientoIA, setConsentimientoIA] = useState(false);
+  const refCampo = useRef(null);
   const mensajes = conversacion.obtenerMensajes();
   const idUltimoAsistente = mensajes.findLast((m) => m.autor === "asistente")?.id;
   const refPrimeraOpcion = useRef(null);
@@ -131,8 +149,29 @@ export default function Emergencia({
     if (refConversacionMostrada.current === conversacion) return;
     refConversacionMostrada.current = conversacion;
     desplazarALoNuevo(refFinal.current, refUltimoAsistente.current);
-    (refPrimeraOpcion.current ?? refUltimoAsistente.current)?.focus({ preventScroll: true });
+    const destino = refPrimeraOpcion.current ?? refCampo.current ?? refUltimoAsistente.current;
+    destino?.focus({ preventScroll: true });
   }, [conversacion]);
+
+  useEffect(() => {
+    if (consentimientoIA) refCampo.current?.focus();
+  }, [consentimientoIA]);
+
+  /**
+   * Envía lo escrito al asistente de IA (spec 004). Doble guarda: sin consentimiento o con un
+   * dato sensible no sale nada (constitución I y II).
+   * @returns {boolean} Si el mensaje se envió.
+   */
+  function enviarMensaje(texto) {
+    if (!consentimientoIA || detectarDatoSensible(texto)) return false;
+    const conMensaje = conversacion.agregarMensajeEscrito(texto);
+    if (conMensaje === conversacion) return false;
+    setConversacion(conMensaje);
+    ASISTENTE_IA.responder(conMensaje.obtenerIntercambioIA()).then((resultado) => {
+      if (resultado.ok) setConversacion((actual) => actual.agregarRespuestaIA(resultado.texto));
+    });
+    return true;
+  }
 
   // Una sola guarda para "atrás", la barra inferior y "Volver al inicio" (research R7).
   function interceptarSalida(destino) {
@@ -186,6 +225,16 @@ export default function Emergencia({
         opciones={conversacion.obtenerOpciones()}
         onElegir={(id) => setConversacion((actual) => actual.elegir(id))}
       />
+      {conversacion.admiteEscritura() && (
+        <EscrituraIA
+          consentimiento={consentimientoIA}
+          esperando={conversacion.estaEsperandoIA()}
+          onAceptar={() => setConsentimientoIA(true)}
+          onVerGuias={() => setConversacion((actual) => actual.abrirGuias())}
+          onEnviar={enviarMensaje}
+          refCampo={refCampo}
+        />
+      )}
       <div
         ref={refFinal}
         aria-hidden="true"

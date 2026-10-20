@@ -383,3 +383,95 @@ describe("ConversacionEmergencia — escritura (spec 004)", () => {
     expect(desdeGuias.reiniciar().obtenerMensajes()).toEqual(iniciar().obtenerMensajes());
   });
 });
+
+describe("ConversacionEmergencia — intercambio con IA", () => {
+  const escritura = () => ConversacionEmergencia.iniciarEscritura(PRUEBA);
+
+  it("un mensaje escrito queda a la espera de la respuesta", () => {
+    const c = escritura().agregarMensajeEscrito("hola");
+    const [escrito, esperando] = c.obtenerMensajes();
+    expect(escrito).toMatchObject({ autor: "persona", tipo: "escrito", texto: "hola" });
+    expect(esperando).toMatchObject({ autor: "asistente", tipo: "esperandoIA" });
+    expect(c.estaEsperandoIA()).toBe(true);
+    expect(c.tieneProgreso()).toBe(true);
+  });
+
+  it("la respuesta reemplaza el mensaje de espera y vuelve a la escritura", () => {
+    const esperando = escritura().agregarMensajeEscrito("hola");
+    const c = esperando.agregarRespuestaIA("respuesta");
+    expect(c.obtenerMensajes()).toHaveLength(2);
+    expect(ultimo(c)).toMatchObject({
+      id: ultimo(esperando).id,
+      autor: "asistente",
+      tipo: "respuestaIA",
+      texto: "respuesta",
+    });
+    expect(c.estaEsperandoIA()).toBe(false);
+    expect(c.agregarMensajeEscrito("otra")).not.toBe(c);
+  });
+
+  it("fuera de su etapa, escribir o responder no hace nada", () => {
+    const esperando = escritura().agregarMensajeEscrito("hola");
+    expect(esperando.agregarMensajeEscrito("otra")).toBe(esperando);
+    const enEscritura = escritura();
+    expect(enEscritura.agregarRespuestaIA("r")).toBe(enEscritura);
+    const enGuias = iniciar();
+    expect(enGuias.agregarMensajeEscrito("hola")).toBe(enGuias);
+  });
+
+  it("rechaza mensajes vacíos o de más de 1.000 caracteres", () => {
+    const c = escritura();
+    expect(c.agregarMensajeEscrito("   ")).toBe(c);
+    expect(c.agregarMensajeEscrito("x".repeat(1001))).toBe(c);
+  });
+
+  it("obtenerIntercambioIA solo trae lo escrito y las respuestas de la IA, en orden", () => {
+    const c = escritura()
+      .agregarMensajeEscrito("uno")
+      .agregarRespuestaIA("r1")
+      .abrirGuias()
+      .elegir("situacion:tarjeta-banco")
+      .mostrarLineasBancarias()
+      .volverAEscribir()
+      .agregarMensajeEscrito("dos");
+    expect(c.obtenerIntercambioIA()).toEqual([
+      { rol: "persona", texto: "uno" },
+      { rol: "asistente", texto: "r1" },
+      { rol: "persona", texto: "dos" },
+    ]);
+  });
+});
+
+describe("ConversacionEmergencia — acciones rápidas mientras responde la IA", () => {
+  it("la respuesta reemplaza el mensaje de espera aunque haya mensajes después", () => {
+    const c = ConversacionEmergencia.iniciarEscritura(PRUEBA)
+      .agregarMensajeEscrito("hola")
+      .mostrarLineasBancarias()
+      .agregarRespuestaIA("respuesta");
+    const tipos = c.obtenerMensajes().map((m) => m.tipo);
+    expect(tipos).toEqual(["escrito", "respuestaIA", "eleccion", "lineasBancarias"]);
+  });
+
+  it("admiteEscritura es verdadero en escritura y falso en las guías", () => {
+    const escritura = ConversacionEmergencia.iniciarEscritura(PRUEBA);
+    expect(escritura.admiteEscritura()).toBe(true);
+    expect(escritura.agregarMensajeEscrito("hola").admiteEscritura()).toBe(true);
+    expect(escritura.abrirGuias().admiteEscritura()).toBe(false);
+    expect(iniciar().admiteEscritura()).toBe(false);
+  });
+});
+
+describe("ConversacionEmergencia — guías mientras responde la IA", () => {
+  it("si abre las guías mientras espera, la respuesta llega igual y no se puede escribir otra vez", () => {
+    const enGuias = ConversacionEmergencia.iniciarEscritura(PRUEBA)
+      .agregarMensajeEscrito("hola")
+      .abrirGuias();
+    expect(enGuias.estaEsperandoIA()).toBe(true);
+    const deVuelta = enGuias.volverAEscribir();
+    expect(deVuelta.agregarMensajeEscrito("otra")).toBe(deVuelta);
+    const respondida = enGuias.agregarRespuestaIA("respuesta");
+    expect(respondida.estaEsperandoIA()).toBe(false);
+    expect(respondida.obtenerMensajes()[1]).toMatchObject({ tipo: "respuestaIA" });
+    expect(respondida.obtenerOpciones()).toEqual(enGuias.obtenerOpciones());
+  });
+});

@@ -99,7 +99,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T010 [P] [US1] Escribir `tests/logic/AsistenteIA.test.js` (`describe("AsistenteIA.responder")`), con `fetch` falso que registre la llamada:
+- [X] T010 [P] [US1] Escribir `tests/logic/AsistenteIA.test.js` (`describe("AsistenteIA.responder")`), con `fetch` falso que registre la llamada:
   - El cuerpo es exactamente `{ mensajes }`, sin otros campos.
   - La petición usa `method: "POST"`, `credentials: "omit"`, `referrerPolicy: "no-referrer"` y `Content-Type: application/json`.
   - Con más de 20 mensajes se envían solo los últimos 20.
@@ -108,7 +108,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
   - JSON inválido da `invalida`; 429 da `limite`; 500 da `red`; `fetch` que rechaza da `red`.
   - Pasados 20 s (con `vi.useFakeTimers()`), da `tiempo` y cancela la petición.
   - El método nunca lanza errores.
-- [ ] T011 [P] [US1] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — intercambio con IA")`:
+- [X] T011 [P] [US1] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — intercambio con IA")`:
   - `agregarMensajeEscrito("hola")` en `escritura` agrega `{ autor: "persona", tipo: "escrito", texto: "hola" }` y `{ autor: "asistente", tipo: "esperandoIA" }`, `estaEsperandoIA()` y `tieneProgreso()`.
   - `agregarRespuestaIA("r")` reemplaza `esperandoIA` por `{ tipo: "respuestaIA", texto: "r" }` y vuelve a `escritura`.
   - En una etapa que no corresponde, los dos métodos devuelven la misma instancia: escribir mientras se espera respuesta, o agregar una respuesta en `escritura`.
@@ -117,44 +117,44 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implementar `class AsistenteIA` en `src/logic/AsistenteIA.js` ([research.md](./research.md) R4, [contracts/webhook.md](./contracts/webhook.md)):
+- [X] T012 [US1] Implementar `class AsistenteIA` en `src/logic/AsistenteIA.js` ([research.md](./research.md) R4, [contracts/webhook.md](./contracts/webhook.md)):
   - Constructor `({ url, fetch = globalThis.fetch, tiempoEsperaMs = TIEMPO_ESPERA_MS })`.
   - `async responder(intercambio)` con `AbortController` y `setTimeout`. Debe recortar a `MAXIMO_MENSAJES_ENVIADOS`, validar la respuesta según la tabla del contrato y devolver siempre `{ ok, texto }` o `{ ok: false, motivo }`, sin lanzar errores.
   - Funciones privadas de menos de 20 líneas, con JSDoc. Hacer pasar T010.
-- [ ] T013 [US1] Implementar en `src/logic/ConversacionEmergencia.js`:
+- [X] T013 [US1] Implementar en `src/logic/ConversacionEmergencia.js`:
   - `agregarMensajeEscrito(texto)`: solo en `escritura` o `falloIA`, texto con `trim` no vacío y de "1–1.000 caracteres".
   - `agregarRespuestaIA(texto)`: solo en `esperandoIA`; reemplaza el último mensaje `esperandoIA` conservando su id.
   - `obtenerIntercambioIA()`: mapea `escrito` → `rol: "persona"` y `respuestaIA` → `rol: "asistente"`.
 
   El texto `esperandoIA` sale de `TEXTOS_IA`. Hacer pasar T011.
-- [ ] T014 [P] [US1] Ampliar `src/components/MensajeConversacion.jsx` ([contracts/pantallas.md](./contracts/pantallas.md), "Mensajes nuevos"):
+- [X] T014 [P] [US1] Ampliar `src/components/MensajeConversacion.jsx` ([contracts/pantallas.md](./contracts/pantallas.md), "Mensajes nuevos"):
   - **`escrito`:** burbuja de la persona con el prefijo `sr-only` "Tú escribiste:".
   - **`respuestaIA`:** burbuja del asistente con el chip `TEXTOS_IA` "Respuesta generada por IA" (`CHIP bg-pista text-texto-secundario`), el texto en `<p className="whitespace-pre-line">` y el pie "No reemplaza a tu banco ni a las autoridades" (`text-xs text-texto-suave`).
   - **`esperandoIA`:** burbuja del asistente con su texto.
 
   Sin `dangerouslySetInnerHTML`.
-- [ ] T015 [US1] Crear `src/components/EscrituraIA.jsx` (versión US1; los bloqueos con resaltado van en US2):
+- [X] T015 [US1] Crear `src/components/EscrituraIA.jsx` (versión US1; los bloqueos con resaltado van en US2):
   - Props `consentimiento`, `onAceptar`, `onVerGuias`, `onEnviar(texto)` y `esperando`.
   - **Sin consentimiento:** tarjeta `TARJETA` con `CONSENTIMIENTO_IA.titulo` y `parrafos` (o un párrafo "Texto del consentimiento pendiente" si está vacío, solo para que se vea en desarrollo) y botones "Acepto y quiero escribir" (`BOTON_PRINCIPAL`) y "No, prefiero ver las guías" (`BOTON_SECUNDARIO`).
   - **Con consentimiento:** `<label htmlFor>` con la invitación, `<textarea maxLength={MAXIMO_CARACTERES_MENSAJE} rows={3}>` (`rounded-boton border border-borde bg-fondo p-3 text-base`), el aviso de datos sensibles con `Lock` de 16 px, un contador cuando quedan 100 caracteres o menos y "Enviar" (`BOTON_PRINCIPAL` con `ChevronRight`), deshabilitado sin texto o mientras `esperando`.
   - Si `detectarDatoSensible(borrador)` no es `null`, no llama a `onEnviar` y muestra un texto genérico de bloqueo (US2 lo mejora).
   - Debajo, el enlace "No puedo o no quiero escribir: ver guías" (`BOTON_ENLACE`).
   - El borrador es estado local y se vacía solo cuando `onEnviar` confirma que se envió.
-- [ ] T016 [US1] En `src/pages/Emergencia.jsx`, modo inicial según [research.md](./research.md) R6:
+- [X] T016 [US1] En `src/pages/Emergencia.jsx`, modo inicial según [research.md](./research.md) R6:
   - `const URL_IA = import.meta.env.VITE_URL_ASISTENTE_IA`.
   - `const asistente = useMemo(() => escrituraConfigurada(URL_IA) ? new AsistenteIA({ url: URL_IA }) : null, [])`.
   - El estado inicial usa `iniciarEscritura` si `asistente && navigator.onLine`; si no, `iniciar`.
   - `const [consentimientoIA, setConsentimientoIA] = useState(false)`, que nunca se guarda en el navegador (FR-005).
-- [ ] T017 [US1] Envío en `src/pages/Emergencia.jsx`: función `enviarMensaje(texto)` que:
+- [X] T017 [US1] Envío en `src/pages/Emergencia.jsx`: función `enviarMensaje(texto)` que:
   1. no hace nada sin consentimiento o si `detectarDatoSensible(texto)` no es `null` (doble guarda, constitución I);
   2. aplica `agregarMensajeEscrito` y calcula el intercambio con la conversación resultante;
   3. hace `await asistente.responder(intercambio)`;
   4. aplica `agregarRespuestaIA(texto)` si `ok`.
 
   Los fallos se tratan en US3 (T026); hasta entonces, un fallo deja la conversación esperando. Usar la forma funcional de `setConversacion`. Mostrar `EscrituraIA` solo en las etapas `escritura`, `esperandoIA` y `falloIA`, entre las opciones y "Volver al inicio".
-- [ ] T018 [US1] Foco en `src/pages/Emergencia.jsx` según la tabla "Foco y anuncios" de [contracts/pantallas.md](./contracts/pantallas.md): al aceptar el consentimiento y al recibir una respuesta, el foco pasa al `textarea` (ref expuesta por `EscrituraIA`). Ajustar el efecto de foco de la 003 para que en la etapa `escritura` no busque una primera opción.
-- [ ] T019 [US1] "Empezar de nuevo" en `src/pages/Emergencia.jsx`: con el `reiniciar()` ampliado (T009) vuelve a la escritura vacía y `consentimientoIA` no cambia (FR-021). Verificar que la confirmación de salida de la 003 (FR-041) siga funcionando con mensajes `escrito`.
-- [ ] T020 [P] [US1] Si T002 lo aprobó: crear `scripts/webhook-prueba.mjs` con `node:http`, sin dependencias, en el puerto 8787:
+- [X] T018 [US1] Foco en `src/pages/Emergencia.jsx` según la tabla "Foco y anuncios" de [contracts/pantallas.md](./contracts/pantallas.md): al aceptar el consentimiento y al recibir una respuesta, el foco pasa al `textarea` (ref expuesta por `EscrituraIA`). Ajustar el efecto de foco de la 003 para que en la etapa `escritura` no busque una primera opción.
+- [X] T019 [US1] "Empezar de nuevo" en `src/pages/Emergencia.jsx`: con el `reiniciar()` ampliado (T009) vuelve a la escritura vacía y `consentimientoIA` no cambia (FR-021). Verificar que la confirmación de salida de la 003 (FR-041) siga funcionando con mensajes `escrito`.
+- [X] T020 [P] [US1] Si T002 lo aprobó: crear `scripts/webhook-prueba.mjs` con `node:http`, sin dependencias, en el puerto 8787:
   - Responde `POST` con CORS para `http://localhost:5173` y `http://localhost:5179` y `{ respuesta: "Respuesta de prueba: recibí N mensajes." }`.
   - Con `?modo=429|500|lento|invalida` simula fallos (`lento` espera 25 s).
   - Comentario inicial: "SOLO DESARROLLO. No se publica ni se incluye en el build."
@@ -171,7 +171,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 **Independent Test**: quickstart escenarios 6 y 7. Cero peticiones con datos bloqueados.
 
-- [ ] T022 [US2] En `src/components/EscrituraIA.jsx`, cambiar el bloqueo genérico por:
+- [X] T022 [US2] En `src/components/EscrituraIA.jsx`, cambiar el bloqueo genérico por:
   - estado `bloqueo` (resultado de `detectarDatoSensible`), calculado al tocar "Enviar" y limpiado con `onChange`;
   - explicación en `<p id="explicacion-bloqueo" role="alert">` con el texto de `TEXTOS_IA` según `tipo`;
   - una vista del mensaje con `bloqueo.fragmento` dentro de `<mark className="rounded-etiqueta bg-advertencia-suave px-1 text-advertencia-texto">`;
@@ -219,7 +219,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 **Independent Test**: quickstart escenario 16.
 
-- [ ] T029 [P] [US4] En `src/components/EscrituraIA.jsx`:
+- [X] T029 [P] [US4] En `src/components/EscrituraIA.jsx`:
   - `aria-describedby` del `textarea` con `aviso-sensibles` (y `explicacion-bloqueo` cuando hay bloqueo);
   - contador con `aria-live="polite"` solo cuando aparece;
   - "Enviar" con `aria-disabled` coherente;
@@ -332,4 +332,6 @@ Sin `VITE_URL_ASISTENTE_IA`, la app se puede publicar en cualquier momento: Emer
 ## Decisiones
 
 - 2026-10-20 (T002): se aprueba `scripts/webhook-prueba.mjs`, solo para desarrollo, fuera de `src/` y del build. T020 sigue.
+- 2026-10-20 (T015): `EscrituraIA.jsx` se escribió de una vez con el bloqueo resaltado (T022) y las asociaciones accesibles del campo (T029), porque los tres tocan el mismo archivo.
+- 2026-10-20 (T013): se agregaron `admiteEscritura()` y que la espera dependa del mensaje "respondiendo…" y no de la etapa, para que las acciones rápidas y las guías abiertas mientras se espera no pierdan la respuesta. Hay pruebas de esos dos casos.
 - 2026-10-20 (T001): rama `004-asistente-ia-emergencia`. Fallos permitidos: los 6 de contenido pendiente de la spec 003, más el de `CONSENTIMIENTO_IA` (T006).

@@ -1,3 +1,5 @@
+import { MAXIMO_CARACTERES_MENSAJE, TEXTOS_IA } from "./AsistenteIA.js";
+
 /** Ids de las 7 situaciones, en el orden fijo de la spec 003 (FR-007). */
 export const IDS_SITUACIONES = [
   "tarjeta-banco",
@@ -219,9 +221,52 @@ export class ConversacionEmergencia {
     return this.#continuar([], [], { etapa: ETAPA.ESCRITURA });
   }
 
+  /** @returns {boolean} Si la pantalla debe mostrar la escritura (escribir, esperar o fallo). */
+  admiteEscritura() {
+    return [ETAPA.ESCRITURA, ETAPA.ESPERANDO_IA, ETAPA.FALLO_IA].includes(this.#posicion.etapa);
+  }
+
   /** @returns {boolean} Si se espera la respuesta del asistente de IA. */
   estaEsperandoIA() {
-    return this.#posicion.etapa === ETAPA.ESPERANDO_IA;
+    // Por el mensaje y no por la etapa: mientras espera, la persona puede abrir las guías.
+    return this.#mensajes.some((m) => m.tipo === "esperandoIA");
+  }
+
+  /**
+   * Mensaje escrito por la persona; queda a la espera de la respuesta (spec 004). El texto ya
+   * debe haber pasado el filtro de datos sensibles.
+   * @param {string} texto De 1 a 1.000 caracteres sin contar espacios de los extremos.
+   * @returns {ConversacionEmergencia} Conversación nueva, o esta misma si no se puede escribir.
+   */
+  agregarMensajeEscrito(texto) {
+    const limpio = texto.trim();
+    const sePuedeEscribir = [ETAPA.ESCRITURA, ETAPA.FALLO_IA].includes(this.#posicion.etapa);
+    const textoValido = limpio && limpio.length <= MAXIMO_CARACTERES_MENSAJE;
+    if (!sePuedeEscribir || this.estaEsperandoIA() || !textoValido) return this;
+    const escrito = { autor: "persona", tipo: "escrito", texto: limpio };
+    const esperando = { autor: "asistente", tipo: "esperandoIA", texto: TEXTOS_IA.respondiendo };
+    return this.#continuar([escrito, esperando], [], { etapa: ETAPA.ESPERANDO_IA });
+  }
+
+  /**
+   * Respuesta del asistente de IA: reemplaza el mensaje de espera (spec 004 FR-011).
+   * @param {string} texto Texto plano de la respuesta.
+   * @returns {ConversacionEmergencia} Conversación nueva, o esta misma si no se esperaba nada.
+   */
+  agregarRespuestaIA(texto) {
+    if (!this.estaEsperandoIA()) return this;
+    const respuesta = { autor: "asistente", tipo: "respuestaIA", texto };
+    return this.#reemplazarEspera(respuesta, [], { etapa: ETAPA.ESCRITURA });
+  }
+
+  /**
+   * Lo único que se envía al asistente de IA: lo escrito y sus respuestas (spec 004 FR-009).
+   * @returns {{ rol: "persona" | "asistente", texto: string }[]}
+   */
+  obtenerIntercambioIA() {
+    return this.#mensajes
+      .filter((m) => m.tipo === "escrito" || m.tipo === "respuestaIA")
+      .map((m) => ({ rol: m.tipo === "escrito" ? "persona" : "asistente", texto: m.texto }));
   }
 
   /**
@@ -409,6 +454,26 @@ export class ConversacionEmergencia {
     if (Object.values(lista)[0].length === 0) return this.#mensajeTexto("");
     const texto = esTextoNoVacio(introduccion) ? introduccion : null;
     return { autor: "asistente", tipo, texto, ...lista };
+  }
+
+  /**
+   * Cambia el mensaje "respondiendo…" por la respuesta o el fallo, con el mismo id. Se busca por
+   * tipo porque, mientras se espera, la persona puede usar las acciones rápidas.
+   */
+  #reemplazarEspera(mensaje, opciones, posicion) {
+    const indice = this.#mensajes.findLastIndex((m) => m.tipo === "esperandoIA");
+    const mensajes = this.#mensajes.with(indice, { id: this.#mensajes[indice].id, ...mensaje });
+    // Si la persona se fue a las guías mientras esperaba, se queda donde está.
+    if (this.#posicion.etapa !== ETAPA.ESPERANDO_IA) {
+      [opciones, posicion] = [this.#opciones, this.#posicion];
+    }
+    return new ConversacionEmergencia(
+      this.#contenido,
+      mensajes,
+      opciones,
+      posicion,
+      this.#modoInicial,
+    );
   }
 
   /** Agrega mensajes (con ids nuevos) y devuelve la conversación con la nueva posición. */
