@@ -5,5 +5,7 @@ const BASE =
 export const BOTON_PRINCIPAL = `${BASE} h-14 w-full bg-primario text-white hover:bg-primario-oscuro active:bg-primario-oscuro`;
 export const BOTON_SECUNDARIO = `${BASE} h-14 w-full border border-primario bg-fondo text-primario`;
 export const BOTON_EMERGENCIA = `${BASE} h-[52px] w-full border-[1.5px] border-peligro bg-fondo text-peligro`;
+// Botón de Inicio con dos líneas: mínimo 52px y crece (excepción a §7.5, spec 003 FR-002).
+export const BOTON_EMERGENCIA_ASISTENTE = `${BASE} min-h-[52px] w-full border-[1.5px] border-peligro bg-fondo py-2 text-peligro`;
 export const BOTON_ENLACE =
   "inline-flex min-h-11 items-center gap-1 font-semibold text-primario underline underline-offset-2";

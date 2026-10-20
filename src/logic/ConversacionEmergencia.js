@@ -115,3 +115,227 @@ export function validarContenidoEmergencias(contenido) {
   situaciones.forEach((s) => validarSituacion(s, idsGuias, errores));
   return { errores, pendientes: buscarPendientes(contenido) };
 }
+
+const PREFIJO_SITUACION = "situacion:";
+const PREFIJO_RESPUESTA = "respuesta:";
+
+const ETAPA = {
+  SITUACIONES: "situaciones",
+  SEGUIMIENTO: "seguimiento",
+  PASO: "paso",
+  CIERRE: "cierre",
+  CIERRE_TRAS_DENUNCIA: "cierreTrasDenuncia",
+  TERMINADA: "terminada",
+};
+
+const OPCION_SIGUIENTE = { id: "siguiente", texto: TEXTOS_ASISTENTE.siguiente };
+const OPCION_DENUNCIAR = { id: "denunciar", texto: TEXTOS_ASISTENTE.denunciar };
+const OPCION_OTRA_COSA = { id: "otraCosa", texto: TEXTOS_ASISTENTE.otraCosa };
+const OPCION_TERMINAR = { id: "terminar", texto: TEXTOS_ASISTENTE.terminar };
+const OPCIONES_CIERRE = [OPCION_DENUNCIAR, OPCION_OTRA_COSA, OPCION_TERMINAR];
+const OPCIONES_TRAS_DENUNCIA = [OPCION_OTRA_COSA, OPCION_TERMINAR];
+
+function eleccion(texto) {
+  return { autor: "persona", tipo: "eleccion", texto };
+}
+
+function pasosDe(guia) {
+  return (guia?.pasos ?? []).filter(esTextoNoVacio);
+}
+
+/**
+ * Conversación guiada del asistente de emergencia (spec 003). Solo funciona con opciones fijas
+ * del contenido; es inmutable: cada acción devuelve una conversación nueva, o la misma si la
+ * acción no aplica. Vive solo en memoria: nunca se guarda ni se envía.
+ */
+export class ConversacionEmergencia {
+  #contenido;
+  #mensajes;
+  #opciones;
+  #posicion;
+
+  /**
+   * Usar {@link ConversacionEmergencia.iniciar}; el constructor es para uso interno.
+   * @param {object} contenido { mensajes, situaciones, guias, lineas, canales }.
+   * @param {object[]} mensajes Historial con ids ya asignados.
+   * @param {{ id: string, texto: string }[]} opciones Opciones pendientes.
+   * @param {{ etapa: string, situacionId?: string, guiaId?: string, numero?: number }} posicion
+   */
+  constructor(contenido, mensajes, opciones, posicion) {
+    this.#contenido = contenido;
+    this.#mensajes = mensajes;
+    this.#opciones = opciones;
+    this.#posicion = posicion;
+  }
+
+  /**
+   * @param {object} contenido { mensajes, situaciones, guias, lineas, canales } de emergencias.js.
+   * @returns {ConversacionEmergencia} Conversación con el saludo y las 7 situaciones.
+   */
+  static iniciar(contenido) {
+    return new ConversacionEmergencia(contenido, [], [], { etapa: ETAPA.SITUACIONES }).#conSaludo(
+      [],
+    );
+  }
+
+  /**
+   * @param {string} idOpcion Id de una opción pendiente.
+   * @returns {ConversacionEmergencia} Conversación nueva, o esta misma si el id no está pendiente.
+   */
+  elegir(idOpcion) {
+    const opcion = this.#opciones.find((o) => o.id === idOpcion);
+    if (!opcion) return this;
+    const previos = [eleccion(opcion.texto)];
+    if (idOpcion.startsWith(PREFIJO_SITUACION)) {
+      return this.#elegirSituacion(idOpcion.slice(PREFIJO_SITUACION.length), previos);
+    }
+    if (idOpcion.startsWith(PREFIJO_RESPUESTA)) {
+      return this.#elegirRespuesta(idOpcion.slice(PREFIJO_RESPUESTA.length), previos);
+    }
+    return this.#elegirAccionFija(idOpcion, previos);
+  }
+
+  /** @returns {object[]} Copia del historial de mensajes, en orden. */
+  obtenerMensajes() {
+    return this.#mensajes.map((mensaje) => ({ ...mensaje }));
+  }
+
+  /** @returns {{ id: string, texto: string }[]} Copia de las opciones pendientes. */
+  obtenerOpciones() {
+    return this.#opciones.map((opcion) => ({ ...opcion }));
+  }
+
+  /** @returns {boolean} Si la persona terminó con "Eso es todo, gracias". */
+  estaTerminada() {
+    return this.#posicion.etapa === ETAPA.TERMINADA;
+  }
+
+  /** @returns {boolean} Si hay algún mensaje de la persona (decide las confirmaciones). */
+  tieneProgreso() {
+    return this.#mensajes.some((mensaje) => mensaje.autor === "persona");
+  }
+
+  #elegirSituacion(id, previos) {
+    const situacion = this.#contenido.situaciones.find((s) => s.id === id);
+    if (!situacion.seguimiento) return this.#iniciarGuia(situacion.guia, previos);
+    const { pregunta, respuestas } = situacion.seguimiento;
+    return this.#continuar(
+      [...previos, this.#mensajeTexto(pregunta)],
+      respuestas.map((r) => ({ id: `${PREFIJO_RESPUESTA}${r.id}`, texto: r.texto })),
+      { etapa: ETAPA.SEGUIMIENTO, situacionId: id },
+    );
+  }
+
+  #elegirRespuesta(id, previos) {
+    const situacion = this.#contenido.situaciones.find((s) => s.id === this.#posicion.situacionId);
+    const respuesta = situacion.seguimiento.respuestas.find((r) => r.id === id);
+    return this.#iniciarGuia(respuesta.guia, previos);
+  }
+
+  #elegirAccionFija(id, previos) {
+    const { mensajes } = this.#contenido;
+    switch (id) {
+      case OPCION_SIGUIENTE.id:
+        return this.#avanzarPaso(previos);
+      case OPCION_DENUNCIAR.id:
+        return this.#continuar([...previos, this.#mensajeCanales()], OPCIONES_TRAS_DENUNCIA, {
+          etapa: ETAPA.CIERRE_TRAS_DENUNCIA,
+        });
+      case OPCION_OTRA_COSA.id:
+        return this.#conSaludo(previos);
+      default:
+        return this.#continuar([...previos, this.#mensajeTexto(mensajes.despedida)], [], {
+          etapa: ETAPA.TERMINADA,
+        });
+    }
+  }
+
+  #iniciarGuia(guiaId, previos) {
+    if (pasosDe(this.#buscarGuia(guiaId)).length === 0) {
+      return this.#conCierre([...previos, this.#mensajeTexto("")]);
+    }
+    return this.#conPaso(guiaId, 1, previos);
+  }
+
+  #avanzarPaso(previos) {
+    const { guiaId, numero } = this.#posicion;
+    if (numero < pasosDe(this.#buscarGuia(guiaId)).length) {
+      return this.#conPaso(guiaId, numero + 1, previos);
+    }
+    return this.#conCierre([...previos, this.#mensajeTexto(this.#contenido.mensajes.cierreGuia)]);
+  }
+
+  #conPaso(guiaId, numero, previos) {
+    const pasos = pasosDe(this.#buscarGuia(guiaId));
+    const paso = {
+      autor: "asistente",
+      tipo: "paso",
+      texto: pasos[numero - 1],
+      numero,
+      total: pasos.length,
+    };
+    return this.#continuar([...previos, paso], [OPCION_SIGUIENTE], {
+      etapa: ETAPA.PASO,
+      guiaId,
+      numero,
+    });
+  }
+
+  #conCierre(nuevos) {
+    return this.#continuar(nuevos, OPCIONES_CIERRE, { etapa: ETAPA.CIERRE });
+  }
+
+  #conSaludo(previos) {
+    const opciones = this.#contenido.situaciones.map((s) => ({
+      id: `${PREFIJO_SITUACION}${s.id}`,
+      texto: s.texto,
+    }));
+    return this.#continuar(
+      [...previos, this.#mensajeTexto(this.#contenido.mensajes.saludo)],
+      opciones,
+      {
+        etapa: ETAPA.SITUACIONES,
+      },
+    );
+  }
+
+  #buscarGuia(id) {
+    return this.#contenido.guias.find((g) => g.id === id);
+  }
+
+  /** Un texto vacío nunca se muestra: se cambia por el aviso de contenido pendiente. */
+  #textoOPendiente(texto) {
+    if (esTextoNoVacio(texto)) return texto;
+    const { contenidoPendiente } = this.#contenido.mensajes;
+    return esTextoNoVacio(contenidoPendiente)
+      ? contenidoPendiente
+      : TEXTOS_ASISTENTE.respaldoPendiente;
+  }
+
+  #mensajeTexto(texto) {
+    return { autor: "asistente", tipo: "texto", texto: this.#textoOPendiente(texto) };
+  }
+
+  #mensajeCanales() {
+    const { canales, mensajes } = this.#contenido;
+    if (canales.length === 0) return this.#mensajeTexto("");
+    return {
+      autor: "asistente",
+      tipo: "canalesDenuncia",
+      texto: esTextoNoVacio(mensajes.introCanalesDenuncia) ? mensajes.introCanalesDenuncia : null,
+      canales,
+    };
+  }
+
+  /** Agrega mensajes (con ids nuevos) y devuelve la conversación con la nueva posición. */
+  #continuar(nuevos, opciones, posicion) {
+    const ultimoId = this.#mensajes.at(-1)?.id ?? 0;
+    const conIds = nuevos.map((mensaje, i) => ({ id: ultimoId + i + 1, ...mensaje }));
+    return new ConversacionEmergencia(
+      this.#contenido,
+      [...this.#mensajes, ...conIds],
+      opciones,
+      posicion,
+    );
+  }
+}

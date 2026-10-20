@@ -1,0 +1,63 @@
+import { CHIP } from "./estilos.js";
+
+const BURBUJA_ASISTENTE =
+  "max-w-[88%] self-start rounded-tarjeta border border-borde bg-fondo p-4 text-base leading-normal text-texto";
+const BURBUJA_PERSONA =
+  "max-w-[80%] self-end rounded-tarjeta bg-primario p-4 text-base leading-normal font-semibold text-white";
+
+function CanalesDenuncia({ canales }) {
+  return (
+    <ul className="mt-3 flex flex-col divide-y divide-borde">
+      {canales.map(({ entidad, contacto, enlace }) => (
+        <li key={entidad} className="py-2">
+          <p className="font-semibold">{entidad}</p>
+          <p className="text-texto-secundario">{contacto}</p>
+          {enlace && (
+            <a
+              href={enlace}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center font-semibold text-primario underline"
+            >
+              Ir al sitio oficial (se abre en otra pestaña)
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ContenidoAsistente({ mensaje }) {
+  return (
+    <>
+      {mensaje.tipo === "paso" && (
+        <span className={`${CHIP} mb-2 bg-pista text-texto-secundario`}>
+          Paso {mensaje.numero} de {mensaje.total}
+        </span>
+      )}
+      {mensaje.texto && <p>{mensaje.texto}</p>}
+      {mensaje.tipo === "canalesDenuncia" && <CanalesDenuncia canales={mensaje.canales} />}
+    </>
+  );
+}
+
+/**
+ * Un mensaje de la conversación de emergencia (spec 003, FR-019 y FR-021): el asistente a la
+ * izquierda (blanco con borde) y la persona a la derecha (primario con texto blanco).
+ * @param {{ mensaje: { autor: string, tipo: string, texto?: string }, ref?: object }} props
+ */
+export default function MensajeConversacion({ mensaje, ref }) {
+  if (mensaje.autor === "persona") {
+    return <li className={BURBUJA_PERSONA}>{mensaje.texto}</li>;
+  }
+  return (
+    <li
+      ref={ref}
+      tabIndex={ref ? -1 : undefined}
+      className={`${BURBUJA_ASISTENTE} flex flex-col items-start`}
+    >
+      <ContenidoAsistente mensaje={mensaje} />
+    </li>
+  );
+}

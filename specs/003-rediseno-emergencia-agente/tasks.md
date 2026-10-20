@@ -100,7 +100,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 > Escribirlas primero y comprobar que fallan.
 
-- [ ] T008 [US1] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — flujo")` con las filas de [contracts/logica-conversacion.md](./contracts/logica-conversacion.md):
+- [X] T008 [US1] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — flujo")` con las filas de [contracts/logica-conversacion.md](./contracts/logica-conversacion.md):
   - `iniciar`: 1 mensaje (saludo) y 7 opciones con ids `situacion:<id>` y los textos del contenido, en orden.
   - Situación directa: elección de la persona con el texto exacto, paso con `numero: 1, total: 3` y opciones `[siguiente]`.
   - Situación con seguimiento y luego respuesta: llega al paso 1 de su guía.
@@ -116,41 +116,41 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implementar la clase inmutable `ConversacionEmergencia` en `src/logic/ConversacionEmergencia.js`:
+- [X] T009 [US1] Implementar la clase inmutable `ConversacionEmergencia` en `src/logic/ConversacionEmergencia.js`:
   - Campos privados `#contenido`, `#mensajes`, `#opciones`, `#posicion` y `#siguienteId`.
   - Métodos `static iniciar(contenido)`, `elegir(idOpcion)`, `obtenerMensajes()`, `obtenerOpciones()`, `estaTerminada()` y `tieneProgreso()`.
   - Etapas `situaciones`, `seguimiento`, `paso`, `cierre`, `cierreTrasDenuncia` y `terminada`, con las transiciones de [data-model.md](./data-model.md).
   - Mensajes con `{ id, autor, tipo, ... }` y tipos `texto`, `paso` (`numero`, `total`), `canalesDenuncia` y `eleccion`.
   - Un texto vacío se reemplaza por `contenidoPendiente` o, si también está vacío, por `TEXTOS_ASISTENTE.respaldoPendiente`.
   - Mismo patrón que `src/logic/PlanAccion.js` (métodos privados `#con…` que devuelven una instancia nueva). Con JSDoc. Hacer pasar T008.
-- [ ] T010 [P] [US1] Agregar `BOTON_EMERGENCIA_ASISTENTE` en `src/components/botones.js`: igual que `BOTON_EMERGENCIA` pero con `min-h-[52px] py-2` en lugar de `h-[52px]` ([R8](./research.md)). No cambiar `BOTON_EMERGENCIA`, que sigue usando `src/pages/Tips.jsx`.
-- [ ] T011 [US1] Cambiar el botón de emergencia en `src/pages/Inicio.jsx`:
+- [X] T010 [P] [US1] Agregar `BOTON_EMERGENCIA_ASISTENTE` en `src/components/botones.js`: igual que `BOTON_EMERGENCIA` pero con `min-h-[52px] py-2` en lugar de `h-[52px]` ([R8](./research.md)). No cambiar `BOTON_EMERGENCIA`, que sigue usando `src/pages/Tips.jsx`.
+- [X] T011 [US1] Cambiar el botón de emergencia en `src/pages/Inicio.jsx`:
   - usar `BOTON_EMERGENCIA_ASISTENTE`;
   - contenido: `TriangleAlert` de 20 px y un `<span className="flex flex-col text-left">` con "Tengo una emergencia ahora" (`text-base font-bold`) y "Un asistente te guía paso a paso" (`text-[13px] font-medium`);
   - sin `aria-label`: el nombre accesible sale del texto visible (spec FR-001 a FR-003).
-- [ ] T012 [P] [US1] Crear `src/components/MensajeConversacion.jsx`, que recibe un `mensaje` de la conversación y dibuja un `<li>`:
+- [X] T012 [P] [US1] Crear `src/components/MensajeConversacion.jsx`, que recibe un `mensaje` de la conversación y dibuja un `<li>`:
   - **Asistente:** alineado a la izquierda, `max-w-[88%]`, `rounded-tarjeta border border-borde bg-fondo p-4 text-base leading-normal text-texto`.
   - **Persona:** alineada a la derecha (`self-end`), `max-w-[80%]`, `rounded-tarjeta bg-primario p-4 font-semibold text-white`.
   - **Tipo `paso`:** chip "Paso {numero} de {total}" con `CHIP` de `estilos.js` más `bg-pista text-texto-secundario` encima del texto.
   - **Tipo `canalesDenuncia`:** la introducción y la lista de canales, reutilizando el marcado de `Denuncia` de `src/pages/Emergencia.jsx`, con enlace externo opcional.
   - Exportar el componente por defecto con JSDoc de props ([R9](./research.md), spec FR-019 y FR-021).
-- [ ] T013 [P] [US1] Crear `src/components/OpcionesConversacion.jsx`. Dibuja la lista de opciones pendientes como `<button type="button">` de ancho completo:
+- [X] T013 [P] [US1] Crear `src/components/OpcionesConversacion.jsx`. Dibuja la lista de opciones pendientes como `<button type="button">` de ancho completo:
   - clases: `flex min-h-[52px] w-full items-center gap-3 rounded-boton border border-borde bg-fondo px-4 text-left font-semibold text-texto focus-visible:outline-2 focus-visible:outline-primario`;
   - texto en `flex-1` y `ChevronRight` de 20 px `text-texto-suave`;
   - props `opciones` y `onElegir(id)`; reenviar una `ref` a la primera opción (`ref` como prop en React 19).
 
   Spec FR-020.
-- [ ] T014 [US1] Reescribir `src/pages/Emergencia.jsx` como conversación ([contracts/pantallas.md](./contracts/pantallas.md), puntos 1 a 6):
+- [X] T014 [US1] Reescribir `src/pages/Emergencia.jsx` como conversación ([contracts/pantallas.md](./contracts/pantallas.md), puntos 1 a 6):
   - Estado: `const [conversacion, setConversacion] = useState(() => ConversacionEmergencia.iniciar(CONTENIDO))`. `CONTENIDO` se arma desde `src/data/emergencias.js` con los nombres `mensajes`, `situaciones`, `guias`, `lineas` y `canales`.
   - `<h1 tabIndex={-1}>` "Respira. Vamos paso a paso." y la presentación del asistente: círculo de 44 px `bg-primario` con `ShieldCheck` blanco de 24 px, "Asistente de emergencias" (16 px/700) y "Nunca te pediré claves, códigos ni datos de tu tarjeta" (14 px/500 `text-texto-secundario`).
   - Mantener `AvisoNoBorres` tal cual.
   - `<ol className="flex flex-col gap-3">` con `MensajeConversacion` por cada mensaje y `OpcionesConversacion` debajo.
   - Eliminar `Menu`, `Guia`, `Bancos`, `VistaActual`, `PREFIJO_GUIA`, `ICONOS_GUIA` y la prop `vista`. Mantener las funciones de bancos y denuncia solo si `MensajeConversacion` las reutiliza; si no, moverlas allí.
   - Sin `<input>`, `<textarea>` ni retardos (spec FR-004 a FR-012, FR-023).
-- [ ] T015 [US1] En `src/App.jsx`, cambiar `irAEmergencia()` a `navegar({ pantalla: "emergencia" })` sin `vista`, y dejar de pasar `vista` y `navegar` a `<Emergencia>`. Pasar `hayDiagnostico`, `onVolverAlInicio` y `registrarInterceptorAtras` ([R7](./research.md)).
-- [ ] T016 [US1] Agregar `navegarConGuarda(destino)` a `src/hooks/useNavegacion.js`: si `interceptorAtras.current?.(destino)` devuelve `true`, no navega; si no, llama a `navegar(destino)`. Con `useCallback`, devolverla junto a las demás y documentarla con JSDoc ([contracts/pantallas.md](./contracts/pantallas.md), "Cambio en `useNavegacion`").
-- [ ] T017 [US1] En `src/App.jsx`, hacer que `navegarDesdeBarra` use `navegarConGuarda` en lugar de `navegar` (también al ir a Emergencia), para que la barra inferior pase por la guarda de salida (spec FR-031).
-- [ ] T018 [US1] Implementar la guarda de salida en `src/pages/Emergencia.jsx` ([R7](./research.md), [contracts/pantallas.md](./contracts/pantallas.md) punto 8):
+- [X] T015 [US1] En `src/App.jsx`, cambiar `irAEmergencia()` a `navegar({ pantalla: "emergencia" })` sin `vista`, y dejar de pasar `vista` y `navegar` a `<Emergencia>`. Pasar `hayDiagnostico`, `onVolverAlInicio` y `registrarInterceptorAtras` ([R7](./research.md)).
+- [X] T016 [US1] Agregar `navegarConGuarda(destino)` a `src/hooks/useNavegacion.js`: si `interceptorAtras.current?.(destino)` devuelve `true`, no navega; si no, llama a `navegar(destino)`. Con `useCallback`, devolverla junto a las demás y documentarla con JSDoc ([contracts/pantallas.md](./contracts/pantallas.md), "Cambio en `useNavegacion`").
+- [X] T017 [US1] En `src/App.jsx`, hacer que `navegarDesdeBarra` use `navegarConGuarda` en lugar de `navegar` (también al ir a Emergencia), para que la barra inferior pase por la guarda de salida (spec FR-031).
+- [X] T018 [US1] Implementar la guarda de salida en `src/pages/Emergencia.jsx` ([R7](./research.md), [contracts/pantallas.md](./contracts/pantallas.md) punto 8):
   - Estado `confirmacion` (`null | { tipo: "salir", destino }`).
   - `useEffect` que registra con `registrarInterceptorAtras` una función `interceptarSalida(destino)`: devuelve `false` si `!conversacion.tieneProgreso()`; si no, guarda `{ tipo: "salir", destino }` y devuelve `true`. Debe depender de `conversacion` y liberar el interceptor al desmontarse, igual que `src/pages/Diagnostico.jsx`.
   - "Volver al inicio" llama a `interceptarSalida({ pantalla: "inicio" })` y, si devuelve `false`, a `onVolverAlInicio()`.

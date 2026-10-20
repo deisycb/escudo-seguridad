@@ -29,9 +29,10 @@ function limitarPregunta(numero) {
 
 export default function App() {
   const escudo = useEstadoEscudo();
-  const { estado, navegar, reemplazar, registrarInterceptorAtras } = useNavegacion({
-    pantalla: escudo.estadoInicial === "valido" ? "resultado" : "inicio",
-  });
+  const { estado, navegar, navegarConGuarda, reemplazar, registrarInterceptorAtras } =
+    useNavegacion({
+      pantalla: escudo.estadoInicial === "valido" ? "resultado" : "inicio",
+    });
   const [consentimiento, setConsentimiento] = useState(false);
   const hayDiagnostico = escudo.diagnostico !== null;
   const pantalla = resolverPantalla(estado.pantalla, {
@@ -65,12 +66,12 @@ export default function App() {
   }
 
   function irAEmergencia() {
-    navegar({ pantalla: "emergencia", vista: "menu" });
+    navegar({ pantalla: "emergencia" });
   }
 
+  // La barra pasa por la guarda: Emergencia pide confirmar si hay una guía a medias (FR-031).
   function navegarDesdeBarra(destino) {
-    if (destino === "emergencia") irAEmergencia();
-    else navegar({ pantalla: destino });
+    navegarConGuarda({ pantalla: destino });
   }
 
   function renderizarPantalla() {
@@ -101,8 +102,8 @@ export default function App() {
       case "emergencia":
         return (
           <Emergencia
-            vista={estado.vista}
             navegar={navegar}
+            registrarInterceptorAtras={registrarInterceptorAtras}
             hayDiagnostico={hayDiagnostico}
             onVolverAlInicio={() => navegar({ pantalla: "inicio" })}
           />

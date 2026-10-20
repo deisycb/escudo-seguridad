@@ -45,6 +45,19 @@ export function useNavegacion(inicial) {
     setEstado(destino);
   }, []);
 
+  /**
+   * Navega salvo que la pantalla actual lo intercepte con el mismo interceptor de "atrás"
+   * (por ejemplo, Emergencia pide confirmación antes de salir: spec 003, FR-031).
+   * @param {object} destino Estado al que se quiere ir.
+   */
+  const navegarConGuarda = useCallback(
+    (destino) => {
+      if (interceptorAtras.current?.(destino)) return;
+      navegar(destino);
+    },
+    [navegar],
+  );
+
   const registrarInterceptorAtras = useCallback((fn) => {
     interceptorAtras.current = fn;
     return () => {
@@ -52,5 +65,5 @@ export function useNavegacion(inicial) {
     };
   }, []);
 
-  return { estado, navegar, reemplazar, registrarInterceptorAtras };
+  return { estado, navegar, navegarConGuarda, reemplazar, registrarInterceptorAtras };
 }

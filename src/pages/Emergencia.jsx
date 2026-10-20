@@ -1,31 +1,43 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  CreditCard,
-  FileText,
-  Mail,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import Dialogo from "../components/Dialogo.jsx";
+import MensajeConversacion from "../components/MensajeConversacion.jsx";
+import OpcionesConversacion from "../components/OpcionesConversacion.jsx";
 import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
-import {
-  LISTA_TARJETAS,
-  TARJETA,
-  TEXTO_LECTURA,
-  TITULO_PANTALLA,
-  TITULO_SECCION,
-} from "../components/estilos.js";
+import { TARJETA, TEXTO_LECTURA, TITULO_PANTALLA } from "../components/estilos.js";
 import {
   AVISO_NO_BORRES,
   CANALES_DENUNCIA,
   GUIAS_EMERGENCIA,
   LINEAS_BANCARIAS,
+  MENSAJES_ASISTENTE,
+  SITUACIONES_EMERGENCIA,
 } from "../data/emergencias.js";
+import { ConversacionEmergencia, TEXTOS_ASISTENTE } from "../logic/ConversacionEmergencia.js";
 
-const PREFIJO_GUIA = "guia:";
+const CONTENIDO = {
+  mensajes: MENSAJES_ASISTENTE,
+  situaciones: SITUACIONES_EMERGENCIA,
+  guias: GUIAS_EMERGENCIA,
+  lineas: LINEAS_BANCARIAS,
+  canales: CANALES_DENUNCIA,
+};
 
-/** Íconos de cada guía según el mapa de la constitución §7.9. */
-const ICONOS_GUIA = { tarjetas: CreditCard, whatsapp: MessageCircle, phishing: Mail };
+function PresentacionAsistente() {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primario">
+        <ShieldCheck size={24} strokeWidth={2} aria-hidden="true" className="text-white" />
+      </span>
+      <div>
+        <p className="font-bold text-texto">Asistente de emergencias</p>
+        <p className="text-sm font-medium text-texto-secundario">
+          Nunca te pediré claves, códigos ni datos de tu tarjeta
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function AvisoNoBorres() {
   return (
@@ -39,123 +51,61 @@ function AvisoNoBorres() {
   );
 }
 
-function Menu({ ir }) {
+/** Confirmación de salida (spec 003, FR-031). "Seguir aquí" es la opción segura. */
+function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
   return (
-    <>
-      <p className={TEXTO_LECTURA}>Elige lo que te pasó:</p>
-      <ul className={LISTA_TARJETAS}>
-        {GUIAS_EMERGENCIA.map(({ id, titulo }) => {
-          const Icono = ICONOS_GUIA[id];
-          return (
-            <li key={id}>
-              <button
-                type="button"
-                className={`${TARJETA} flex min-h-11 w-full items-center gap-3 text-left font-bold text-texto`}
-                onClick={() => ir(`${PREFIJO_GUIA}${id}`)}
-              >
-                {Icono && (
-                  <Icono size={24} strokeWidth={2} aria-hidden="true" className="text-peligro" />
-                )}
-                <span className="flex-1">{titulo}</span>
-                <ChevronRight
-                  size={20}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  className="text-texto-suave"
-                />
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      <div className="flex flex-col gap-3">
-        <button type="button" className={BOTON_PRINCIPAL} onClick={() => ir("bancos")}>
-          <Phone size={20} strokeWidth={2} aria-hidden="true" />
-          Llamar a la línea de mi banco
-        </button>
-        <button type="button" className={BOTON_SECUNDARIO} onClick={() => ir("denuncia")}>
-          Cómo denunciar en Colombia
-        </button>
-      </div>
-    </>
+    <Dialogo
+      abierto={confirmacion !== null}
+      titulo={TEXTOS_ASISTENTE.confirmarSalirTitulo}
+      onCerrar={onSeguir}
+      acciones={
+        <>
+          <button type="button" className={BOTON_PRINCIPAL} onClick={onSeguir}>
+            {TEXTOS_ASISTENTE.seguirAqui}
+          </button>
+          <button type="button" className={BOTON_SECUNDARIO} onClick={onConfirmar}>
+            {TEXTOS_ASISTENTE.confirmarSalir}
+          </button>
+        </>
+      }
+    >
+      <p>{TEXTOS_ASISTENTE.confirmarTexto}</p>
+    </Dialogo>
   );
 }
 
-function Guia({ id }) {
-  const guia = GUIAS_EMERGENCIA.find((g) => g.id === id);
-  if (!guia) return null;
-  return (
-    <section className={`${TARJETA} flex flex-col gap-3`}>
-      <h2 className={TITULO_SECCION}>{guia.titulo}</h2>
-      <ol className={`list-decimal space-y-2 pl-6 ${TEXTO_LECTURA}`}>
-        {guia.pasos.map((paso) => (
-          <li key={paso}>{paso}</li>
-        ))}
-      </ol>
-    </section>
-  );
-}
+/**
+ * Pantalla de Emergencia: conversación guiada solo con botones (spec 003). La conversación vive
+ * solo en este estado: no se guarda ni sale del dispositivo, y se descarta al salir.
+ */
+export default function Emergencia({
+  hayDiagnostico,
+  navegar,
+  registrarInterceptorAtras,
+  onVolverAlInicio,
+}) {
+  const [conversacion, setConversacion] = useState(() => ConversacionEmergencia.iniciar(CONTENIDO));
+  const [confirmacion, setConfirmacion] = useState(null);
 
-function Bancos() {
-  return (
-    <section className="flex flex-col gap-3">
-      <h2 className={TITULO_SECCION}>Líneas de los bancos</h2>
-      <ul className={LISTA_TARJETAS}>
-        {LINEAS_BANCARIAS.map(({ banco, numero }) => (
-          <li key={banco}>
-            <a
-              href={`tel:${encodeURIComponent(numero)}`}
-              className={`${TARJETA} flex min-h-11 flex-wrap items-center justify-between gap-2`}
-            >
-              <span className="font-semibold text-texto">{banco}</span>
-              <span className="flex items-center gap-2 font-bold text-primario underline">
-                <Phone size={20} strokeWidth={2} aria-hidden="true" />
-                {numero}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+  // Una sola guarda para "atrás", la barra inferior y "Volver al inicio" (research R7).
+  function interceptarSalida(destino) {
+    // Ir a Emergencia estando en Emergencia no es salir: se ignora y la conversación sigue.
+    if (destino.pantalla === "emergencia") return true;
+    if (!conversacion.tieneProgreso()) return false;
+    setConfirmacion({ tipo: "salir", destino });
+    return true;
+  }
 
-function Denuncia() {
-  return (
-    <section className="flex flex-col gap-3">
-      <h2 className={TITULO_SECCION}>Cómo denunciar en Colombia</h2>
-      <ul className={LISTA_TARJETAS}>
-        {CANALES_DENUNCIA.map(({ entidad, contacto, enlace }) => (
-          <li key={entidad} className={TARJETA}>
-            <p className="font-semibold text-texto">{entidad}</p>
-            <p className={TEXTO_LECTURA}>{contacto}</p>
-            {enlace && (
-              <a
-                href={enlace}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center font-semibold text-primario underline"
-              >
-                Ir al sitio oficial (se abre en otra pestaña)
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+  useEffect(() => registrarInterceptorAtras(interceptarSalida));
 
-function VistaActual({ vista, ir }) {
-  if (vista.startsWith(PREFIJO_GUIA)) return <Guia id={vista.slice(PREFIJO_GUIA.length)} />;
-  if (vista === "bancos") return <Bancos />;
-  if (vista === "denuncia") return <Denuncia />;
-  return <Menu ir={ir} />;
-}
+  function confirmarSalida() {
+    const { destino } = confirmacion;
+    setConfirmacion(null);
+    navegar(destino);
+  }
 
-export default function Emergencia({ vista = "menu", navegar, hayDiagnostico, onVolverAlInicio }) {
-  function ir(destino) {
-    navegar({ pantalla: "emergencia", vista: destino });
+  function volverAlInicio() {
+    if (!interceptarSalida({ pantalla: "inicio" })) onVolverAlInicio();
   }
 
   return (
@@ -163,20 +113,28 @@ export default function Emergencia({ vista = "menu", navegar, hayDiagnostico, on
       <h1 tabIndex={-1} className={TITULO_PANTALLA}>
         Respira. Vamos paso a paso.
       </h1>
-      <VistaActual vista={vista} ir={ir} />
-      {vista !== "menu" && (
-        <button type="button" className={BOTON_SECUNDARIO} onClick={() => ir("menu")}>
-          <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
-          Volver a las opciones
-        </button>
-      )}
+      <PresentacionAsistente />
       <AvisoNoBorres />
+      <ol className="flex flex-col gap-3">
+        {conversacion.obtenerMensajes().map((mensaje) => (
+          <MensajeConversacion key={mensaje.id} mensaje={mensaje} />
+        ))}
+      </ol>
+      <OpcionesConversacion
+        opciones={conversacion.obtenerOpciones()}
+        onElegir={(id) => setConversacion((actual) => actual.elegir(id))}
+      />
       {!hayDiagnostico && (
-        <button type="button" className={BOTON_SECUNDARIO} onClick={onVolverAlInicio}>
+        <button type="button" className={BOTON_SECUNDARIO} onClick={volverAlInicio}>
           <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
           Volver al inicio
         </button>
       )}
+      <DialogoConfirmacion
+        confirmacion={confirmacion}
+        onSeguir={() => setConfirmacion(null)}
+        onConfirmar={confirmarSalida}
+      />
     </div>
   );
 }
