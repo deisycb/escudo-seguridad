@@ -1,5 +1,7 @@
 # Contrato: pantallas que cambian (Inicio y Emergencia)
 
+> La vista de escritura libre con el asistente de IA (spec 003 FR-042) está en [../../004-asistente-ia-emergencia/contracts/pantallas.md](../../004-asistente-ia-emergencia/contracts/pantallas.md).
+
 Complementa [../../001-escudo-web-app/contracts/pantallas.md](../../001-escudo-web-app/contracts/pantallas.md). Las reglas generales de esa página (tokens, columna de 560 px, fondos, foco en el `<h1>` al cambiar de pantalla) siguen vigentes.
 
 ## Cambios en la tabla de pantallas

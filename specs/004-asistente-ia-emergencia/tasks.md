@@ -231,18 +231,18 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T032 [P] Actualizar la documentación de la spec 003:
+- [X] T032 [P] Actualizar la documentación de la spec 003:
   - `specs/003-rediseno-emergencia-agente/plan.md`: en "Riesgos y dependencias", agregar que FR-042 lo implementa la spec 004.
   - `specs/003-rediseno-emergencia-agente/contracts/pantallas.md`: agregar al inicio un enlace a `../../004-asistente-ia-emergencia/contracts/pantallas.md` para la vista de escritura.
-- [ ] T033 [P] Revisar `src/components/EscrituraIA.jsx`, `src/logic/AsistenteIA.js`, `src/logic/FiltroDatosSensibles.js` y los cambios en `src/pages/Emergencia.jsx` y `src/components/MensajeConversacion.jsx`. No debe haber hex, `style=`, `localStorage`, `sessionStorage`, `history.state` ni `dangerouslySetInnerHTML`, la única llamada a `fetch` debe estar en `AsistenteIA`, y solo deben usarse íconos de §7.9.
-- [ ] T034 Ejecutar `npm test`, `npm run lint` y `npm run format:check`, y los tres builds de [quickstart.md](./quickstart.md):
+- [X] T033 [P] Revisar `src/components/EscrituraIA.jsx`, `src/logic/AsistenteIA.js`, `src/logic/FiltroDatosSensibles.js` y los cambios en `src/pages/Emergencia.jsx` y `src/components/MensajeConversacion.jsx`. No debe haber hex, `style=`, `localStorage`, `sessionStorage`, `history.state` ni `dangerouslySetInnerHTML`, la única llamada a `fetch` debe estar en `AsistenteIA`, y solo deben usarse íconos de §7.9.
+- [X] T034 Ejecutar `npm test`, `npm run lint` y `npm run format:check`, y los tres builds de [quickstart.md](./quickstart.md):
   - sin la variable: `connect-src 'none'` en `dist/index.html`;
   - con una URL `https://`: `connect-src` igual a su origen;
   - con `http://`: el build debe fallar.
 - [ ] T035 Validar los escenarios 17 (revisión de red con la URL real) y 15 (almacenamiento) de [quickstart.md](./quickstart.md) en un build de producción (`npm run build && npm run preview`).
 - [X] T036 [P] Agregar a `.gitignore` las líneas `.env` y `.env.*` excepto `.env.example`, para que nunca se suba una URL de webhook privada.
 - [ ] T037 Cuando el equipo defina proveedor y alojamiento (TODOs de la constitución): configurar el flujo en n8n según [contracts/n8n-flujo.md](./contracts/n8n-flujo.md), verificar el escenario 18 de [quickstart.md](./quickstart.md) y exportar el flujo **sin credenciales** a `n8n/asistente-emergencia.json`.
-- [ ] T038 Escribir el resumen para el equipo en el mensaje del commit final. Debe incluir lo pendiente para publicar: el proveedor y el alojamiento, `CONSENTIMIENTO_IA` y el contenido de emergencias de la 003. Y lo que hay que aprobar: los elementos visuales nuevos de R7 y R8 (tarjeta de consentimiento, campo y chip de IA) y los textos de interfaz de `TEXTOS_IA`.
+- [X] T038 Escribir el resumen para el equipo en el mensaje del commit final. Debe incluir lo pendiente para publicar: el proveedor y el alojamiento, `CONSENTIMIENTO_IA` y el contenido de emergencias de la 003. Y lo que hay que aprobar: los elementos visuales nuevos de R7 y R8 (tarjeta de consentimiento, campo y chip de IA) y los textos de interfaz de `TEXTOS_IA`.
 
 ---
 

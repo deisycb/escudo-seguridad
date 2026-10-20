@@ -141,6 +141,8 @@ specs/001-escudo-web-app/               # documentos de la 001 que quedan desfas
 | La rama activa es `conexion-n8n`, no `003-rediseno-emergencia-agente` | Mezcla con el trabajo de n8n | Decidir con el equipo si se crea una rama propia antes de `/speckit-implement` |
 | La constitución 2.0.0 prevé un chat de IA en Emergencia | Posible choque de diseño cuando se agregue | Este asistente es la ayuda que funciona sin conexión; el chat de IA será un complemento aparte (spec, Assumptions) |
 
+| FR-042 (escritura libre como forma principal, guías como respaldo) | Emergencia abre en la escritura cuando hay webhook y conexión | Lo implementa la spec 004 ([../004-asistente-ia-emergencia/plan.md](../004-asistente-ia-emergencia/plan.md)); sin webhook configurado, Emergencia sigue abriendo en estas guías |
+
 ## Complexity Tracking
 
 No hay violaciones de la constitución que justificar.
