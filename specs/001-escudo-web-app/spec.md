@@ -234,7 +234,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 ### Measurable Outcomes
 
 - **SC-001**: Un usuario nuevo completa el diagnóstico (desde la pantalla de inicio hasta ver su resultado) en menos de 5 minutos.
-- **SC-002**: Desde la pantalla de inicio, un usuario llega al primer paso de la guía de su emergencia en 3 toques o menos (botón de emergencia, situación y, si existe, respuesta de seguimiento), sin aceptar consentimiento ni hacer diagnóstico (SC-001 de la [spec 003](../003-rediseno-emergencia-agente/spec.md); antes 2 toques, clarificación 2026-10-20).
+- **SC-002**: Desde la pantalla de inicio, un usuario llega al primer paso de la guía de su emergencia en 4 toques o menos (botón de emergencia, "ver guías", situación y, si existe, respuesta de seguimiento; 3 sin conexión), sin aceptar consentimiento ni hacer diagnóstico (SC-001 de la [spec 003](../003-rediseno-emergencia-agente/spec.md); antes 2 y luego 3 toques, clarificaciones 2026-10-20).
 - **SC-003**: Para cualquier combinación de respuestas, el porcentaje total, los porcentajes por dimensión y el nivel del semáforo coinciden en el 100 % de los casos con el cálculo manual a partir del archivo de contenido, y repetir las mismas respuestas produce el mismo resultado.
 - **SC-004**: En una revisión de red durante el uso completo de la web app (diagnóstico, plan, tips y emergencia), no se envía ninguna respuesta, resultado ni progreso del usuario a ningún servidor, y no hay peticiones a servidores externos (incluidas fuentes tipográficas o íconos).
 - **SC-005**: Tras cerrar y volver a abrir la web app en el mismo navegador, el 100 % de los resultados y del progreso del plan se conservan.
