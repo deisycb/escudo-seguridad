@@ -7,7 +7,7 @@
 - Node.js 22+ y `npm install` (sin dependencias nuevas).
 - Para probar con respuestas: un webhook que cumpla [contracts/webhook.md](./contracts/webhook.md):
   - **Desarrollo**: `node scripts/webhook-prueba.mjs` (responde un texto fijo; con `?modo=429|500|lento|invalida` simula fallos). Solo local, nunca se publica.
-  - **Real**: el flujo de n8n de [contracts/n8n-flujo.md](./contracts/n8n-flujo.md), cuando el equipo defina proveedor y alojamiento.
+  - **Real**: el flujo de n8n de [contracts/n8n-flujo.md](./contracts/n8n-flujo.md). Su primera versión (eco en n8n Cloud) se prepara y valida con [../005-conexion-n8n-eco/quickstart.md](../005-conexion-n8n-eco/quickstart.md); la versión con IA, cuando el equipo defina el proveedor.
 
 ## Verificación automática
 

@@ -1,5 +1,7 @@
 # Contrato: flujo de n8n del asistente de emergencia
 
+> **Primera versión (eco):** ya existe en `n8n/asistente-emergencia.json` y se describe en [../../005-conexion-n8n-eco/contracts/n8n-flujo-eco.md](../../005-conexion-n8n-eco/contracts/n8n-flujo-eco.md). Tiene el webhook, la validación y el límite (global, 30 por minuto, sin IPs); el paso 4 de este contrato todavía no existe y en su lugar se devuelve un eco.
+
 El flujo no es código del repositorio: vive en n8n (constitución IV). Este documento fija lo que **debe** cumplir; cuando exista, se exporta **sin credenciales** a `n8n/asistente-emergencia.json`.
 
 ## Nodos (en orden)
