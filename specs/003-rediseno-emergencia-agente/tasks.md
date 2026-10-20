@@ -43,18 +43,18 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 **⚠️ CRITICAL**: ninguna historia empieza antes de terminar esta fase.
 
-- [ ] T002 [P] Crear `tests/fixtures/emergenciasPrueba.js` con contenido sintético (comentario inicial "CONTENIDO SINTÉTICO SOLO PARA PRUEBAS", igual que `tests/fixtures/contenidoPrueba.js`) que exporte `contenidoEmergenciasPrueba = { mensajes, situaciones, guias, lineas, canales }`:
+- [X] T002 [P] Crear `tests/fixtures/emergenciasPrueba.js` con contenido sintético (comentario inicial "CONTENIDO SINTÉTICO SOLO PARA PRUEBAS", igual que `tests/fixtures/contenidoPrueba.js`) que exporte `contenidoEmergenciasPrueba = { mensajes, situaciones, guias, lineas, canales }`:
   - las 7 situaciones con los ids de `IDS_SITUACIONES` en orden; `tarjeta-banco` directa a una guía de 3 pasos; `duda` con `seguimiento` de 2 respuestas que llevan a guías distintas; `whatsapp-perdido` directa a una guía de 1 paso; `suplantacion` directa a una guía con `pasos: []` (caso de contenido pendiente);
   - todos los mensajes con texto, 2 líneas bancarias y 2 canales de denuncia.
 
   Exportar además una variante `contenidoEmergenciasVacio` con mensajes `""`, `lineas: []` y `canales: []`.
-- [ ] T003 [P] Ampliar `src/data/emergencias.js` según [contracts/contenido-emergencias.md](./contracts/contenido-emergencias.md):
+- [X] T003 [P] Ampliar `src/data/emergencias.js` según [contracts/contenido-emergencias.md](./contracts/contenido-emergencias.md):
   - `MENSAJES_ASISTENTE` con `saludo`, `cierreGuia`, `despedida`, `introLineasBancarias`, `introCanalesDenuncia` y `contenidoPendiente`, todos `""` con comentario `// PENDIENTE: lo entrega el equipo`.
   - `SITUACIONES_EMERGENCIA` con las 7 situaciones de la tabla "Estado provisional" (texto y guía exactamente como en la tabla), cada línea con `// PROVISIONAL` (spec FR-013, Clarifications 2026-10-20).
   - `GUIAS_EMERGENCIA`, `AVISO_NO_BORRES`, `LINEAS_BANCARIAS` y `CANALES_DENUNCIA` sin cambios.
   - Actualizar el comentario de cabecera para referenciar la spec 003. No escribir pasos, mensajes, números ni canales inventados.
-- [ ] T004 Crear `src/logic/ConversacionEmergencia.js` solo con las constantes exportadas `IDS_SITUACIONES` (`"tarjeta-banco", "enlace-falso", "codigo-compartido", "whatsapp-perdido", "suplantacion", "pago-estafador", "duda"`, en ese orden) y `TEXTOS_ASISTENTE`, con los textos exactos de [contracts/logica-conversacion.md](./contracts/logica-conversacion.md) (`siguiente` "Listo, ¿qué sigue?", `denunciar`, `otraCosa`, `terminar`, `llamarBanco`, `comoDenunciar`, `empezarDeNuevo`, `masAyuda` "Más ayuda", `confirmarSalirTitulo`, `confirmarReiniciarTitulo`, `confirmarTexto` "Perderás el paso en que vas.", `confirmarSalir` "Salir", `seguirAqui` "Seguir aquí" y `respaldoPendiente`)
-- [ ] T005 Escribir en `tests/logic/ConversacionEmergencia.test.js` un bloque `describe("validarContenidoEmergencias")` con contenido de `tests/fixtures/emergenciasPrueba.js` que cubra:
+- [X] T004 Crear `src/logic/ConversacionEmergencia.js` solo con las constantes exportadas `IDS_SITUACIONES` (`"tarjeta-banco", "enlace-falso", "codigo-compartido", "whatsapp-perdido", "suplantacion", "pago-estafador", "duda"`, en ese orden) y `TEXTOS_ASISTENTE`, con los textos exactos de [contracts/logica-conversacion.md](./contracts/logica-conversacion.md) (`siguiente` "Listo, ¿qué sigue?", `denunciar`, `otraCosa`, `terminar`, `llamarBanco`, `comoDenunciar`, `empezarDeNuevo`, `masAyuda` "Más ayuda", `confirmarSalirTitulo`, `confirmarReiniciarTitulo`, `confirmarTexto` "Perderás el paso en que vas.", `confirmarSalir` "Salir", `seguirAqui` "Seguir aquí" y `respaldoPendiente`)
+- [X] T005 Escribir en `tests/logic/ConversacionEmergencia.test.js` un bloque `describe("validarContenidoEmergencias")` con contenido de `tests/fixtures/emergenciasPrueba.js` que cubra:
   - **Sin errores:** el contenido de prueba válido devuelve `errores: []`.
   - **Errores:**
     - ids de situación distintos de los 7 fijos o en otro orden;
@@ -70,7 +70,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
     - `lineas` y `canales` vacíos.
 
   Las pruebas deben fallar antes de T006.
-- [ ] T006 Implementar `export function validarContenidoEmergencias({ mensajes, situaciones, guias, lineas, canales })` en `src/logic/ConversacionEmergencia.js`. Debe devolver `{ errores: string[], pendientes: string[] }` con mensajes en español que digan qué id falla y aplicar estas reglas de [data-model.md](./data-model.md):
+- [X] T006 Implementar `export function validarContenidoEmergencias({ mensajes, situaciones, guias, lineas, canales })` en `src/logic/ConversacionEmergencia.js`. Debe devolver `{ errores: string[], pendientes: string[] }` con mensajes en español que digan qué id falla y aplicar estas reglas de [data-model.md](./data-model.md):
   - "Exactamente 7, en orden fijo".
   - "`texto` no vacío".
   - "No puede tener `guia` y `seguimiento` a la vez".
@@ -81,7 +81,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
   - "vacío = contenido pendiente".
 
   Con JSDoc. Hacer pasar T005.
-- [ ] T007 Actualizar el `describe("emergencias.js")` de `tests/logic/contenido.test.js`:
+- [X] T007 Actualizar el `describe("emergencias.js")` de `tests/logic/contenido.test.js`:
   - Reemplazar la prueba "tiene exactamente las 3 guías…" por una que exija que existan las guías `tarjetas`, `whatsapp` y `phishing` con sus títulos.
   - Agregar una prueba que llame a `validarContenidoEmergencias` con `MENSAJES_ASISTENTE`, `SITUACIONES_EMERGENCIA`, `GUIAS_EMERGENCIA`, `LINEAS_BANCARIAS` y `CANALES_DENUNCIA` y exija `errores` vacío.
   - Mantener las pruebas existentes de pasos, aviso, bancos y canales, que siguen marcando el contenido pendiente igual que hoy.
@@ -350,7 +350,7 @@ No se publica hasta que el equipo entregue el contenido real de `src/data/emerge
 Registrados en T001 (2026-10-20, rama `003-rediseno-emergencia-agente`). `npm run lint` sin errores; `npm test`: 6 fallos de 84, todos en `tests/logic/contenido.test.js` y todos por contenido que el equipo aún no entrega:
 
 1. `politica.js > tiene título y al menos 1 sección con subtítulo y texto`
-2. `emergencias.js > tiene exactamente las 3 guías con sus ids, títulos y pasos` (T007 la divide: títulos, que pasa, y pasos, que sigue pendiente)
+2. `emergencias.js > tiene exactamente las 3 guías con sus ids, títulos y pasos` (T007 la divide: la de títulos pasa; queda pendiente `emergencias.js > cada guía tiene pasos no vacíos`)
 3. `emergencias.js > AVISO_NO_BORRES tiene el título exacto y texto`
 4. `emergencias.js > LINEAS_BANCARIAS: al menos 1, número con solo dígitos, espacios, +, #, *, -`
 5. `emergencias.js > CANALES_DENUNCIA: al menos 1; si hay enlace, empieza por https://`

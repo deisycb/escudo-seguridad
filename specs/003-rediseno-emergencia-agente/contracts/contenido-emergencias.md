@@ -72,4 +72,4 @@ No se publica con errores ni con pendientes. En desarrollo, los pendientes se mu
 | pago-estafador | "Le pagué o transferí a un estafador" | guía `tarjetas` |
 | duda | "Tengo una duda o no sé qué me pasó" | guía `phishing` |
 
-Cada línea lleva el comentario `// PROVISIONAL`. Los mensajes del asistente quedan `""` con `// PENDIENTE`.
+Cada situación lleva el campo `provisional: true` (opcional en el contrato), que `validarContenidoEmergencias` reporta como pendiente; un comentario no se puede revisar en tiempo de ejecución. Los mensajes del asistente quedan `""` con `// PENDIENTE`.
