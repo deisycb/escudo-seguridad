@@ -212,14 +212,14 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] En `src/pages/Emergencia.jsx`, convertir la lista de mensajes en `<ol role="log" aria-live="polite" aria-label="Conversación con el asistente">`. Las opciones quedan fuera del `log` (spec FR-024, [R5](./research.md)).
-- [ ] T028 [P] [US3] En `src/components/MensajeConversacion.jsx`, anteponer a cada mensaje un `<span className="sr-only">` con "El asistente dice:" o "Tú elegiste:". El chip "Paso N de M" debe ser texto real dentro del `<li>` y el último mensaje del asistente debe poder recibir foco (`tabIndex={-1}`, `ref` como prop) (spec FR-026).
-- [ ] T029 [US3] Manejo del foco en `src/pages/Emergencia.jsx`:
+- [X] T027 [US3] En `src/pages/Emergencia.jsx`, convertir la lista de mensajes en `<ol role="log" aria-live="polite" aria-label="Conversación con el asistente">`. Las opciones quedan fuera del `log` (spec FR-024, [R5](./research.md)).
+- [X] T028 [P] [US3] En `src/components/MensajeConversacion.jsx`, anteponer a cada mensaje un `<span className="sr-only">` con "El asistente dice:" o "Tú elegiste:". El chip "Paso N de M" debe ser texto real dentro del `<li>` y el último mensaje del asistente debe poder recibir foco (`tabIndex={-1}`, `ref` como prop) (spec FR-026).
+- [X] T029 [US3] Manejo del foco en `src/pages/Emergencia.jsx`:
   - `useEffect` que depende de `conversacion` y, tras cada cambio que no sea el montaje inicial, enfoca la primera opción pendiente (ref de `OpcionesConversacion`) o, si no hay opciones, el último mensaje del asistente.
   - Tras `reiniciar()`, enfocar la primera situación.
   - Usar un `useRef` para saltar el primer render, porque al entrar el foco ya va al `<h1>` vía `useNavegacion` (spec FR-025, [R5](./research.md)).
-- [ ] T030 [US3] Desplazamiento en `src/pages/Emergencia.jsx`: tras cada cambio de `conversacion`, llamar a `scrollIntoView({ block: "nearest", behavior })` sobre el último mensaje. `behavior` es `"smooth"` salvo que `window.matchMedia("(prefers-reduced-motion: reduce)").matches`, en cuyo caso es `"auto"`. Sin animaciones CSS nuevas (spec FR-023, [R6](./research.md)).
-- [ ] T031 [US3] Revisar el foco de los diálogos en `src/pages/Emergencia.jsx`: el foco inicial va a "Seguir aquí" (`autoFocus` o ref), y al cancelar vuelve al control que abrió el diálogo ("Más ayuda" o el botón de la barra o "Volver al inicio" que se tocó). Si `Dialogo` no lo permite, agregar en `src/components/Dialogo.jsx` una prop opcional `alCerrarEnfocar` sin cambiar su uso actual en Inicio y Diagnóstico.
+- [X] T030 [US3] Desplazamiento en `src/pages/Emergencia.jsx`: tras cada cambio de `conversacion`, llamar a `scrollIntoView({ block: "nearest", behavior })` sobre el último mensaje. `behavior` es `"smooth"` salvo que `window.matchMedia("(prefers-reduced-motion: reduce)").matches`, en cuyo caso es `"auto"`. Sin animaciones CSS nuevas (spec FR-023, [R6](./research.md)).
+- [X] T031 [US3] Revisar el foco de los diálogos en `src/pages/Emergencia.jsx`: el foco inicial va a "Seguir aquí" (`autoFocus` o ref), y al cancelar vuelve al control que abrió el diálogo ("Más ayuda" o el botón de la barra o "Volver al inicio" que se tocó). Si `Dialogo` no lo permite, agregar en `src/components/Dialogo.jsx` una prop opcional `alCerrarEnfocar` sin cambiar su uso actual en Inicio y Diagnóstico.
 - [ ] T032 [US3] Validar US3 con [quickstart.md](./quickstart.md) escenarios 13, 14, 15 y 17 con VoiceOver (macOS o iOS) y, si se puede, NVDA. Si el orden de anuncio entre el foco y la región viva confunde, aplicar la alternativa de R5 (enfocar el mensaje nuevo en lugar de la opción) y anotarlo en `specs/003-rediseno-emergencia-agente/research.md`.
 
 **Checkpoint**: las tres historias funcionan y son accesibles.
@@ -228,24 +228,24 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T033 [P] Actualizar `specs/001-escudo-web-app/contracts/pantallas.md`:
+- [X] T033 [P] Actualizar `specs/001-escudo-web-app/contracts/pantallas.md`:
   - Cambiar la fila `emergencia` de la tabla a `{ pantalla: "emergencia" }`, sin `vista`, y con "FR-030…FR-034 → spec 003".
   - Cambiar la fila "Vista interna de Emergencia" de la tabla de "atrás" a "Confirmación de salida (spec 003, FR-031)".
   - Agregar en la sección de Emergencia un enlace a `../../003-rediseno-emergencia-agente/contracts/pantallas.md`.
-- [ ] T034 [P] Actualizar `specs/001-escudo-web-app/contracts/contenido.md`: reemplazar el bloque `## \`emergencias.js\`` por una línea que remita a `../../003-rediseno-emergencia-agente/contracts/contenido-emergencias.md`.
-- [ ] T035 [P] Actualizar en `specs/001-escudo-web-app/tasks.md` las tareas T036 y T087 para que validen "3 toques o menos" (SC-002 aclarado el 2026-10-20, spec 003 SC-001).
-- [ ] T036 Revisar que `src/pages/Emergencia.jsx`, `src/components/MensajeConversacion.jsx`, `src/components/OpcionesConversacion.jsx` y `src/components/AccionesRapidas.jsx`:
+- [X] T034 [P] Actualizar `specs/001-escudo-web-app/contracts/contenido.md`: reemplazar el bloque `## \`emergencias.js\`` por una línea que remita a `../../003-rediseno-emergencia-agente/contracts/contenido-emergencias.md`.
+- [X] T035 [P] Actualizar en `specs/001-escudo-web-app/tasks.md` las tareas T036 y T087 para que validen "3 toques o menos" (SC-002 aclarado el 2026-10-20, spec 003 SC-001).
+- [X] T036 Revisar que `src/pages/Emergencia.jsx`, `src/components/MensajeConversacion.jsx`, `src/components/OpcionesConversacion.jsx` y `src/components/AccionesRapidas.jsx`:
   - no tengan hex, `style=`, `<input>`, `<textarea>`, `localStorage`, `history.state` ni `fetch`;
   - usen solo íconos de §7.9 (ShieldCheck, TriangleAlert, ChevronRight, ChevronDown, Phone, FileText, X);
   - no tengan código muerto de la versión anterior (`vista`, `PREFIJO_GUIA`).
-- [ ] T037 Ejecutar `npm test`, `npm run lint`, `npm run format:check` y `npm run build`. Corregir cualquier fallo que no esté en la lista de T001 (nunca escribiendo contenido para hacer pasar una prueba, principio III) y confirmar que la CSP del build sigue con `connect-src 'none'` en `dist/index.html`.
+- [X] T037 Ejecutar `npm test`, `npm run lint`, `npm run format:check` y `npm run build`. Corregir cualquier fallo que no esté en la lista de T001 (nunca escribiendo contenido para hacer pasar una prueba, principio III) y confirmar que la CSP del build sigue con `connect-src 'none'` en `dist/index.html`.
 - [ ] T038 Validar los escenarios restantes de [quickstart.md](./quickstart.md):
   - 10: modo sin conexión y cero peticiones en Network.
   - 11: nada guardado en Local Storage tras salir.
   - 12: movimiento reducido.
   - 16: 1440 px.
   - SC-006: 360 px sin desplazamiento horizontal, incluido el botón de dos líneas con zoom de texto al 200 %.
-- [ ] T039 Escribir el resumen para el equipo (en la descripción del commit o del PR) con:
+- [X] T039 Escribir el resumen para el equipo (en la descripción del commit o del PR) con:
   - lo que queda pendiente de entregar en `src/data/emergencias.js` (salida de `validarContenidoEmergencias` contra el contenido real);
   - lo que queda pendiente de aprobar: el respaldo de R3, el estilo de R4 y R9, y los textos "Salir" / "Seguir aquí".
 

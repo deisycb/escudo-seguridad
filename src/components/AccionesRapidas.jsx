@@ -28,8 +28,11 @@ export default function AccionesRapidas({
   const refPropia = useRef(null);
   const refBoton = refMasAyuda ?? refPropia;
 
+  // El botón tocado desaparece con el panel: el foco pasa a "Más ayuda" (y vuelve ahí al cancelar
+  // un diálogo); si la conversación cambia, la pantalla lo mueve a la siguiente opción.
   function elegir(accion) {
     setAbierto(false);
+    refBoton.current?.focus();
     accion();
   }
 

@@ -73,7 +73,12 @@ function ContenidoAsistente({ mensaje }) {
  */
 export default function MensajeConversacion({ mensaje, ref }) {
   if (mensaje.autor === "persona") {
-    return <li className={BURBUJA_PERSONA}>{mensaje.texto}</li>;
+    return (
+      <li className={BURBUJA_PERSONA}>
+        <span className="sr-only">Tú elegiste: </span>
+        {mensaje.texto}
+      </li>
+    );
   }
   return (
     <li
@@ -81,6 +86,7 @@ export default function MensajeConversacion({ mensaje, ref }) {
       tabIndex={ref ? -1 : undefined}
       className={`${BURBUJA_ASISTENTE} flex flex-col items-start`}
     >
+      <span className="sr-only">El asistente dice: </span>
       <ContenidoAsistente mensaje={mensaje} />
     </li>
   );

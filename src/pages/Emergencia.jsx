@@ -1,5 +1,5 @@
 import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AccionesRapidas from "../components/AccionesRapidas.jsx";
 import Dialogo from "../components/Dialogo.jsx";
 import MensajeConversacion from "../components/MensajeConversacion.jsx";
@@ -66,14 +66,16 @@ const CONFIRMACIONES = {
  */
 function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
   const textos = CONFIRMACIONES[confirmacion?.tipo ?? "salir"];
+  const refSeguir = useRef(null);
   return (
     <Dialogo
       abierto={confirmacion !== null}
       titulo={textos.titulo}
+      refFocoInicial={refSeguir}
       onCerrar={onSeguir}
       acciones={
         <>
-          <button type="button" className={BOTON_PRINCIPAL} onClick={onSeguir}>
+          <button type="button" ref={refSeguir} className={BOTON_PRINCIPAL} onClick={onSeguir}>
             {TEXTOS_ASISTENTE.seguirAqui}
           </button>
           <button type="button" className={BOTON_SECUNDARIO} onClick={onConfirmar}>
@@ -85,6 +87,22 @@ function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
       <p>{TEXTOS_ASISTENTE.confirmarTexto}</p>
     </Dialogo>
   );
+}
+
+function quiereMenosMovimiento() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * Deja a la vista las opciones nuevas; si el mensaje nuevo es largo, prioriza su comienzo.
+ * El margen de desplazamiento de `final` descuenta las acciones fijas y la barra inferior.
+ */
+function desplazarALoNuevo(final, ultimoMensaje) {
+  const behavior = quiereMenosMovimiento() ? "auto" : "smooth";
+  final?.scrollIntoView({ block: "end", behavior });
+  if (ultimoMensaje && ultimoMensaje.getBoundingClientRect().top < 0) {
+    ultimoMensaje.scrollIntoView({ block: "start", behavior });
+  }
 }
 
 /**
@@ -99,6 +117,22 @@ export default function Emergencia({
 }) {
   const [conversacion, setConversacion] = useState(() => ConversacionEmergencia.iniciar(CONTENIDO));
   const [confirmacion, setConfirmacion] = useState(null);
+  const mensajes = conversacion.obtenerMensajes();
+  const idUltimoAsistente = mensajes.findLast((m) => m.autor === "asistente")?.id;
+  const refPrimeraOpcion = useRef(null);
+  const refUltimoAsistente = useRef(null);
+  const refFinal = useRef(null);
+  const refConversacionMostrada = useRef(conversacion);
+
+  // Tras cada cambio: mostrar lo nuevo y llevar el foco a la siguiente acción útil (R5, R6).
+  // Al entrar no se toca (el foco ya va al <h1> desde useNavegacion); comparar la instancia
+  // evita moverlo cuando StrictMode repite el efecto.
+  useEffect(() => {
+    if (refConversacionMostrada.current === conversacion) return;
+    refConversacionMostrada.current = conversacion;
+    desplazarALoNuevo(refFinal.current, refUltimoAsistente.current);
+    (refPrimeraOpcion.current ?? refUltimoAsistente.current)?.focus({ preventScroll: true });
+  }, [conversacion]);
 
   // Una sola guarda para "atrás", la barra inferior y "Volver al inicio" (research R7).
   function interceptarSalida(destino) {
@@ -133,14 +167,29 @@ export default function Emergencia({
       </h1>
       <PresentacionAsistente />
       <AvisoNoBorres />
-      <ol className="flex flex-col gap-3">
-        {conversacion.obtenerMensajes().map((mensaje) => (
-          <MensajeConversacion key={mensaje.id} mensaje={mensaje} />
+      <ol
+        role="log"
+        aria-live="polite"
+        aria-label="Conversación con el asistente"
+        className="flex flex-col gap-3"
+      >
+        {mensajes.map((mensaje) => (
+          <MensajeConversacion
+            key={mensaje.id}
+            mensaje={mensaje}
+            ref={mensaje.id === idUltimoAsistente ? refUltimoAsistente : undefined}
+          />
         ))}
       </ol>
       <OpcionesConversacion
+        ref={refPrimeraOpcion}
         opciones={conversacion.obtenerOpciones()}
         onElegir={(id) => setConversacion((actual) => actual.elegir(id))}
+      />
+      <div
+        ref={refFinal}
+        aria-hidden="true"
+        className={hayDiagnostico ? "scroll-mb-40" : "scroll-mb-24"}
       />
       {!hayDiagnostico && (
         <button type="button" className={BOTON_SECUNDARIO} onClick={volverAlInicio}>

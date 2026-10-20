@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Navegación propia con la History API (R1): sin react-router y sin cambiar la URL.
- * El estado es { pantalla, pregunta?, vista? }.
+ * El estado es { pantalla, pregunta? }.
  * @param {object} inicial Estado con el que arranca la app.
  */
 export function useNavegacion(inicial) {

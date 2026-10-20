@@ -37,8 +37,8 @@ API en [contracts/logica-conversacion.md](./contracts/logica-conversacion.md).
 |---|---|---|
 | `texto` | asistente | `texto` |
 | `paso` | asistente | `texto`, `numero` (N), `total` (M) |
-| `lineasBancarias` | asistente | `texto` (introducción), `lineas[]` |
-| `canalesDenuncia` | asistente | `texto` (introducción), `canales[]` |
+| `lineasBancarias` | asistente | `texto` (introducción, o `null` si está pendiente), `lineas[]` |
+| `canalesDenuncia` | asistente | `texto` (introducción, o `null` si está pendiente), `canales[]` |
 | `eleccion` | persona | `texto` (texto exacto del botón o acción rápida) |
 
 Todos llevan `id` (contador creciente, sirve de `key` en React) y `autor` (`"asistente"` | `"persona"`).
@@ -76,3 +76,5 @@ cualquier etapa ──reiniciar──► situaciones con historial vacío (solo 
 **Progreso**: la conversación "tiene progreso" en cuanto existe algún mensaje de la persona (elección o acción rápida). Con progreso, salir de la pantalla y "Empezar de nuevo" piden confirmación (spec FR-018, FR-031). Esa confirmación es estado de la pantalla, no de la clase.
 
 Cada elección válida agrega primero un mensaje `eleccion` de la persona y después los mensajes del asistente. Un id que no está entre las opciones pendientes no cambia nada (devuelve la misma instancia). Una guía sin pasos lleva directamente al mensaje de contenido pendiente y a la etapa `cierre`.
+
+Si la lista de líneas o de canales está vacía, en lugar de esos tipos se agrega un mensaje `texto` con el aviso de contenido pendiente.

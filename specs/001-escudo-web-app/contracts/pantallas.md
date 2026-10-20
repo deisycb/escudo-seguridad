@@ -14,7 +14,7 @@ Todas las pantallas usan los tokens, la tipografía y los componentes base de la
 | Texto de lectura | ≥ 16px, peso 400–500, interlineado 1.5 |
 | Tarjetas | Fondo `fondo`, borde 1px `borde`, radio 16px, relleno 20–22px, separación 10–14px, sin sombras |
 | Botón primario | `primario` (hover/presionado `primario-oscuro`), texto blanco, 56px de alto, ancho completo de la columna, peso 700, radio 12px |
-| Botón de emergencia | Blanco, borde 1.5px `peligro`, texto `peligro`, ícono TriangleAlert, 52px de alto, radio 12px |
+| Botón de emergencia | Blanco, borde 1.5px `peligro`, texto `peligro`, ícono TriangleAlert, 52px de alto, radio 12px. En Inicio: dos líneas y mínimo 52px que crece (excepción, spec 003 FR-002) |
 | Prioridad | Urgente: `peligro` + blanco; Importante: `advertencia-suave` + `advertencia-texto`; Revisa: `pista` + `texto-secundario`; radio 6px |
 | Íconos | Solo `lucide-react`, 20–24px (16px en chips), `strokeWidth` 2 |
 | Tema | Solo claro; sin emojis ni ilustraciones |
@@ -28,7 +28,7 @@ Todas las pantallas usan los tokens, la tipografía y los componentes base de la
 | `resultado` | diagnóstico | Sí | carga con diagnóstico; fin de la encuesta; barra | FR-013…FR-018 |
 | `plan` | diagnóstico | Sí | Resultado → botón; barra | FR-019…FR-024 |
 | `tips` | diagnóstico | Sí | barra | FR-025…FR-029 |
-| `emergencia` (+ `vista`: `menu` \| `guia:<id>` \| `bancos` \| `denuncia`) | — | Solo si hay diagnóstico | Inicio → "Tengo una emergencia ahora"; Tips → acceso; barra | FR-030…FR-034 |
+| `emergencia` (sin `vista`; la conversación es estado local) | — | Solo si hay diagnóstico | Inicio → "Tengo una emergencia ahora"; Tips → acceso; barra | FR-030…FR-034 → spec 003 |
 
 **Guardas**: si se pide `resultado`, `plan` o `tips` sin diagnóstico, se muestra `inicio`. Si se pide `diagnostico` sin consentimiento, se muestra `inicio`.
 
@@ -38,7 +38,7 @@ Todas las pantallas usan los tokens, la tipografía y los componentes base de la
 |---|---|
 | Pregunta k > 1 | Va a la pregunta k−1 con la respuesta conservada |
 | Pregunta 1 | Vuelve a empujar el estado y abre el diálogo "¿Salir del diagnóstico?" (igual que "Salir") |
-| Vista interna de Emergencia | Vuelve a `menu` |
+| Emergencia con una guía a medias | Confirmación de salida (spec 003, FR-031); también desde la barra inferior |
 | Otra pantalla | Vuelve a la pantalla anterior del historial, aplicando las guardas |
 
 ## Elementos y textos fijos por pantalla
@@ -53,7 +53,7 @@ Los textos entre comillas son exactos (vienen de la spec). El resto del texto sa
 - Casilla nativa `<input type="checkbox">` de consentimiento (Ley 1581 de 2012), **siempre desmarcada al entrar**, dentro de una tarjeta (`superficie`, borde), con área táctil de 44×44 px. Justo después del texto va el botón-enlace "Ver política", **fuera del `<label>`** (abrirlo no cambia la casilla), que abre `Dialogo` con `POLITICA_PRIVACIDAD`. Al cerrar el diálogo, la casilla conserva su estado.
 - Botón "Empezar diagnóstico": usa `disabled` mientras la casilla no esté marcada.
 - Botón "Empezar diagnóstico" con estilo de botón primario.
-- Botón "Tengo una emergencia ahora": siempre visible, con estilo de botón de emergencia (§7.5).
+- Botón "Tengo una emergencia ahora" / "Un asistente te guía paso a paso": siempre visible, con estilo de botón de emergencia (§7.5) en dos líneas (spec 003, FR-001 y FR-002).
 - Pie centrado "Basado en NIST CSF 2.0 y CIS Controls v8.1" (12px, `texto-suave`).
 
 ### Diagnóstico (`TarjetaPregunta`)
@@ -84,13 +84,7 @@ Los textos entre comillas son exactos (vienen de la spec). El resto del texto sa
 - Enlace-botón "¿Ya caíste en una? Ve a primeros auxilios", que lleva a `emergencia`.
 
 ### Emergencia
-- `<h1>` "Respira. Vamos paso a paso.".
-- Tres botones con los títulos de las guías (íconos CreditCard, MessageCircle, Mail), que llevan a `guia:<id>` con una lista `<ol>` de pasos.
-- Aviso "No borres nada" con ícono FileText.
-- Aviso "No borres nada" siempre visible (`AVISO_NO_BORRES`).
-- Botón "Llamar a la línea de mi banco", que lleva a `bancos`: lista de `<a href="tel:…">` con el nombre del banco y el número visible.
-- Botón "Cómo denunciar en Colombia", que lleva a `denuncia`: lista de `CANALES_DENUNCIA`.
-- Sin diagnóstico: botón "Volver al inicio" (R7).
+- Reemplazada por el asistente guiado: ver [../../003-rediseno-emergencia-agente/contracts/pantallas.md](../../003-rediseno-emergencia-agente/contracts/pantallas.md) (spec 003).
 
 ### Barra inferior (`BarraNavegacion`)
 - `<nav aria-label="Secciones">` de 72px de alto, fondo blanco y borde superior `borde`, con 4 botones con ícono y texto: Resultado (ShieldCheck), Mi plan (ListChecks), Tips (Lightbulb) y Emergencia (TriangleAlert).

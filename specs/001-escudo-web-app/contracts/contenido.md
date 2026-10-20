@@ -78,26 +78,7 @@ export const TIPS = [
 
 ## `emergencias.js`
 
-```js
-export const GUIAS_EMERGENCIA = [
-  { id: "tarjetas", titulo: "Bloquear mis tarjetas", pasos: ["<paso 1>", "..."] },
-  { id: "whatsapp", titulo: "Reportar fraude en WhatsApp", pasos: ["..."] },
-  { id: "phishing", titulo: "Fui víctima de phishing", pasos: ["..."] },
-]; // ✔ exactamente estos 3 ids y títulos; pasos no vacíos
-
-export const AVISO_NO_BORRES = {
-  titulo: "No borres nada",
-  texto: "<guardar capturas, números y comprobantes… Ley 1273 de 2009>",
-}; // ✔ título exacto; texto no vacío
-
-export const LINEAS_BANCARIAS = [
-  { banco: "<nombre>", numero: "<número oficial tal como se marca>" },
-]; // ✔ al menos 1; número con solo dígitos, espacios, +, #, *, -
-
-export const CANALES_DENUNCIA = [
-  { entidad: "<entidad oficial>", contacto: "<texto visible>", enlace: "https://…" /* opcional */ },
-]; // ✔ al menos 1; si hay enlace, empieza por https://
-```
+Reemplazado por [../../003-rediseno-emergencia-agente/contracts/contenido-emergencias.md](../../003-rediseno-emergencia-agente/contracts/contenido-emergencias.md) (spec 003): mensajes del asistente, 7 situaciones, guías, aviso, líneas bancarias y canales de denuncia.
 
 ## `politica.js`
 
