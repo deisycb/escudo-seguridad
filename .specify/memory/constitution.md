@@ -1,15 +1,36 @@
 <!--
 Sync Impact Report
-- Cambio de versión: 1.0.0 → 1.1.0 (MINOR: se añade una sección nueva; nada se elimina ni redefine)
-- Principios modificados: ninguno
-- Secciones añadidas: 7. Sistema de Diseño (Reglas de UI)
+- Cambio de versión: 1.1.0 → 2.0.0 (MAJOR: se redefinen los principios I y IV; deja de ser una
+  app 100 % sin backend y se permite enviar datos fuera del dispositivo en un caso acotado)
+- Principios modificados:
+  - I. Privacidad Ante Todo → I. Privacidad Ante Todo (excepción acotada al asistente de emergencia)
+  - II. Consentimiento y Cumplimiento Legal (consentimiento aparte para el asistente)
+  - III. Contenido Fijo y Cálculo de Riesgo Determinista (las respuestas de la IA no son contenido
+    fijo ni modifican el cálculo)
+  - IV. Simplicidad: Solo Navegador, Sin Código Sombra → IV. Simplicidad: Navegador Primero,
+    Backend Solo para Emergencias
+  - VI. Lenguaje Sencillo y Ayuda Siempre Disponible (las guías fijas siguen sin depender del
+    asistente)
+- Secciones añadidas: "Asistente de Emergencia (n8n + IA)" dentro de Stack Tecnológico y
+  Restricciones
+- Secciones modificadas: Stack Tecnológico (Backend), Governance (Cumplimiento)
 - Secciones eliminadas: ninguna
 - Historial:
+  - 2.0.0 (2026-10-20): se permite un backend en n8n con un asistente de IA, solo para el flujo
+    de emergencia, con reglas de privacidad, consentimiento y respaldo sin conexión.
   - 1.1.0 (2026-10-16): se cambió el sistema de diseño a "Confianza institucional" (paleta,
     tipografía, formas, componentes base, responsive, accesibilidad, tono visual e íconos).
     Sección añadida también en constitucion.md (raíz).
   - 1.0.0 (2026-10-15): adopción inicial a partir de constitucion.md.
-- TODOs diferidos: ninguno. Nota: los mockups de /docs/diseno/ aún no existen en el repositorio.
+- TODOs diferidos:
+  - TODO(PROVEEDOR_IA): definir qué modelo y proveedor de IA usa el flujo de n8n.
+  - TODO(HOSTING_N8N): definir dónde se aloja n8n (n8n Cloud o servidor propio) y su dominio, que
+    es el único permitido en el CSP.
+  - TODO(CONSTITUCION_RAIZ): constitucion.md (raíz) no se actualizó con esta enmienda.
+  - Nota: los mockups de /docs/diseno/ aún no existen en el repositorio.
+- Plantillas: ninguna requiere cambios (leen la constitución en tiempo de ejecución).
+  specs/001-escudo-web-app/plan.md declara "Sin backend" y CSP connect-src 'none'; su
+  Constitution Check queda desactualizado para la nueva funcionalidad.
 -->
 
 # Escudo — Web App de Seguridad Digital para Personas Naturales Constitution
@@ -19,27 +40,41 @@ expuesta está a estafas y robos digitales y saber qué hacer para protegerse. E
 un prediagnóstico declarativo de 14 preguntas; la app calcula su nivel de riesgo, lo muestra en un
 semáforo (bajo, medio, alto) y entrega un plan de acción priorizado, tips para reconocer las
 estafas más comunes en Colombia (SMS, llamadas, correo y WhatsApp) y una guía de primeros auxilios
-digitales. Se fundamenta en el NIST Cybersecurity Framework 2.0 y los CIS Critical Security
+digitales, que incluye un asistente de IA para orientar a la víctima en el momento. Se fundamenta en el NIST Cybersecurity Framework 2.0 y los CIS Critical Security
 Controls, y trata los datos conforme a la Ley 1581 de 2012.
 
 ## Core Principles
 
 ### I. Privacidad Ante Todo (NO NEGOCIABLE)
 
-- Ninguna respuesta del usuario se envía a servidores externos; todo permanece en su dispositivo
-  (localStorage).
+- Las respuestas del diagnóstico, el resultado y el progreso del plan NUNCA salen del
+  dispositivo; permanecen en localStorage.
+- **Única excepción:** el asistente de emergencia (ver principio IV) envía al backend solo los
+  mensajes que el usuario escribe en ese chat. No DEBE enviar respuestas del diagnóstico,
+  resultados, progreso, identificadores del dispositivo ni datos de localStorage.
 - La app NUNCA DEBE tener campos que pidan contraseñas, números de tarjeta, códigos de
   verificación ni datos bancarios, ni acceder a las cuentas o dispositivos del usuario.
+- El chat del asistente DEBE advertir, antes del primer mensaje, que no se escriban contraseñas,
+  números de tarjeta o de cuenta, ni códigos de verificación. El cliente DEBE bloquear el envío
+  de mensajes con secuencias que parezcan números de tarjeta (13 a 19 dígitos) o códigos de
+  verificación, y explicar al usuario por qué.
+- La conversación no se guarda: ni en localStorage ni en n8n (el flujo DEBE tener desactivado el
+  guardado de datos de ejecución). Al cerrar el asistente, la conversación se borra.
 - Se DEBE rechazar cualquier implementación que viole estas reglas, aunque se solicite
   explícitamente.
 
 **Razón:** una herramienta de seguridad que recolecta datos sensibles se convierte en el riesgo
-que pretende prevenir.
+que pretende prevenir. El asistente aporta ayuda inmediata a una víctima, pero solo se acepta si
+lo que viaja es lo mínimo, el usuario lo decide y no queda registrado.
 
 ### II. Consentimiento y Cumplimiento Legal
 
 - El diagnóstico SOLO PUEDE iniciar si el usuario acepta el tratamiento de sus respuestas según
   la Ley 1581 de 2012.
+- El asistente de emergencia SOLO PUEDE usarse si el usuario acepta un consentimiento propio y
+  aparte del diagnóstico. Ese consentimiento DEBE explicar que los mensajes se procesan en n8n y
+  en un proveedor de IA externo (posiblemente fuera de Colombia), que no se guardan y para qué se
+  usan.
 - No existen cuentas de usuario, registro ni inicio de sesión.
 
 **Razón:** cumplimiento de la ley colombiana de protección de datos y mínima recolección.
@@ -60,21 +95,34 @@ que pretende prevenir.
 - **Semáforo:** Bajo 0–39 %, Medio 40–69 %, Alto 70 % en adelante.
 - **Plan de acción:** solo para respuestas con puntaje mayor a cero, ordenadas de mayor a menor
   puntaje. Cada acción incluye "Qué hacer ahora" y "Cómo prevenirlo".
+- **Asistente de IA:** sus respuestas no son contenido fijo. No DEBEN reemplazar ni modificar el
+  contenido de `/data`, ni intervenir en el cálculo del riesgo, el semáforo o el plan de acción.
 - **Progreso:** al marcar una acción como "Ya lo hice", su puntaje se descuenta del riesgo
   mostrado y el avance se guarda en localStorage.
 
 **Razón:** el valor de la herramienta depende de un contenido validado y de resultados
 reproducibles y explicables.
 
-### IV. Simplicidad: Solo Navegador, Sin Código Sombra
+### IV. Simplicidad: Navegador Primero, Backend Solo para Emergencias
 
-- Toda la lógica se ejecuta en el navegador. No hay backend, base de datos ni servidor.
+- Toda la lógica del diagnóstico, el resultado, el plan y los tips se ejecuta en el navegador.
+- **Único backend permitido:** un flujo de n8n que conecta con un asistente de IA, usado solo por
+  el flujo de emergencia. El frontend se comunica con él por un único webhook HTTPS.
+- No hay servidor propio ni base de datos. Las claves del proveedor de IA viven solo en n8n;
+  NUNCA DEBEN estar en el código del frontend.
+- El CSP de producción DEBE limitar `connect-src` al origen de ese webhook de n8n.
+- El flujo de n8n DEBE limitar al asistente a orientar sobre incidentes de seguridad digital, en
+  español sencillo; nunca DEBE pedir datos sensibles y DEBE remitir a los canales oficiales de
+  `emergencias.js` (líneas bancarias y denuncia). Además, DEBE limitar la cantidad de peticiones
+  para evitar abuso.
 - Se construye estrictamente lo documentado en `spec.md`. PROHIBIDO añadir características "por si
-  acaso": backend, cuentas, analítica, rastreo, anuncios o conexiones a servicios externos.
+  acaso": otros backends, cuentas, analítica, rastreo, anuncios o conexiones a servicios externos
+  distintos del asistente de emergencia.
 - Estructura plana; no se implementa Clean Architecture completa ni patrones complejos.
 
 **Razón:** menos superficie de ataque, menos mantenimiento y alcance acotado a un proyecto
-académico.
+académico. El backend se limita al único caso donde aporta valor real: orientar a una víctima en
+el momento.
 
 ### V. Código Limpio y Verificado
 
@@ -96,6 +144,9 @@ académico.
 - Todo el contenido se redacta en español sencillo, sin tecnicismos, para cualquier persona.
 - La sección de primeros auxilios digitales DEBE ser accesible desde la pantalla de inicio sin
   hacer el diagnóstico.
+- Las guías fijas de emergencia, las líneas bancarias y los canales de denuncia DEBEN funcionar
+  sin conexión y sin el asistente. Si el asistente falla o no responde, se muestra un mensaje
+  amigable que remite a esas guías.
 - Nunca se muestran errores crudos ni *stack traces* al usuario; todo error técnico se traduce a
   un mensaje amigable.
 
@@ -105,8 +156,9 @@ académico.
 
 - **Frontend / UI:** React con Vite; estilos con Tailwind CSS.
 - **Lenguaje:** JavaScript en todo el proyecto.
-- **Backend:** no aplica.
-- **Persistencia:** localStorage del navegador.
+- **Backend:** solo n8n con un asistente de IA, para el flujo de emergencia (ver principio IV y
+  la subsección "Asistente de Emergencia (n8n + IA)").
+- **Persistencia:** localStorage del navegador, solo para el diagnóstico y el progreso.
 - **Contenido estático:** preguntas, puntajes, recomendaciones, tips y guías de emergencia en
   archivos JavaScript/JSON dentro del proyecto.
 - **Entorno de desarrollo:** Node.js y npm, solo para desarrollo y compilación.
@@ -116,6 +168,19 @@ académico.
     antes de calcular el resultado.
   - Si localStorage no está disponible o contiene datos corruptos, la app DEBE seguir funcionando
     (sin guardar progreso) y mostrar un aviso amigable.
+
+**Asistente de Emergencia (n8n + IA):**
+
+- **Dónde vive:** solo dentro de la pantalla Emergencia, como complemento de las guías fijas.
+- **Qué envía el cliente:** solo el texto del mensaje y los mensajes anteriores de la misma
+  conversación abierta. Nada más.
+- **Antes de enviar:** consentimiento del asistente aceptado y filtro de datos sensibles superado
+  (principio I).
+- **Respuestas:** se muestran como texto plano (nunca como HTML) y se identifican como
+  generadas por IA, con la advertencia de que no reemplazan al banco ni a las autoridades.
+- **Errores:** si hay un tiempo de espera agotado, un error de red o una respuesta inválida, se
+  muestra un mensaje amigable y se remite a las guías fijas (principio VI).
+- **Pendiente:** proveedor de IA y alojamiento de n8n (ver TODOs del Sync Impact Report).
 
 ## Estructura de Código y Flujo de Trabajo
 
@@ -246,7 +311,9 @@ Todos los colores se definen como tokens en `tailwind.config.js`. Prohibido escr
 - **Versionado semántico:** MAJOR para eliminar o redefinir principios; MINOR para añadir
   principios o secciones o ampliar guías; PATCH para aclaraciones y correcciones de redacción.
 - **Cumplimiento:** cada `plan.md` DEBE pasar el Constitution Check y cada revisión de código
-  DEBE verificar los principios I (privacidad) y III (contenido y cálculo). Toda complejidad
-  adicional DEBE justificarse por escrito.
+  DEBE verificar los principios I (privacidad) y III (contenido y cálculo). Todo cambio que toque
+  el asistente de emergencia DEBE verificar además qué datos salen del dispositivo, el CSP y que
+  las guías fijas funcionen sin conexión. Toda complejidad adicional DEBE justificarse por
+  escrito.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-16
+**Version**: 2.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-20
