@@ -215,6 +215,35 @@ export class ConversacionEmergencia {
     return this.#mensajes.some((mensaje) => mensaje.autor === "persona");
   }
 
+  /**
+   * Acción rápida "Llamar a la línea de mi banco": muestra las líneas sin perder el paso
+   * (spec 003, FR-015 y FR-017).
+   * @returns {ConversacionEmergencia} Conversación nueva con las mismas opciones pendientes.
+   */
+  mostrarLineasBancarias() {
+    return this.#mostrarSinMoverse(TEXTOS_ASISTENTE.llamarBanco, this.#mensajeLineas());
+  }
+
+  /**
+   * Acción rápida "Cómo denunciar en Colombia" (spec 003, FR-016 y FR-017).
+   * @returns {ConversacionEmergencia} Conversación nueva con las mismas opciones pendientes.
+   */
+  mostrarCanalesDenuncia() {
+    return this.#mostrarSinMoverse(TEXTOS_ASISTENTE.comoDenunciar, this.#mensajeCanales());
+  }
+
+  /**
+   * "Empezar de nuevo" (la confirmación es de la pantalla, spec 003 FR-018).
+   * @returns {ConversacionEmergencia} Conversación nueva con solo el saludo.
+   */
+  reiniciar() {
+    return ConversacionEmergencia.iniciar(this.#contenido);
+  }
+
+  #mostrarSinMoverse(textoAccion, mensaje) {
+    return this.#continuar([eleccion(textoAccion), mensaje], this.#opciones, this.#posicion);
+  }
+
   #elegirSituacion(id, previos) {
     const situacion = this.#contenido.situaciones.find((s) => s.id === id);
     if (!situacion.seguimiento) return this.#iniciarGuia(situacion.guia, previos);
@@ -318,13 +347,19 @@ export class ConversacionEmergencia {
 
   #mensajeCanales() {
     const { canales, mensajes } = this.#contenido;
-    if (canales.length === 0) return this.#mensajeTexto("");
-    return {
-      autor: "asistente",
-      tipo: "canalesDenuncia",
-      texto: esTextoNoVacio(mensajes.introCanalesDenuncia) ? mensajes.introCanalesDenuncia : null,
-      canales,
-    };
+    return this.#mensajeLista("canalesDenuncia", { canales }, mensajes.introCanalesDenuncia);
+  }
+
+  #mensajeLineas() {
+    const { lineas, mensajes } = this.#contenido;
+    return this.#mensajeLista("lineasBancarias", { lineas }, mensajes.introLineasBancarias);
+  }
+
+  /** Lista de líneas o canales; sin elementos, el aviso de pendiente (nunca una lista vacía). */
+  #mensajeLista(tipo, lista, introduccion) {
+    if (Object.values(lista)[0].length === 0) return this.#mensajeTexto("");
+    const texto = esTextoNoVacio(introduccion) ? introduccion : null;
+    return { autor: "asistente", tipo, texto, ...lista };
   }
 
   /** Agrega mensajes (con ids nuevos) y devuelve la conversación con la nueva posición. */

@@ -170,7 +170,7 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T020 [US2] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — acciones rápidas")`:
+- [X] T020 [US2] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — acciones rápidas")`:
   - `mostrarLineasBancarias()` en las etapas `situaciones`, `seguimiento`, `paso` y `cierre`: agrega la elección "Llamar a la línea de mi banco" y un mensaje `lineasBancarias` con la introducción y las 2 líneas. `obtenerOpciones()` y el número de paso quedan iguales (`toEqual` con lo anterior).
   - Lo mismo para `mostrarCanalesDenuncia()` con "Cómo denunciar en Colombia".
   - Una acción repetida dos veces agrega 4 mensajes.
@@ -181,20 +181,20 @@ description: "Lista de tareas: asistente guiado de emergencia (spec 003)"
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implementar `mostrarLineasBancarias()`, `mostrarCanalesDenuncia()` y `reiniciar()` en `src/logic/ConversacionEmergencia.js`: agregan la elección y el mensaje sin tocar `#opciones` ni `#posicion`, y el mensaje de tipo `lineasBancarias` lleva `{ texto, lineas }`. Reutilizar el armado del mensaje de canales de `denunciar` (T009) para no duplicar código. Con JSDoc. Hacer pasar T020.
-- [ ] T022 [US2] Dibujar el tipo `lineasBancarias` en `src/components/MensajeConversacion.jsx`: introducción y lista de `<a href={`tel:${encodeURIComponent(numero)}`}>` con banco y número visibles (`Phone` 20 px, `min-h-11`), reutilizando el marcado de `Bancos` del `Emergencia.jsx` anterior (spec FR-015; R10 de la 001).
-- [ ] T023 [P] [US2] Crear `src/components/AccionesRapidas.jsx` ([R4](./research.md), [contracts/pantallas.md](./contracts/pantallas.md) punto 7):
+- [X] T021 [US2] Implementar `mostrarLineasBancarias()`, `mostrarCanalesDenuncia()` y `reiniciar()` en `src/logic/ConversacionEmergencia.js`: agregan la elección y el mensaje sin tocar `#opciones` ni `#posicion`, y el mensaje de tipo `lineasBancarias` lleva `{ texto, lineas }`. Reutilizar el armado del mensaje de canales de `denunciar` (T009) para no duplicar código. Con JSDoc. Hacer pasar T020.
+- [X] T022 [US2] Dibujar el tipo `lineasBancarias` en `src/components/MensajeConversacion.jsx`: introducción y lista de `<a href={`tel:${encodeURIComponent(numero)}`}>` con banco y número visibles (`Phone` 20 px, `min-h-11`), reutilizando el marcado de `Bancos` del `Emergencia.jsx` anterior (spec FR-015; R10 de la 001).
+- [X] T023 [P] [US2] Crear `src/components/AccionesRapidas.jsx` ([R4](./research.md), [contracts/pantallas.md](./contracts/pantallas.md) punto 7):
   - Contenedor `<nav aria-label="Acciones rápidas">` con `sticky` y posición `bottom-barra` si `hayBarra`, si no `bottom-0`; además `-mx-6 border-t border-borde bg-superficie px-6 py-2`.
   - Fila con "Llamar a la línea de mi banco" (estilo primario, `flex-1 min-h-[52px] h-auto`, `Phone`) y "Más ayuda" (estilo secundario, `ChevronDown` con `rotate-180` cuando está abierto, `aria-expanded` y `aria-controls="panel-mas-ayuda"`).
   - Panel `#panel-mas-ayuda` encima de la fila, solo si está abierto, con "Cómo denunciar en Colombia" y "Empezar de nuevo" (secundarios, ancho completo, `min-h-11`).
   - El panel se cierra al elegir, al volver a tocar "Más ayuda" o con Esc (con `onKeyDown` en el `nav`), y el foco vuelve a "Más ayuda".
   - Props: `hayBarra`, `onLlamarBanco`, `onComoDenunciar` y `onEmpezarDeNuevo`. Textos tomados de `TEXTOS_ASISTENTE`.
-- [ ] T024 [US2] Integrar `AccionesRapidas` al final de `src/pages/Emergencia.jsx`:
+- [X] T024 [US2] Integrar `AccionesRapidas` al final de `src/pages/Emergencia.jsx`:
   - `onLlamarBanco` → `setConversacion(c => c.mostrarLineasBancarias())`.
   - `onComoDenunciar` → `mostrarCanalesDenuncia()`.
   - `hayBarra={hayDiagnostico}`.
   - Agregar `pb-20` (o el alto real del bloque cerrado) al contenedor de la conversación y `scroll-mb-24` a mensajes y opciones para que el bloque fijo no tape la última opción (spec FR-014, FR-017).
-- [ ] T025 [US2] Confirmación de "Empezar de nuevo" en `src/pages/Emergencia.jsx` ([R12](./research.md)):
+- [X] T025 [US2] Confirmación de "Empezar de nuevo" en `src/pages/Emergencia.jsx` ([R12](./research.md)):
   - Ampliar `confirmacion` con `{ tipo: "reiniciar" }`. `onEmpezarDeNuevo` no hace nada si `!conversacion.tieneProgreso()`; si no, abre la confirmación.
   - El mismo `Dialogo` muestra `confirmarReiniciarTitulo` y `confirmarTexto` con los botones "Seguir aquí" (`BOTON_PRINCIPAL`) y "Empezar de nuevo" (`BOTON_SECUNDARIO`, llama a `setConversacion(c => c.reiniciar())` y cierra).
   - Elegir título y acciones del diálogo según `confirmacion.tipo`, sin un segundo `Dialogo` (spec FR-018).

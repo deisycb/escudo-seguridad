@@ -1,3 +1,4 @@
+import { Phone } from "lucide-react";
 import { CHIP } from "./estilos.js";
 
 const BURBUJA_ASISTENTE =
@@ -5,9 +6,31 @@ const BURBUJA_ASISTENTE =
 const BURBUJA_PERSONA =
   "max-w-[80%] self-end rounded-tarjeta bg-primario p-4 text-base leading-normal font-semibold text-white";
 
+/** El número siempre se ve: en un computador sin llamadas se marca a mano (R10 de la 001). */
+function LineasBancarias({ lineas }) {
+  return (
+    <ul className="mt-3 flex flex-col divide-y divide-borde self-stretch">
+      {lineas.map(({ banco, numero }) => (
+        <li key={banco}>
+          <a
+            href={`tel:${encodeURIComponent(numero)}`}
+            className="flex min-h-11 flex-wrap items-center justify-between gap-2 py-2"
+          >
+            <span className="font-semibold">{banco}</span>
+            <span className="flex items-center gap-2 font-bold text-primario underline">
+              <Phone size={20} strokeWidth={2} aria-hidden="true" />
+              {numero}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function CanalesDenuncia({ canales }) {
   return (
-    <ul className="mt-3 flex flex-col divide-y divide-borde">
+    <ul className="mt-3 flex flex-col divide-y divide-borde self-stretch">
       {canales.map(({ entidad, contacto, enlace }) => (
         <li key={entidad} className="py-2">
           <p className="font-semibold">{entidad}</p>
@@ -37,6 +60,7 @@ function ContenidoAsistente({ mensaje }) {
         </span>
       )}
       {mensaje.texto && <p>{mensaje.texto}</p>}
+      {mensaje.tipo === "lineasBancarias" && <LineasBancarias lineas={mensaje.lineas} />}
       {mensaje.tipo === "canalesDenuncia" && <CanalesDenuncia canales={mensaje.canales} />}
     </>
   );

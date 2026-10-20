@@ -1,5 +1,6 @@
 import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import AccionesRapidas from "../components/AccionesRapidas.jsx";
 import Dialogo from "../components/Dialogo.jsx";
 import MensajeConversacion from "../components/MensajeConversacion.jsx";
 import OpcionesConversacion from "../components/OpcionesConversacion.jsx";
@@ -51,12 +52,24 @@ function AvisoNoBorres() {
   );
 }
 
-/** Confirmación de salida (spec 003, FR-031). "Seguir aquí" es la opción segura. */
+const CONFIRMACIONES = {
+  salir: { titulo: TEXTOS_ASISTENTE.confirmarSalirTitulo, accion: TEXTOS_ASISTENTE.confirmarSalir },
+  reiniciar: {
+    titulo: TEXTOS_ASISTENTE.confirmarReiniciarTitulo,
+    accion: TEXTOS_ASISTENTE.empezarDeNuevo,
+  },
+};
+
+/**
+ * Confirmación de salida (FR-031) o de "Empezar de nuevo" (FR-018). Un solo diálogo para ambas;
+ * "Seguir aquí" es la opción segura.
+ */
 function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
+  const textos = CONFIRMACIONES[confirmacion?.tipo ?? "salir"];
   return (
     <Dialogo
       abierto={confirmacion !== null}
-      titulo={TEXTOS_ASISTENTE.confirmarSalirTitulo}
+      titulo={textos.titulo}
       onCerrar={onSeguir}
       acciones={
         <>
@@ -64,7 +77,7 @@ function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
             {TEXTOS_ASISTENTE.seguirAqui}
           </button>
           <button type="button" className={BOTON_SECUNDARIO} onClick={onConfirmar}>
-            {TEXTOS_ASISTENTE.confirmarSalir}
+            {textos.accion}
           </button>
         </>
       }
@@ -98,10 +111,15 @@ export default function Emergencia({
 
   useEffect(() => registrarInterceptorAtras(interceptarSalida));
 
-  function confirmarSalida() {
-    const { destino } = confirmacion;
+  function confirmar() {
+    const { tipo, destino } = confirmacion;
     setConfirmacion(null);
-    navegar(destino);
+    if (tipo === "salir") navegar(destino);
+    else setConversacion((actual) => actual.reiniciar());
+  }
+
+  function empezarDeNuevo() {
+    if (conversacion.tieneProgreso()) setConfirmacion({ tipo: "reiniciar" });
   }
 
   function volverAlInicio() {
@@ -109,7 +127,7 @@ export default function Emergencia({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-6">
       <h1 tabIndex={-1} className={TITULO_PANTALLA}>
         Respira. Vamos paso a paso.
       </h1>
@@ -130,10 +148,16 @@ export default function Emergencia({
           Volver al inicio
         </button>
       )}
+      <AccionesRapidas
+        hayBarra={hayDiagnostico}
+        onLlamarBanco={() => setConversacion((actual) => actual.mostrarLineasBancarias())}
+        onComoDenunciar={() => setConversacion((actual) => actual.mostrarCanalesDenuncia())}
+        onEmpezarDeNuevo={empezarDeNuevo}
+      />
       <DialogoConfirmacion
         confirmacion={confirmacion}
         onSeguir={() => setConfirmacion(null)}
-        onConfirmar={confirmarSalida}
+        onConfirmar={confirmar}
       />
     </div>
   );

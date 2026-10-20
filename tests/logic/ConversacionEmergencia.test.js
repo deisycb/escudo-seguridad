@@ -275,3 +275,74 @@ describe("ConversacionEmergencia — flujo", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+describe("ConversacionEmergencia — acciones rápidas", () => {
+  const ETAPAS = {
+    situaciones: [],
+    seguimiento: ["situacion:duda"],
+    paso: ["situacion:tarjeta-banco", "siguiente"],
+    cierre: ["situacion:whatsapp-perdido", "siguiente"],
+  };
+
+  Object.entries(ETAPAS).forEach(([etapa, ids]) => {
+    it(`en la etapa ${etapa}, las líneas y los canales no cambian las opciones pendientes`, () => {
+      const antes = recorrer(iniciar(), ids);
+      const conLineas = antes.mostrarLineasBancarias();
+      expect(conLineas.obtenerMensajes().at(-2)).toMatchObject({
+        autor: "persona",
+        texto: TEXTOS_ASISTENTE.llamarBanco,
+      });
+      expect(ultimo(conLineas)).toMatchObject({
+        tipo: "lineasBancarias",
+        texto: MENSAJES.introLineasBancarias,
+        lineas: PRUEBA.lineas,
+      });
+      const conCanales = conLineas.mostrarCanalesDenuncia();
+      expect(conCanales.obtenerMensajes().at(-2)).toMatchObject({
+        texto: TEXTOS_ASISTENTE.comoDenunciar,
+      });
+      expect(ultimo(conCanales)).toMatchObject({ tipo: "canalesDenuncia" });
+      expect(conCanales.obtenerOpciones()).toEqual(antes.obtenerOpciones());
+    });
+  });
+
+  it("en el paso N, después de ver las líneas, 'Listo, ¿qué sigue?' lleva al paso N+1", () => {
+    const c = recorrer(iniciar(), ["situacion:tarjeta-banco", "siguiente"])
+      .mostrarLineasBancarias()
+      .elegir("siguiente");
+    expect(ultimo(c)).toMatchObject({ tipo: "paso", numero: 3, total: 3 });
+  });
+
+  it("repetir una acción rápida la agrega cada vez", () => {
+    const antes = iniciar();
+    const despues = antes.mostrarLineasBancarias().mostrarLineasBancarias();
+    expect(despues.obtenerMensajes()).toHaveLength(antes.obtenerMensajes().length + 4);
+  });
+
+  it("después de terminar, la acción se muestra y las opciones siguen vacías", () => {
+    const c = recorrer(iniciar(), [
+      "situacion:whatsapp-perdido",
+      "siguiente",
+      "terminar",
+    ]).mostrarCanalesDenuncia();
+    expect(ultimo(c)).toMatchObject({ tipo: "canalesDenuncia" });
+    expect(c.obtenerOpciones()).toEqual([]);
+    expect(c.estaTerminada()).toBe(true);
+  });
+
+  it("sin líneas ni canales muestra el aviso de pendiente, nunca una lista vacía", () => {
+    const c = iniciar(contenidoEmergenciasVacio).mostrarLineasBancarias().mostrarCanalesDenuncia();
+    const [, , lineas, , canales] = c.obtenerMensajes();
+    expect(lineas).toMatchObject({ tipo: "texto", texto: TEXTOS_ASISTENTE.respaldoPendiente });
+    expect(canales).toMatchObject({ tipo: "texto", texto: TEXTOS_ASISTENTE.respaldoPendiente });
+  });
+
+  it("una acción rápida cuenta como progreso y reiniciar vuelve al saludo sin progreso", () => {
+    const c = iniciar().mostrarLineasBancarias();
+    expect(c.tieneProgreso()).toBe(true);
+    const reiniciada = recorrer(c, ["situacion:tarjeta-banco"]).reiniciar();
+    expect(reiniciada.obtenerMensajes()).toEqual(iniciar().obtenerMensajes());
+    expect(reiniciada.obtenerOpciones()).toEqual(iniciar().obtenerOpciones());
+    expect(reiniciada.tieneProgreso()).toBe(false);
+  });
+});
