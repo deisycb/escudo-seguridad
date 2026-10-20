@@ -143,6 +143,7 @@ const OPCION_OTRA_COSA = { id: "otraCosa", texto: TEXTOS_ASISTENTE.otraCosa };
 const OPCION_TERMINAR = { id: "terminar", texto: TEXTOS_ASISTENTE.terminar };
 const OPCIONES_CIERRE = [OPCION_DENUNCIAR, OPCION_OTRA_COSA, OPCION_TERMINAR];
 const OPCIONES_TRAS_DENUNCIA = [OPCION_OTRA_COSA, OPCION_TERMINAR];
+const OPCION_VER_GUIAS = { id: "verGuias", texto: TEXTOS_IA.verGuias };
 
 function eleccion(texto) {
   return { autor: "persona", tipo: "eleccion", texto };
@@ -260,6 +261,19 @@ export class ConversacionEmergencia {
   }
 
   /**
+   * El asistente de IA no respondió: mensaje amable y la opción "Ver guías" (spec 004 FR-013;
+   * constitución VI). Nunca se muestran errores técnicos.
+   * @param {"tiempo" | "red" | "invalida" | "limite"} motivo
+   * @returns {ConversacionEmergencia} Conversación nueva, o esta misma si no se esperaba nada.
+   */
+  agregarFalloIA(motivo) {
+    if (!this.estaEsperandoIA()) return this;
+    const texto = motivo === "limite" ? TEXTOS_IA.falloLimite : TEXTOS_IA.falloGeneral;
+    const fallo = { autor: "asistente", tipo: "falloIA", motivo, texto };
+    return this.#reemplazarEspera(fallo, [OPCION_VER_GUIAS], { etapa: ETAPA.FALLO_IA });
+  }
+
+  /**
    * Lo único que se envía al asistente de IA: lo escrito y sus respuestas (spec 004 FR-009).
    * @returns {{ rol: "persona" | "asistente", texto: string }[]}
    */
@@ -365,6 +379,7 @@ export class ConversacionEmergencia {
           etapa: ETAPA.CIERRE_TRAS_DENUNCIA,
         });
       case OPCION_OTRA_COSA.id:
+      case OPCION_VER_GUIAS.id:
         return this.#conSaludo(previos);
       default:
         return this.#continuar([...previos, this.#mensajeTexto(mensajes.despedida)], [], {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TEXTOS_IA } from "../../src/logic/AsistenteIA.js";
 import {
   ConversacionEmergencia,
   TEXTOS_ASISTENTE,
@@ -473,5 +474,53 @@ describe("ConversacionEmergencia — guías mientras responde la IA", () => {
     expect(respondida.estaEsperandoIA()).toBe(false);
     expect(respondida.obtenerMensajes()[1]).toMatchObject({ tipo: "respuestaIA" });
     expect(respondida.obtenerOpciones()).toEqual(enGuias.obtenerOpciones());
+  });
+});
+
+describe("ConversacionEmergencia — fallos y guías", () => {
+  const esperando = () =>
+    ConversacionEmergencia.iniciarEscritura(PRUEBA).agregarMensajeEscrito("hola");
+
+  it("un fallo reemplaza la espera por un mensaje amable y ofrece 'Ver guías'", () => {
+    const c = esperando().agregarFalloIA("tiempo");
+    expect(ultimo(c)).toMatchObject({
+      autor: "asistente",
+      tipo: "falloIA",
+      motivo: "tiempo",
+      texto: TEXTOS_IA.falloGeneral,
+    });
+    expect(c.obtenerOpciones()).toEqual([{ id: "verGuias", texto: TEXTOS_IA.verGuias }]);
+    expect(c.estaEsperandoIA()).toBe(false);
+    expect(c.admiteEscritura()).toBe(true);
+  });
+
+  it("el límite de peticiones usa su propio texto", () => {
+    expect(ultimo(esperando().agregarFalloIA("limite"))).toMatchObject({
+      texto: TEXTOS_IA.falloLimite,
+    });
+  });
+
+  it("sin espera pendiente, el fallo no hace nada", () => {
+    const c = ConversacionEmergencia.iniciarEscritura(PRUEBA);
+    expect(c.agregarFalloIA("red")).toBe(c);
+  });
+
+  it("'Ver guías' registra la elección y abre el saludo con las 7 situaciones", () => {
+    const c = esperando().agregarFalloIA("red").elegir("verGuias");
+    const [, , eleccion, saludo] = c.obtenerMensajes();
+    expect(eleccion).toMatchObject({ autor: "persona", texto: TEXTOS_IA.verGuias });
+    expect(saludo).toMatchObject({ texto: MENSAJES.saludo });
+    expect(idsOpciones(c)).toHaveLength(7);
+  });
+
+  it("después de un fallo se puede reintentar escribiendo", () => {
+    const c = esperando().agregarFalloIA("red").agregarMensajeEscrito("otra vez");
+    expect(c.estaEsperandoIA()).toBe(true);
+  });
+
+  it("ir a las guías y volver no cambia el intercambio con la IA", () => {
+    const respondida = esperando().agregarRespuestaIA("r1");
+    const c = respondida.abrirGuias().elegir("situacion:tarjeta-banco").volverAEscribir();
+    expect(c.obtenerIntercambioIA()).toEqual(respondida.obtenerIntercambioIA());
   });
 });

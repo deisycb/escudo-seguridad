@@ -5,7 +5,7 @@ import Dialogo from "../components/Dialogo.jsx";
 import EscrituraIA from "../components/EscrituraIA.jsx";
 import MensajeConversacion from "../components/MensajeConversacion.jsx";
 import OpcionesConversacion from "../components/OpcionesConversacion.jsx";
-import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
+import { BOTON_ENLACE, BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
 import { TARJETA, TEXTO_LECTURA, TITULO_PANTALLA } from "../components/estilos.js";
 import {
   AVISO_NO_BORRES,
@@ -15,7 +15,7 @@ import {
   MENSAJES_ASISTENTE,
   SITUACIONES_EMERGENCIA,
 } from "../data/emergencias.js";
-import { AsistenteIA, escrituraConfigurada } from "../logic/AsistenteIA.js";
+import { AsistenteIA, TEXTOS_IA, escrituraConfigurada } from "../logic/AsistenteIA.js";
 import { ConversacionEmergencia, TEXTOS_ASISTENTE } from "../logic/ConversacionEmergencia.js";
 import { detectarDatoSensible } from "../logic/FiltroDatosSensibles.js";
 
@@ -134,6 +134,10 @@ export default function Emergencia({
   const [confirmacion, setConfirmacion] = useState(null);
   // El consentimiento vale solo en esta visita: nunca se guarda (spec 004 FR-005).
   const [consentimientoIA, setConsentimientoIA] = useState(false);
+  // Con webhook pero sin conexión al abrir, se avisa por qué se muestran las guías (FR-003).
+  const [sinConexionAlAbrir] = useState(() => Boolean(ASISTENTE_IA) && !navigator.onLine);
+  const sePuedeVolverAEscribir =
+    Boolean(ASISTENTE_IA) && navigator.onLine && !conversacion.admiteEscritura();
   const refCampo = useRef(null);
   const mensajes = conversacion.obtenerMensajes();
   const idUltimoAsistente = mensajes.findLast((m) => m.autor === "asistente")?.id;
@@ -168,7 +172,11 @@ export default function Emergencia({
     if (conMensaje === conversacion) return false;
     setConversacion(conMensaje);
     ASISTENTE_IA.responder(conMensaje.obtenerIntercambioIA()).then((resultado) => {
-      if (resultado.ok) setConversacion((actual) => actual.agregarRespuestaIA(resultado.texto));
+      setConversacion((actual) =>
+        resultado.ok
+          ? actual.agregarRespuestaIA(resultado.texto)
+          : actual.agregarFalloIA(resultado.motivo),
+      );
     });
     return true;
   }
@@ -206,6 +214,11 @@ export default function Emergencia({
       </h1>
       <PresentacionAsistente />
       <AvisoNoBorres />
+      {sinConexionAlAbrir && (
+        <p role="status" className={TEXTO_LECTURA}>
+          {TEXTOS_IA.sinConexion}
+        </p>
+      )}
       <ol
         role="log"
         aria-live="polite"
@@ -225,6 +238,15 @@ export default function Emergencia({
         opciones={conversacion.obtenerOpciones()}
         onElegir={(id) => setConversacion((actual) => actual.elegir(id))}
       />
+      {sePuedeVolverAEscribir && (
+        <button
+          type="button"
+          className={`${BOTON_ENLACE} self-start`}
+          onClick={() => setConversacion((actual) => actual.volverAEscribir())}
+        >
+          {TEXTOS_IA.volverAEscribir}
+        </button>
+      )}
       {conversacion.admiteEscritura() && (
         <EscrituraIA
           consentimiento={consentimientoIA}

@@ -192,7 +192,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T024 [US3] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — fallos y guías")`:
+- [X] T024 [US3] Agregar a `tests/logic/ConversacionEmergencia.test.js` un `describe("ConversacionEmergencia — fallos y guías")`:
   - `agregarFalloIA("tiempo")` en `esperandoIA` reemplaza `esperandoIA` por `{ tipo: "falloIA", motivo: "tiempo", texto: TEXTOS_IA fallo general }`, con opciones `[{ id: "verGuias", texto: "Ver guías" }]`.
   - Con `"limite"` usa el texto de límite.
   - `elegir("verGuias")` agrega la elección, el saludo y las 7 situaciones.
@@ -201,9 +201,9 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Implementar `agregarFalloIA(motivo)` y la opción `verGuias` en `src/logic/ConversacionEmergencia.js`. `elegir("verGuias")` se resuelve en `#elegirAccionFija`: registra la elección y llama a `abrirGuias`. Hacer pasar T024.
-- [ ] T026 [US3] En `enviarMensaje` (`src/pages/Emergencia.jsx`), si `!resultado.ok` aplicar `agregarFalloIA(resultado.motivo)` (spec FR-013). El foco pasa a la opción "Ver guías" con la regla de foco de la 003.
-- [ ] T027 [US3] En `src/pages/Emergencia.jsx`:
+- [X] T025 [US3] Implementar `agregarFalloIA(motivo)` y la opción `verGuias` en `src/logic/ConversacionEmergencia.js`. `elegir("verGuias")` se resuelve en `#elegirAccionFija`: registra la elección y llama a `abrirGuias`. Hacer pasar T024.
+- [X] T026 [US3] En `enviarMensaje` (`src/pages/Emergencia.jsx`), si `!resultado.ok` aplicar `agregarFalloIA(resultado.motivo)` (spec FR-013). El foco pasa a la opción "Ver guías" con la regla de foco de la 003.
+- [X] T027 [US3] En `src/pages/Emergencia.jsx`:
   - **Sin conexión con URL configurada (FR-003):** mostrar arriba de la conversación `<p role="status">` con `TEXTOS_IA` "No tienes conexión. Te muestro las guías, que funcionan sin internet."
   - **"No, prefiero ver las guías" y el enlace "No puedo o no quiero escribir: ver guías":** llaman a `abrirGuias()`.
   - **Vuelta a la escritura:** si `asistente` existe, `navigator.onLine` y la etapa es de la 003, mostrar debajo de las opciones el enlace "Prefiero escribirlo" (`BOTON_ENLACE`). Llama a `volverAEscribir()` y no toca `consentimientoIA` (FR-014).
@@ -224,7 +224,7 @@ description: "Lista de tareas: escritura libre en Emergencia con asistente de IA
   - contador con `aria-live="polite"` solo cuando aparece;
   - "Enviar" con `aria-disabled` coherente;
   - tras un bloqueo, el foco vuelve al `textarea` (spec FR-019).
-- [ ] T030 [US4] Verificar en `src/pages/Emergencia.jsx` que `esperandoIA`, `respuestaIA` y `falloIA` se anuncian por el `role="log"` existente, y que el prefijo `sr-only` "El asistente dice:" no se duplica con el chip "Respuesta generada por IA". Ajustar `MensajeConversacion` si el orden de lectura confunde.
+- [X] T030 [US4] Verificar en `src/pages/Emergencia.jsx` que `esperandoIA`, `respuestaIA` y `falloIA` se anuncian por el `role="log"` existente, y que el prefijo `sr-only` "El asistente dice:" no se duplica con el chip "Respuesta generada por IA". Ajustar `MensajeConversacion` si el orden de lectura confunde.
 - [ ] T031 [US4] Validar US4 con [quickstart.md](./quickstart.md) escenario 16 con VoiceOver y, si se puede, NVDA, más axe DevTools o Lighthouse en la vista de escritura (SC-007).
 
 ---
