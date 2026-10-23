@@ -63,7 +63,7 @@ description: "Tareas de implementación: Tips de seguridad interactivos (006)"
 ## Phase 5: Pulido y verificación
 
 - [X] T013 Comparar lado a lado con `scripts/prototipos/prototipo-tips.html` a 390 px (escenarios 1–8 de [quickstart.md](./quickstart.md)) y ajustar diferencias que no estén en "Decisiones frente al prototipo".
-- [ ] T014 Revisión de accesibilidad: teclado en todo (incluidas frases trampa), `aria-expanded`, `aria-live`, 44 px, foco visible, contraste ≥ 4.5:1 de los pares de research R8 (calcularlo), `prefers-reduced-motion`; corregir lo que falle.
+- [X] T014 Revisión de accesibilidad: teclado en todo (incluidas frases trampa), `aria-expanded`, `aria-live`, 44 px, foco visible, contraste ≥ 4.5:1 de los pares de research R8 (calcularlo), `prefers-reduced-motion`; corregir lo que falle.
 
 ---
 

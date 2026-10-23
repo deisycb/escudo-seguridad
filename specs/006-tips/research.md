@@ -46,7 +46,7 @@ Cada decisión resuelve una duda técnica del plan. Formato: Decisión / Razón 
 ## R8. Tokens nuevos
 
 - **Decisión**: se agregan `primario-suave` `#E6EDFC` (caja del reto, cuadro de SMS) y `exito-suave` `#E3F4E8` (opción correcta, cuadro de WhatsApp), los mismos tonos del prototipo. Correspondencias: azul `primario`, texto azul `primario-oscuro`, rojo `peligro`/`peligro-suave`, ámbar `advertencia`/`advertencia-suave`, verde `exito`/`exito-suave`, burbuja `superficie`, tarjeta `fondo`, línea `borde`, gris `texto-suave`, pista de barra `pista`.
-- **Contraste** (a verificar en la tarea de accesibilidad): `exito` sobre `exito-suave`, `peligro` sobre `peligro-suave`, `primario-oscuro` sobre `primario-suave` y `texto-suave` sobre `superficie`, todos ≥ 4.5:1.
+- **Contraste** (medido en T014): `peligro`/`peligro-suave` 5.75, `primario-oscuro`/`primario-suave` 8.82, `texto-suave`/`superficie` 4.97, `peligro`/`primario-suave` 5.60, blanco 80 %/`primario` 4.89. El mensaje de acierto en `exito` sobre `primario-suave` daba 4.27:1 (falla AA, igual en el prototipo), así que se agregó el token `exito-texto` `#166534` (6.07:1) para ese texto. Íconos (3:1): `advertencia`/`advertencia-suave` 4.30, `exito`/`exito-suave` 4.39.
 - **Razón**: constitución §7.2 (solo tokens). Agregar tokens amplía la paleta sin escribir hex en componentes.
 
 ## R9. Todo texto visible sale de `tips.js`

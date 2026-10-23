@@ -47,7 +47,7 @@ export default function MiniReto({ reto, onResponder }) {
       </div>
       <p
         aria-live="polite"
-        className={`mt-2.5 text-base font-semibold ${resultado?.correcta ? "text-exito" : "text-peligro"}`}
+        className={`mt-2.5 text-base font-semibold ${resultado?.correcta ? "text-exito-texto" : "text-peligro"}`}
       >
         {resultado?.mensaje}
       </p>

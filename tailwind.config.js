@@ -26,6 +26,8 @@ export default {
         "advertencia-suave": "#FCEBD3",
         exito: "#15803D",
         "exito-suave": "#E3F4E8",
+        // Texto verde sobre fondos suaves: `exito` sobre `primario-suave` da 4.27:1 (< 4.5:1, §7.7).
+        "exito-texto": "#166534",
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
