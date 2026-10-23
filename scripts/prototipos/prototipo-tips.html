@@ -1,0 +1,305 @@
+<title>Tips de seguridad Escudo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: columna móvil única; cada tip se abre en 4 bloques: el mensaje, señales, qué hacer, reto */
+:root{
+  --bg:#eef2f8; --card:#ffffff; --ink:#0f172a; --muted:#5b6478; --line:#dfe5ef;
+  --blue:#1d4ed8; --blue-soft:#e6edfc; --blue-ink:#1e3a8a;
+  --red:#b91c1c; --red-soft:#fde8e6; --amber:#b45309; --amber-soft:#fdf1dc;
+  --green:#15803d; --green-soft:#e3f4e8;
+  --bubble:#f3f5f9; --bubble-me:#dbe6fb;
+  --f:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1322; --card:#151d30; --ink:#e8edf7; --muted:#9aa5bd; --line:#26314a;
+  --blue:#6d93f5; --blue-soft:#1c2b52; --blue-ink:#b9ccfb;
+  --red:#f28b82; --red-soft:#3a1d22; --amber:#f2b66a; --amber-soft:#3a2a14;
+  --green:#6fd394; --green-soft:#16301f; --bubble:#1d263b; --bubble-me:#22335c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1322; --card:#151d30; --ink:#e8edf7; --muted:#9aa5bd; --line:#26314a;
+  --blue:#6d93f5; --blue-soft:#1c2b52; --blue-ink:#b9ccfb;
+  --red:#f28b82; --red-soft:#3a1d22; --amber:#f2b66a; --amber-soft:#3a2a14;
+  --green:#6fd394; --green-soft:#16301f; --bubble:#1d263b; --bubble-me:#22335c; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:16px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.rule{background:var(--blue);color:#fff;border-radius:18px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start}
+.rule b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:2px}
+.rule p{margin:0;font-weight:700;font-size:15.5px;line-height:1.4}
+.rule svg{flex:none;margin-top:2px}
+.progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);font-weight:600}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--blue);border-radius:99px;transition:width .4s}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--f);padding:9px 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip:focus-visible,.head:focus-visible,button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.list{display:flex;flex-direction:column;gap:12px}
+.tip{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.head{all:unset;box-sizing:border-box;width:100%;display:flex;gap:14px;align-items:center;padding:16px;cursor:pointer}
+.ico{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue)}
+.ico.call{background:var(--red-soft);color:var(--red)}
+.ico.mail{background:var(--amber-soft);color:var(--amber)}
+.ico.wa{background:var(--green-soft);color:var(--green)}
+.htxt{flex:1;min-width:0}
+.meta{font-size:12.5px;color:var(--muted);font-weight:600;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seen{color:var(--green);font-weight:700}
+.title{font-size:17px;font-weight:700;line-height:1.3;margin-top:2px;text-wrap:balance}
+.chev{flex:none;color:var(--muted);transition:transform .25s}
+.tip.open .chev{transform:rotate(180deg)}
+.body{padding:0 16px 18px;display:flex;flex-direction:column;gap:18px}
+.tip:not(.open) .body{display:none}
+.sec h3{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.sec h3 span{letter-spacing:0;text-transform:none;font-weight:700;color:var(--blue)}
+
+/* Mensaje simulado */
+.phone{background:var(--bubble);border-radius:16px;padding:12px;border:1px dashed var(--line)}
+.from{font-size:12.5px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.from b{color:var(--ink);font-weight:700;overflow-wrap:anywhere}
+.msg{background:var(--card);border-radius:4px 16px 16px 16px;padding:11px 13px;font-size:15px;line-height:1.55;overflow-wrap:anywhere}
+.call .msg{border-radius:16px}
+mark{all:unset;cursor:pointer;background:transparent;border-bottom:2.5px dotted var(--red);color:inherit;padding:0 1px;border-radius:3px;transition:background .2s}
+mark:hover{background:var(--red-soft)}
+mark.found{background:var(--red-soft);border-bottom-style:solid;color:var(--red);font-weight:600}
+.why{margin-top:8px;font-size:14px;background:var(--red-soft);color:var(--ink);border-radius:12px;padding:10px 12px;display:flex;gap:8px}
+.why b{color:var(--red)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.tag-ex{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+ul.flags{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.flags li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+ul.flags li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:8px}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+ol.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;font-size:14.5px}
+ol.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center}
+
+.quiz{background:var(--blue-soft);border-radius:16px;padding:14px}
+.quiz p{margin:0 0 10px;font-weight:700;color:var(--blue-ink)}
+.opts{display:grid;gap:8px}
+.opt{font:600 14.5px var(--f);text-align:left;padding:12px 14px;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.opt.ok{border-color:var(--green);background:var(--green-soft)}
+.opt.bad{border-color:var(--red);background:var(--red-soft)}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;font-size:14px;font-weight:600}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--red)}
+.fact{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.fact b{color:var(--ink)}
+
+.sos{display:flex;gap:10px;align-items:center;border:1.5px solid var(--red);color:var(--red);border-radius:16px;padding:14px 16px;font-weight:700;background:var(--card)}
+.sos span{font-weight:500;color:var(--ink)}
+.pop{animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Tips de seguridad</h1>
+    <p class="sub">Las estafas más comunes en Colombia. Abre cada una, busca las trampas en el mensaje y pon a prueba lo que harías.</p>
+  </header>
+
+  <div class="rule" role="note">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    <div><b>Regla de oro</b><p>Tu banco nunca te pedirá claves, códigos ni el número completo de tu tarjeta. Ni por llamada, ni por mensaje, ni por correo.</p></div>
+  </div>
+
+  <div class="progress"><span id="pText">0 de 8 retos superados</span><div class="bar"><i id="pBar"></i></div></div>
+
+  <div class="filters" role="group" aria-label="Filtrar por canal" id="filters"></div>
+  <div class="list" id="list"></div>
+
+  <div class="sos">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    <div>¿Ya caíste en una? <span>Ve a Emergencia y sigue los primeros auxilios.</span></div>
+  </div>
+</div>
+
+<script>
+const ICONS={
+  sms:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  call:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>',
+  wa:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>'
+};
+const CANALES=[["todos","Todos"],["sms","SMS"],["call","Llamadas"],["mail","Correo"],["wa","WhatsApp"]];
+const LABEL={sms:"SMS · Smishing",call:"Llamada · Vishing",mail:"Correo · Phishing",wa:"WhatsApp · Suplantación"};
+
+// Las frases entre [[ ]] son señales de alerta tocables; el índice apunta a "flags".
+const TIPS=[
+ {c:"sms",t:"Tu paquete está retenido",
+  de:"Envíos Col", hora:"10:42 a. m.",
+  m:"Tu paquete está retenido por [[dirección incompleta]]. [[Paga $3.900]] para reprogramar la entrega: [[bit.ly/entrega-co8841]]",
+  flags:["Pretexto genérico: sirve para cualquier persona, esperes o no un paquete.","El cobro es pequeño a propósito. Lo que buscan son los datos de tu tarjeta.","Enlace acortado: esconde a qué página te lleva en realidad."],
+  senales:["No estabas esperando ningún envío, o no lo pediste por ese medio.","Te cobran una tarifa pequeña para \"liberar\" el paquete.","El enlace no es la página oficial de la transportadora."],
+  hacer:["No abras el enlace ni pagues.","Si sí esperas algo, rastréalo desde la app o página oficial de la tienda.","Borra el mensaje y bloquea el número."],
+  q:"No estás esperando nada y te llega este SMS. ¿Qué haces?",
+  o:[["Pago, son solo $3.900",0],["Borro el mensaje y rastreo mis pedidos en la app oficial",1],["Respondo preguntando de qué paquete se trata",0]],
+  ok:"Exacto. Lo que pierdes no son $3.900: son los datos de tu tarjeta.",
+  dato:"El monto bajo es el gancho: casi nadie desconfía de un cobro tan pequeño."},
+ {c:"sms",t:"Descuento o premio en tu plan de celular",
+  de:"890123", hora:"Ayer",
+  m:"¡FELICIDADES! [[Ganaste 50% de descuento]] en tu plan por 12 meses. Reclámalo [[HOY antes de las 11:59 p. m.]] en [[planes-promo.co/reclamar]]",
+  flags:["Ganaste algo sin haber participado en nada.","Urgencia artificial: quieren que actúes sin pensar.","Dominio que no es el de tu operador."],
+  senales:["Premios o descuentos que no pediste.","Plazos que vencen \"hoy\" o \"en minutos\".","Te piden datos personales o de tarjeta para \"activar\" el beneficio."],
+  hacer:["No entres al enlace.","Revisa las promociones reales en la app oficial de tu operador.","Reporta el número como spam."],
+  q:"El descuento suena muy bien y vence hoy. ¿Qué haces?",
+  o:[["Entro rápido antes de que se acabe",0],["Lo verifico en la app oficial de mi operador",1],["Se lo reenvío a mi familia para que también reclamen",0]],
+  ok:"Bien. Si la promoción es real, también aparece en la app oficial.",
+  dato:"Las promociones reales no desaparecen porque te tomes cinco minutos para verificar."},
+ {c:"call",t:"\"Le hablamos del banco por un movimiento sospechoso\"",
+  de:"Número desconocido", hora:"Llamada entrante",
+  m:"Buenas tardes, le hablamos del [[área de seguridad de su banco]]. Detectamos una [[compra por $1.850.000]]. Para cancelarla, [[dígame el código que le acaba de llegar]].",
+  flags:["Te llaman ellos. No tienes cómo comprobar quién está al otro lado.","Una cifra alta para asustarte y que actúes sin pensar.","Ese código es la llave de tu cuenta. El banco nunca lo pide."],
+  senales:["Te llaman a ti, no tú a ellos.","Te asustan con una compra o un bloqueo.","Te piden claves, códigos o el número completo de la tarjeta."],
+  hacer:["Cuelga sin dar ningún dato.","Llama tú al número que aparece detrás de tu tarjeta o en la app.","Revisa tus movimientos directamente en la app del banco."],
+  q:"Te dicen que si no das el código perderás $1.850.000. ¿Qué haces?",
+  o:[["Doy el código para cancelar la compra",0],["Doy mi cédula pero no el código",0],["Cuelgo y llamo yo a la línea oficial del banco",1]],
+  ok:"Perfecto. Colgar es seguro: si el problema es real, el banco te lo confirma.",
+  dato:"Los estafadores pueden saber tu nombre y tus últimos dígitos. Eso no los vuelve el banco."},
+ {c:"call",t:"Falso técnico o asesor de tu operador",
+  de:"Soporte técnico", hora:"Llamada entrante",
+  m:"Le llamamos de soporte de su operador. [[Su línea será suspendida hoy]]. Para evitarlo, [[instale la aplicación que le voy a indicar]] y [[léame el número que aparece en pantalla]].",
+  flags:["Amenaza de corte inmediato para presionarte.","Esas apps dan control remoto de tu celular.","Con ese número entran a tu equipo y ven todo lo que haces."],
+  senales:["Te piden instalar una app que no buscaste.","Te piden leer códigos o números que aparecen en pantalla.","Amenazan con suspender tu servicio si no actúas ya."],
+  hacer:["Cuelga. Tu operador no te pide instalar apps por llamada.","Si dudas, llama tú a la línea oficial del operador.","Si ya instalaste algo, desinstálalo y cambia tus claves desde otro equipo."],
+  q:"El \"técnico\" insiste en que instales una app para no perder la línea. ¿Qué haces?",
+  o:[["La instalo, no quiero quedarme sin servicio",0],["Cuelgo y llamo yo a la línea oficial de mi operador",1],["La instalo pero no le leo el código",0]],
+  ok:"Muy bien. Una app de control remoto es como darle las llaves de tu casa a un extraño.",
+  dato:"Con acceso remoto pueden abrir tu app bancaria mientras tú miras la pantalla."},
+ {c:"mail",t:"Tu cuenta será suspendida",
+  de:"Soporte <[[seguridad@cuenta-verificacion.net]]>", hora:"7:15 a. m.",
+  m:"Estimado usuario: detectamos actividad inusual. Su cuenta será [[suspendida en 24 horas]]. Verifique su identidad aquí: [[Verificar ahora]]",
+  flags:["El dominio no es el de la empresa real. Mira siempre después de la @.","Plazo corto para que no te detengas a revisar.","El botón te lleva a una página falsa que copia el inicio de sesión."],
+  senales:["El saludo es genérico: \"Estimado usuario\".","El remitente tiene un dominio raro o con letras cambiadas.","Te piden iniciar sesión desde un botón del correo."],
+  hacer:["No toques el botón.","Entra tú escribiendo la dirección oficial o desde la app.","Marca el correo como phishing y bórralo."],
+  q:"El correo tiene el logo de la empresa y se ve muy real. ¿Qué miras primero?",
+  o:[["Que el logo esté bien hecho",0],["El dominio después de la @ del remitente",1],["Que no tenga errores de ortografía",0]],
+  ok:"Así es. Copiar un logo es fácil; el dominio real no lo pueden usar.",
+  dato:"Hoy muchos correos falsos no tienen errores de ortografía. El remitente sigue siendo la mejor pista."},
+ {c:"mail",t:"Factura o recibo que no esperabas",
+  de:"Facturación <cobros@notifica-pagos.com>", hora:"Lunes",
+  m:"Adjuntamos factura electrónica N.° 55902 por [[$2.340.000 vencida]]. Descargue [[Factura_55902.zip]] para evitar [[cobro jurídico]].",
+  flags:["Una deuda que no reconoces, pensada para que abras por curiosidad o miedo.","Los archivos .zip, .exe o .html pueden instalar programas maliciosos.","Amenaza legal para presionarte."],
+  senales:["No reconoces la compra ni la empresa.","El adjunto es comprimido o ejecutable, no un PDF normal.","Amenazan con cobro jurídico o reportes."],
+  hacer:["No descargues el archivo.","Si crees que puede ser real, contacta a la empresa por su canal oficial.","Borra el correo y mantén tu equipo actualizado."],
+  q:"No reconoces la factura, pero te preocupa el cobro jurídico. ¿Qué haces?",
+  o:[["Abro el .zip para ver qué es",0],["Lo ignoro y, si dudo, consulto a la empresa por su canal oficial",1],["Respondo el correo pidiendo explicaciones",0]],
+  ok:"Correcto. Abrir el adjunto es justo lo que buscan.",
+  dato:"Un cobro real llega con tu nombre completo y datos que tú puedes verificar."},
+ {c:"wa",t:"\"Cambié de número, necesito un favor\"",
+  de:"+57 312 000 0000", hora:"9:03 p. m.",
+  m:"Hola mami, [[este es mi número nuevo]], guárdalo. Estoy en un problema, [[¿me prestas $450.000?]] Te los devuelvo mañana, [[no puedo hablar ahora]].",
+  flags:["Número desconocido que dice ser alguien cercano.","Pedido de plata urgente apenas escribe.","Evitan la llamada para que no reconozcas la voz."],
+  senales:["Un contacto conocido escribe desde un número nuevo.","Te pide dinero o una transferencia rápido.","Pone excusas para no hablar por llamada o videollamada."],
+  hacer:["No transfieras.","Llama al número de siempre de esa persona o haz una pregunta que solo ella sepa.","Bloquea y reporta el número en WhatsApp."],
+  q:"El mensaje suena igual a tu hijo y dice que es urgente. ¿Qué haces?",
+  o:[["Transfiero, es mi familia",0],["Lo llamo a su número de siempre antes de hacer cualquier cosa",1],["Le pido una foto para confirmar",0]],
+  ok:"Exacto. Una llamada al número de siempre resuelve la duda en segundos.",
+  dato:"Una foto no confirma nada: la pueden sacar de las redes sociales."},
+ {c:"wa",t:"Te piden el código de 6 dígitos",
+  de:"Laura (contacto)", hora:"4:20 p. m.",
+  m:"Hola! [[Te envié un código por error]] a tu celular, [[¿me lo reenvías porfa?]] Es para entrar a mi cuenta.",
+  flags:["Ese código no llegó por error: es el de tu propio WhatsApp.","Si lo reenvías, se quedan con tu cuenta y escriben a tus contactos.","Puede ser un contacto real cuya cuenta ya fue robada."],
+  senales:["Te llega un código que no pediste.","Alguien te lo pide, aunque sea un conocido.","Te escriben con prisa y mucha confianza."],
+  hacer:["Nunca compartas ese código, con nadie.","Activa la verificación en dos pasos (PIN) en WhatsApp.","Avisa a tu contacto por otro medio: su cuenta puede estar robada."],
+  q:"Es una amiga de verdad quien te pide el código. ¿Qué haces?",
+  o:[["Se lo mando, la conozco",0],["No lo comparto y la llamo para avisarle que la pudieron hackear",1],["Le mando solo los primeros 3 números",0]],
+  ok:"Muy bien. Ese código abre tu cuenta, no la de ella.",
+  dato:"Con el PIN de verificación en dos pasos, aunque alguien tenga el código, no puede entrar."}
+];
+
+let filtro="todos", abierto=null, logros=new Set(), hallados={};
+try{ (JSON.parse(localStorage.getItem("escudo-tips")||"[]")).forEach(i=>logros.add(i)); }catch(e){}
+const guardar=()=>{try{localStorage.setItem("escudo-tips",JSON.stringify([...logros]))}catch(e){}};
+
+const svg=(k,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+const esc=s=>s.replace(/[&<>]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[ch]));
+function conMarcas(txt,i){let n=0;return esc(txt).replace(/\[\[(.+?)\]\]/g,(_,p)=>`<mark tabindex="0" role="button" data-tip="${i}" data-f="${n++}">${p}</mark>`)}
+
+function progreso(){
+  document.getElementById("pText").textContent=`${logros.size} de ${TIPS.length} retos superados`;
+  document.getElementById("pBar").style.width=(logros.size/TIPS.length*100)+"%";
+}
+
+function pintarFiltros(){
+  document.getElementById("filters").innerHTML=CANALES.map(([k,l])=>`<button class="chip" id="f-${k}" aria-pressed="${k===filtro}" data-k="${k}">${l}</button>`).join("");
+}
+
+function pintar(){
+  const L=document.getElementById("list");
+  L.innerHTML=TIPS.map((t,i)=>{
+    if(filtro!=="todos"&&t.c!==filtro) return "";
+    const open=abierto===i, h=hallados[i]||new Set();
+    return `<article class="tip ${open?"open":""}">
+      <button class="head" aria-expanded="${open}" data-open="${i}">
+        <span class="ico ${t.c}">${svg(t.c)}</span>
+        <span class="htxt"><span class="meta">${LABEL[t.c]}${logros.has(i)?' · <span class="seen">Reto superado</span>':""}</span>
+        <span class="title">${esc(t.t)}</span></span>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      ${open?`<div class="body">
+        <section class="sec">
+          <h3>Así se ve <span>${h.size} de ${t.flags.length} trampas</span></h3>
+          <div class="phone ${t.c==="call"?"call":""}">
+            <div class="from"><span>${t.c==="call"?"Lo que te dicen":"De"}: <b>${conMarcas(t.de,i)}</b></span><span class="tag-ex">Ejemplo</span></div>
+            <div class="msg">${conMarcas(t.m,i)}</div>
+          </div>
+          <div id="why-${i}" aria-live="polite"></div>
+          ${h.size<t.flags.length?'<div class="hint">Toca las partes subrayadas en rojo para descubrir cada trampa.</div>':""}
+        </section>
+        <section class="sec"><h3>Cómo reconocerla</h3><ul class="flags">${t.senales.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></section>
+        <section class="sec"><h3>Qué hacer</h3><ol class="steps">${t.hacer.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></section>
+        <section class="quiz" id="quiz-${i}">
+          <p>${esc(t.q)}</p>
+          <div class="opts">${t.o.map((o,j)=>`<button class="opt" data-q="${i}" data-j="${j}">${esc(o[0])}</button>`).join("")}</div>
+          <div class="fb" id="fb-${i}" aria-live="polite"></div>
+        </section>
+        <div class="fact"><b>Dato:</b> ${esc(t.dato)}</div>
+      </div>`:""}
+    </article>`;
+  }).join("");
+  // Restaura marcas ya halladas
+  Object.entries(hallados).forEach(([i,s])=>s.forEach(f=>{const m=L.querySelector(`mark[data-tip="${i}"][data-f="${f}"]`);if(m)m.classList.add("found")}));
+}
+
+function tocarMarca(m){
+  const i=+m.dataset.tip, f=+m.dataset.f, t=TIPS[i];
+  (hallados[i]=hallados[i]||new Set()).add(f);
+  m.classList.add("found"); m.classList.remove("pop"); void m.offsetWidth; m.classList.add("pop");
+  const cont=m.closest(".sec"); cont.querySelector("h3 span").textContent=`${hallados[i].size} de ${t.flags.length} trampas`;
+  const extra=hallados[i].size===t.flags.length?" <b>¡Las encontraste todas!</b>":"";
+  document.getElementById("why-"+i).innerHTML=`<div class="why"><span><b>Trampa:</b> ${esc(t.flags[f])}${extra}</span></div>`;
+  if(hallados[i].size===t.flags.length){const h=cont.querySelector(".hint");if(h)h.remove()}
+}
+
+function responder(b){
+  const i=+b.dataset.q, j=+b.dataset.j, t=TIPS[i], correcta=t.o[j][1]===1;
+  const box=document.getElementById("quiz-"+i), fb=document.getElementById("fb-"+i);
+  if(correcta){
+    box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+    b.classList.add("ok"); fb.className="fb ok"; fb.textContent=t.ok;
+    logros.add(i); guardar(); progreso();
+    const meta=box.closest(".tip").querySelector(".meta");
+    if(!meta.querySelector(".seen")) meta.insertAdjacentHTML("beforeend",' · <span class="seen">Reto superado</span>');
+  }else{
+    b.classList.add("bad"); b.disabled=true; fb.className="fb bad"; fb.textContent="Esa opción te deja expuesto. Intenta otra.";
+  }
+}
+
+document.addEventListener("click",e=>{
+  const c=e.target.closest(".chip"); if(c){filtro=c.dataset.k;abierto=null;pintarFiltros();pintar();return}
+  const h=e.target.closest("[data-open]"); if(h){const i=+h.dataset.open;abierto=abierto===i?null:i;pintar();return}
+  const m=e.target.closest("mark"); if(m){tocarMarca(m);return}
+  const o=e.target.closest(".opt"); if(o&&!o.disabled){responder(o)}
+});
+document.addEventListener("keydown",e=>{const m=e.target.closest&&e.target.closest("mark");if(m&&(e.key==="Enter"||e.key===" ")){e.preventDefault();tocarMarca(m)}});
+
+abierto=0; pintarFiltros(); pintar(); progreso();
+</script>
