@@ -17,12 +17,15 @@ export default {
         "texto-suave": "#5B6B82",
         primario: "#1D4ED8",
         "primario-oscuro": "#1E3A8A",
+        // Spec 006 (research R8): fondos suaves del prototipo de Tips.
+        "primario-suave": "#E6EDFC",
         peligro: "#B42318",
         "peligro-suave": "#FDECEA",
         advertencia: "#B45309",
         "advertencia-texto": "#7A3E06",
         "advertencia-suave": "#FCEBD3",
         exito: "#15803D",
+        "exito-suave": "#E3F4E8",
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
@@ -37,6 +40,17 @@ export default {
       },
       spacing: {
         barra: "72px",
+      },
+      // "Pop" de las frases trampa (spec 006, research R7): box-shadow sí se pinta en texto en línea.
+      keyframes: {
+        pop: {
+          "0%": { boxShadow: "0 0 0 0 #FDECEA" },
+          "40%": { boxShadow: "0 0 0 4px #FDECEA" },
+          "100%": { boxShadow: "0 0 0 0 #FDECEA" },
+        },
+      },
+      animation: {
+        pop: "pop 350ms ease",
       },
       fontSize: {
         bienvenida: ["38px", { lineHeight: "1.15", letterSpacing: "-0.03em", fontWeight: "800" }],
