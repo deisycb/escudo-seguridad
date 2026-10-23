@@ -54,7 +54,7 @@ description: "Tareas de implementación: Tips de seguridad interactivos (006)"
 
 ## Phase 4: Pantalla
 
-- [ ] T012 [US3] Reescribir `src/pages/Tips.jsx` (título, subtítulo, Regla de oro con ShieldCheck sobre `primario`, `BarraProgreso`, `FiltrosCanal`, lista de `TarjetaTip`, botón TriangleAlert a Emergencia) y pasar `escudo.tips` desde `src/App.jsx`. Sin cálculos en la pantalla.
+- [X] T012 [US3] Reescribir `src/pages/Tips.jsx` (título, subtítulo, Regla de oro con ShieldCheck sobre `primario`, `BarraProgreso`, `FiltrosCanal`, lista de `TarjetaTip`, botón TriangleAlert a Emergencia) y pasar `escudo.tips` desde `src/App.jsx`. Sin cálculos en la pantalla.
 
 **Checkpoint**: US1, US2 y US3 funcionando de punta a punta.
 
@@ -62,7 +62,7 @@ description: "Tareas de implementación: Tips de seguridad interactivos (006)"
 
 ## Phase 5: Pulido y verificación
 
-- [ ] T013 Comparar lado a lado con `scripts/prototipos/prototipo-tips.html` a 390 px (escenarios 1–8 de [quickstart.md](./quickstart.md)) y ajustar diferencias que no estén en "Decisiones frente al prototipo".
+- [X] T013 Comparar lado a lado con `scripts/prototipos/prototipo-tips.html` a 390 px (escenarios 1–8 de [quickstart.md](./quickstart.md)) y ajustar diferencias que no estén en "Decisiones frente al prototipo".
 - [ ] T014 Revisión de accesibilidad: teclado en todo (incluidas frases trampa), `aria-expanded`, `aria-live`, 44 px, foco visible, contraste ≥ 4.5:1 de los pares de research R8 (calcularlo), `prefers-reduced-motion`; corregir lo que falle.
 
 ---

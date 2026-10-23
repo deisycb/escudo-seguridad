@@ -98,7 +98,7 @@ export default function App() {
       case "plan":
         return <PlanAccion plan={escudo.plan} onAlternarAccion={escudo.alternarAccion} />;
       case "tips":
-        return <Tips onIrAEmergencia={irAEmergencia} />;
+        return <Tips tips={escudo.tips} onIrAEmergencia={irAEmergencia} />;
       case "emergencia":
         return (
           <Emergencia
