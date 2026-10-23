@@ -3,15 +3,23 @@ import { useEffect, useId, useRef } from "react";
 import { TITULO_SECCION } from "./estilos.js";
 
 /** Diálogo modal sobre el <dialog> nativo (foco y Esc los maneja el navegador). */
-export default function Dialogo({ abierto, titulo, onCerrar, children, acciones }) {
+/**
+ * @param {{ abierto: boolean, titulo: string, onCerrar: () => void, children: any,
+ *   acciones: any, refFocoInicial?: object }} props `refFocoInicial`: control que recibe el
+ *   foco al abrir (por defecto, el navegador enfoca el primero, que es la X).
+ */
+export default function Dialogo({ abierto, titulo, onCerrar, children, acciones, refFocoInicial }) {
   const referencia = useRef(null);
   const idTitulo = useId();
 
   useEffect(() => {
     const dialogo = referencia.current;
-    if (abierto && !dialogo.open) dialogo.showModal();
+    if (abierto && !dialogo.open) {
+      dialogo.showModal();
+      refFocoInicial?.current?.focus();
+    }
     if (!abierto && dialogo.open) dialogo.close();
-  }, [abierto]);
+  }, [abierto, refFocoInicial]);
 
   useEffect(() => {
     const dialogo = referencia.current;

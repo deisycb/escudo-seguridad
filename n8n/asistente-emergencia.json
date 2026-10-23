@@ -1,0 +1,76 @@
+  
+  {
+  "name": "Escudo — asistente de emergencia (eco)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "1c37a256-47d5-4def-bd46-5aa98fb3ff8d",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173"
+        }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "1c37a256-47d5-4def-bd46-5aa98fb3ff8d"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Eco del asistente de emergencia (spec 005; contrato en specs/005-conexion-n8n-eco/contracts/).\n// No guarda textos ni IPs: el límite es global y solo cuenta peticiones (constitución I y IV).\nconst LIMITE_POR_MINUTO = 30;\nconst VENTANA_MS = 60000;\nconst MAXIMO_MENSAJES = 20;\nconst MAXIMO_CARACTERES = 4000;\nconst ROLES = [\"persona\", \"asistente\"];\n\nfunction aplicarLimite(datos, ahora) {\n  if (typeof datos.inicioVentana !== \"number\" || ahora - datos.inicioVentana >= VENTANA_MS) {\n    datos.inicioVentana = ahora;\n    datos.cantidad = 0;\n  }\n  datos.cantidad += 1;\n  return datos.cantidad <= LIMITE_POR_MINUTO;\n}\n\nfunction esMensajeValido(mensaje) {\n  return (\n    ROLES.includes(mensaje?.rol) &&\n    typeof mensaje.texto === \"string\" &&\n    mensaje.texto.length > 0 &&\n    mensaje.texto.length <= MAXIMO_CARACTERES\n  );\n}\n\nfunction esPeticionValida(cuerpo) {\n  if (cuerpo === null || typeof cuerpo !== \"object\") return false;\n  const { mensajes, ...otros } = cuerpo;\n  return (\n    Object.keys(otros).length === 0 &&\n    Array.isArray(mensajes) &&\n    mensajes.length > 0 &&\n    mensajes.length <= MAXIMO_MENSAJES &&\n    mensajes.every(esMensajeValido) &&\n    mensajes.at(-1).rol === \"persona\"\n  );\n}\n\nfunction salida(estado, cuerpo) {\n  return [{ json: { estado, cuerpo } }];\n}\n\nconst cuerpo = $input.first().json.body;\nif (!aplicarLimite($getWorkflowStaticData(\"global\"), Date.now())) {\n  return salida(429, { error: \"limite\" });\n}\nif (!esPeticionValida(cuerpo)) return salida(400, { error: \"peticion_invalida\" });\nreturn salida(200, { respuesta: \"Eco: \" + cuerpo.mensajes.at(-1).texto });\n"
+      },
+      "name": "Validar, limitar y hacer eco",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.cuerpo }}",
+        "options": {
+          "responseCode": "={{ $json.estado }}"
+        }
+      },
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validar, limitar y hacer eco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar, limitar y hacer eco": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false
+  },
+  "pinData": {}
+}

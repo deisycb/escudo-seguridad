@@ -1,31 +1,59 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  CreditCard,
-  FileText,
-  Mail,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
-import { BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
-import {
-  LISTA_TARJETAS,
-  TARJETA,
-  TEXTO_LECTURA,
-  TITULO_PANTALLA,
-  TITULO_SECCION,
-} from "../components/estilos.js";
+import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import AccionesRapidas from "../components/AccionesRapidas.jsx";
+import Dialogo from "../components/Dialogo.jsx";
+import EscrituraIA from "../components/EscrituraIA.jsx";
+import MensajeConversacion from "../components/MensajeConversacion.jsx";
+import OpcionesConversacion from "../components/OpcionesConversacion.jsx";
+import { BOTON_ENLACE, BOTON_PRINCIPAL, BOTON_SECUNDARIO } from "../components/botones.js";
+import { TARJETA, TEXTO_LECTURA, TITULO_PANTALLA } from "../components/estilos.js";
 import {
   AVISO_NO_BORRES,
   CANALES_DENUNCIA,
   GUIAS_EMERGENCIA,
   LINEAS_BANCARIAS,
+  MENSAJES_ASISTENTE,
+  SITUACIONES_EMERGENCIA,
 } from "../data/emergencias.js";
+import { AsistenteIA, TEXTOS_IA, escrituraConfigurada } from "../logic/AsistenteIA.js";
+import { ConversacionEmergencia, TEXTOS_ASISTENTE } from "../logic/ConversacionEmergencia.js";
+import { detectarDatoSensible } from "../logic/FiltroDatosSensibles.js";
 
-const PREFIJO_GUIA = "guia:";
+const CONTENIDO = {
+  mensajes: MENSAJES_ASISTENTE,
+  situaciones: SITUACIONES_EMERGENCIA,
+  guias: GUIAS_EMERGENCIA,
+  lineas: LINEAS_BANCARIAS,
+  canales: CANALES_DENUNCIA,
+};
 
-/** Íconos de cada guía según el mapa de la constitución §7.9. */
-const ICONOS_GUIA = { tarjetas: CreditCard, whatsapp: MessageCircle, phishing: Mail };
+// Sin webhook configurado no hay escritura: Emergencia abre en las guías (spec 004 R1).
+const URL_ASISTENTE_IA = import.meta.env.VITE_URL_ASISTENTE_IA;
+const ASISTENTE_IA = escrituraConfigurada(URL_ASISTENTE_IA)
+  ? new AsistenteIA({ url: URL_ASISTENTE_IA })
+  : null;
+
+/** Escritura con conexión; si no, las guías, que funcionan sin internet (spec 004 R6). */
+function iniciarConversacion() {
+  if (ASISTENTE_IA && navigator.onLine) return ConversacionEmergencia.iniciarEscritura(CONTENIDO);
+  return ConversacionEmergencia.iniciar(CONTENIDO);
+}
+
+function PresentacionAsistente() {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primario">
+        <ShieldCheck size={24} strokeWidth={2} aria-hidden="true" className="text-white" />
+      </span>
+      <div>
+        <p className="font-bold text-texto">Asistente de emergencias</p>
+        <p className="text-sm font-medium text-texto-secundario">
+          Nunca te pediré claves, códigos ni datos de tu tarjeta
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function AvisoNoBorres() {
   return (
@@ -39,144 +67,218 @@ function AvisoNoBorres() {
   );
 }
 
-function Menu({ ir }) {
+const CONFIRMACIONES = {
+  salir: { titulo: TEXTOS_ASISTENTE.confirmarSalirTitulo, accion: TEXTOS_ASISTENTE.confirmarSalir },
+  reiniciar: {
+    titulo: TEXTOS_ASISTENTE.confirmarReiniciarTitulo,
+    accion: TEXTOS_ASISTENTE.empezarDeNuevo,
+  },
+};
+
+/**
+ * Confirmación de salida (FR-041) o de "Empezar de nuevo" (FR-018). Un solo diálogo para ambas;
+ * "Seguir aquí" es la opción segura.
+ */
+function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
+  const textos = CONFIRMACIONES[confirmacion?.tipo ?? "salir"];
+  const refSeguir = useRef(null);
   return (
-    <>
-      <p className={TEXTO_LECTURA}>Elige lo que te pasó:</p>
-      <ul className={LISTA_TARJETAS}>
-        {GUIAS_EMERGENCIA.map(({ id, titulo }) => {
-          const Icono = ICONOS_GUIA[id];
-          return (
-            <li key={id}>
-              <button
-                type="button"
-                className={`${TARJETA} flex min-h-11 w-full items-center gap-3 text-left font-bold text-texto`}
-                onClick={() => ir(`${PREFIJO_GUIA}${id}`)}
-              >
-                {Icono && (
-                  <Icono size={24} strokeWidth={2} aria-hidden="true" className="text-peligro" />
-                )}
-                <span className="flex-1">{titulo}</span>
-                <ChevronRight
-                  size={20}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  className="text-texto-suave"
-                />
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      <div className="flex flex-col gap-3">
-        <button type="button" className={BOTON_PRINCIPAL} onClick={() => ir("bancos")}>
-          <Phone size={20} strokeWidth={2} aria-hidden="true" />
-          Llamar a la línea de mi banco
-        </button>
-        <button type="button" className={BOTON_SECUNDARIO} onClick={() => ir("denuncia")}>
-          Cómo denunciar en Colombia
-        </button>
-      </div>
-    </>
+    <Dialogo
+      abierto={confirmacion !== null}
+      titulo={textos.titulo}
+      refFocoInicial={refSeguir}
+      onCerrar={onSeguir}
+      acciones={
+        <>
+          <button type="button" ref={refSeguir} className={BOTON_PRINCIPAL} onClick={onSeguir}>
+            {TEXTOS_ASISTENTE.seguirAqui}
+          </button>
+          <button type="button" className={BOTON_SECUNDARIO} onClick={onConfirmar}>
+            {textos.accion}
+          </button>
+        </>
+      }
+    >
+      <p>{TEXTOS_ASISTENTE.confirmarTexto}</p>
+    </Dialogo>
   );
 }
 
-function Guia({ id }) {
-  const guia = GUIAS_EMERGENCIA.find((g) => g.id === id);
-  if (!guia) return null;
-  return (
-    <section className={`${TARJETA} flex flex-col gap-3`}>
-      <h2 className={TITULO_SECCION}>{guia.titulo}</h2>
-      <ol className={`list-decimal space-y-2 pl-6 ${TEXTO_LECTURA}`}>
-        {guia.pasos.map((paso) => (
-          <li key={paso}>{paso}</li>
-        ))}
-      </ol>
-    </section>
-  );
+function quiereMenosMovimiento() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function Bancos() {
-  return (
-    <section className="flex flex-col gap-3">
-      <h2 className={TITULO_SECCION}>Líneas de los bancos</h2>
-      <ul className={LISTA_TARJETAS}>
-        {LINEAS_BANCARIAS.map(({ banco, numero }) => (
-          <li key={banco}>
-            <a
-              href={`tel:${encodeURIComponent(numero)}`}
-              className={`${TARJETA} flex min-h-11 flex-wrap items-center justify-between gap-2`}
-            >
-              <span className="font-semibold text-texto">{banco}</span>
-              <span className="flex items-center gap-2 font-bold text-primario underline">
-                <Phone size={20} strokeWidth={2} aria-hidden="true" />
-                {numero}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+/**
+ * Deja a la vista las opciones nuevas; si el mensaje nuevo es largo, prioriza su comienzo.
+ * El margen de desplazamiento de `final` descuenta las acciones fijas y la barra inferior.
+ */
+function desplazarALoNuevo(final, ultimoMensaje) {
+  const behavior = quiereMenosMovimiento() ? "auto" : "smooth";
+  final?.scrollIntoView({ block: "end", behavior });
+  if (ultimoMensaje && ultimoMensaje.getBoundingClientRect().top < 0) {
+    ultimoMensaje.scrollIntoView({ block: "start", behavior });
+  }
 }
 
-function Denuncia() {
-  return (
-    <section className="flex flex-col gap-3">
-      <h2 className={TITULO_SECCION}>Cómo denunciar en Colombia</h2>
-      <ul className={LISTA_TARJETAS}>
-        {CANALES_DENUNCIA.map(({ entidad, contacto, enlace }) => (
-          <li key={entidad} className={TARJETA}>
-            <p className="font-semibold text-texto">{entidad}</p>
-            <p className={TEXTO_LECTURA}>{contacto}</p>
-            {enlace && (
-              <a
-                href={enlace}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center font-semibold text-primario underline"
-              >
-                Ir al sitio oficial (se abre en otra pestaña)
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+/**
+ * Pantalla de Emergencia: conversación guiada solo con botones (spec 003). La conversación vive
+ * solo en este estado: no se guarda ni sale del dispositivo, y se descarta al salir.
+ */
+export default function Emergencia({
+  hayDiagnostico,
+  navegar,
+  registrarInterceptorAtras,
+  onVolverAlInicio,
+}) {
+  const [conversacion, setConversacion] = useState(iniciarConversacion);
+  const [confirmacion, setConfirmacion] = useState(null);
+  // El consentimiento vale solo en esta visita: nunca se guarda (spec 004 FR-005).
+  const [consentimientoIA, setConsentimientoIA] = useState(false);
+  // Con webhook pero sin conexión al abrir, se avisa por qué se muestran las guías (FR-003).
+  const [sinConexionAlAbrir] = useState(() => Boolean(ASISTENTE_IA) && !navigator.onLine);
+  const sePuedeVolverAEscribir =
+    Boolean(ASISTENTE_IA) && navigator.onLine && !conversacion.admiteEscritura();
+  const refCampo = useRef(null);
+  const mensajes = conversacion.obtenerMensajes();
+  const idUltimoAsistente = mensajes.findLast((m) => m.autor === "asistente")?.id;
+  const refPrimeraOpcion = useRef(null);
+  const refUltimoAsistente = useRef(null);
+  const refFinal = useRef(null);
+  const refConversacionMostrada = useRef(conversacion);
 
-function VistaActual({ vista, ir }) {
-  if (vista.startsWith(PREFIJO_GUIA)) return <Guia id={vista.slice(PREFIJO_GUIA.length)} />;
-  if (vista === "bancos") return <Bancos />;
-  if (vista === "denuncia") return <Denuncia />;
-  return <Menu ir={ir} />;
-}
+  // Tras cada cambio: mostrar lo nuevo y llevar el foco a la siguiente acción útil (R5, R6).
+  // Al entrar no se toca (el foco ya va al <h1> desde useNavegacion); comparar la instancia
+  // evita moverlo cuando StrictMode repite el efecto.
+  useEffect(() => {
+    if (refConversacionMostrada.current === conversacion) return;
+    refConversacionMostrada.current = conversacion;
+    desplazarALoNuevo(refFinal.current, refUltimoAsistente.current);
+    const destino = refPrimeraOpcion.current ?? refCampo.current ?? refUltimoAsistente.current;
+    destino?.focus({ preventScroll: true });
+  }, [conversacion]);
 
-export default function Emergencia({ vista = "menu", navegar, hayDiagnostico, onVolverAlInicio }) {
-  function ir(destino) {
-    navegar({ pantalla: "emergencia", vista: destino });
+  useEffect(() => {
+    if (consentimientoIA) refCampo.current?.focus();
+  }, [consentimientoIA]);
+
+  /**
+   * Envía lo escrito al asistente de IA (spec 004). Doble guarda: sin consentimiento o con un
+   * dato sensible no sale nada (constitución I y II).
+   * @returns {boolean} Si el mensaje se envió.
+   */
+  function enviarMensaje(texto) {
+    if (!consentimientoIA || detectarDatoSensible(texto)) return false;
+    const conMensaje = conversacion.agregarMensajeEscrito(texto);
+    if (conMensaje === conversacion) return false;
+    setConversacion(conMensaje);
+    ASISTENTE_IA.responder(conMensaje.obtenerIntercambioIA()).then((resultado) => {
+      setConversacion((actual) =>
+        resultado.ok
+          ? actual.agregarRespuestaIA(resultado.texto)
+          : actual.agregarFalloIA(resultado.motivo),
+      );
+    });
+    return true;
+  }
+
+  // Una sola guarda para "atrás", la barra inferior y "Volver al inicio" (research R7).
+  function interceptarSalida(destino) {
+    // Ir a Emergencia estando en Emergencia no es salir: se ignora y la conversación sigue.
+    if (destino.pantalla === "emergencia") return true;
+    if (!conversacion.tieneProgreso()) return false;
+    setConfirmacion({ tipo: "salir", destino });
+    return true;
+  }
+
+  useEffect(() => registrarInterceptorAtras(interceptarSalida));
+
+  function confirmar() {
+    const { tipo, destino } = confirmacion;
+    setConfirmacion(null);
+    if (tipo === "salir") navegar(destino);
+    else setConversacion((actual) => actual.reiniciar());
+  }
+
+  function empezarDeNuevo() {
+    if (conversacion.tieneProgreso()) setConfirmacion({ tipo: "reiniciar" });
+  }
+
+  function volverAlInicio() {
+    if (!interceptarSalida({ pantalla: "inicio" })) onVolverAlInicio();
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-6">
       <h1 tabIndex={-1} className={TITULO_PANTALLA}>
         Respira. Vamos paso a paso.
       </h1>
-      <VistaActual vista={vista} ir={ir} />
-      {vista !== "menu" && (
-        <button type="button" className={BOTON_SECUNDARIO} onClick={() => ir("menu")}>
-          <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
-          Volver a las opciones
+      <PresentacionAsistente />
+      <AvisoNoBorres />
+      {sinConexionAlAbrir && (
+        <p role="status" className={TEXTO_LECTURA}>
+          {TEXTOS_IA.sinConexion}
+        </p>
+      )}
+      <ol
+        role="log"
+        aria-live="polite"
+        aria-label="Conversación con el asistente"
+        className="flex flex-col gap-3"
+      >
+        {mensajes.map((mensaje) => (
+          <MensajeConversacion
+            key={mensaje.id}
+            mensaje={mensaje}
+            ref={mensaje.id === idUltimoAsistente ? refUltimoAsistente : undefined}
+          />
+        ))}
+      </ol>
+      <OpcionesConversacion
+        ref={refPrimeraOpcion}
+        opciones={conversacion.obtenerOpciones()}
+        onElegir={(id) => setConversacion((actual) => actual.elegir(id))}
+      />
+      {sePuedeVolverAEscribir && (
+        <button
+          type="button"
+          className={`${BOTON_ENLACE} self-start`}
+          onClick={() => setConversacion((actual) => actual.volverAEscribir())}
+        >
+          {TEXTOS_IA.volverAEscribir}
         </button>
       )}
-      <AvisoNoBorres />
+      {conversacion.admiteEscritura() && (
+        <EscrituraIA
+          consentimiento={consentimientoIA}
+          esperando={conversacion.estaEsperandoIA()}
+          onAceptar={() => setConsentimientoIA(true)}
+          onVerGuias={() => setConversacion((actual) => actual.abrirGuias())}
+          onEnviar={enviarMensaje}
+          refCampo={refCampo}
+        />
+      )}
+      <div
+        ref={refFinal}
+        aria-hidden="true"
+        className={hayDiagnostico ? "scroll-mb-40" : "scroll-mb-24"}
+      />
       {!hayDiagnostico && (
-        <button type="button" className={BOTON_SECUNDARIO} onClick={onVolverAlInicio}>
+        <button type="button" className={BOTON_SECUNDARIO} onClick={volverAlInicio}>
           <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
           Volver al inicio
         </button>
       )}
+      <AccionesRapidas
+        hayBarra={hayDiagnostico}
+        onLlamarBanco={() => setConversacion((actual) => actual.mostrarLineasBancarias())}
+        onComoDenunciar={() => setConversacion((actual) => actual.mostrarCanalesDenuncia())}
+        onEmpezarDeNuevo={empezarDeNuevo}
+      />
+      <DialogoConfirmacion
+        confirmacion={confirmacion}
+        onSeguir={() => setConfirmacion(null)}
+        onConfirmar={confirmar}
+      />
     </div>
   );
 }

@@ -30,6 +30,12 @@
 - Q: ¿Cómo se ubica el enlace "Ver política" en el consentimiento de Inicio? → A: Justo después del texto "Acepto el tratamiento de mis respuestas según la Ley 1581 de 2012.", en la misma línea visual, pero como control separado de la casilla (abrirlo no la marca ni la desmarca). El consentimiento sigue dentro de una tarjeta (`superficie` y borde).
 - Q: ¿Cómo caben las tres tarjetas de garantías en una fila en un celular de 390px? → A: Se mantienen en 3 columnas (separación 10px); su relleno interno es de 12px (excepción a §7.4, que pide 20–22px) y el texto se ajusta en varias líneas sin partir palabras ni causar desplazamiento horizontal.
 
+### Session 2026-10-20
+
+- Q: ¿La sección de Emergencia sigue siendo un menú de 3 guías fijas con pasos numerados? → A: No. El menú (FR-030, FR-031) se reemplaza por el asistente guiado de la [spec 003](../003-rediseno-emergencia-agente/spec.md): una conversación solo con botones que ofrece 7 situaciones, hace una pregunta de seguimiento cuando hace falta y entrega la guía un paso a la vez.
+- Q: ¿Cómo se muestran las líneas bancarias y los canales de denuncia? → A: Dentro de la conversación del asistente, como acciones rápidas siempre visibles que no hacen perder el paso en curso. FR-033 y FR-034 se reemplazan por FR-014 a FR-017 de la [spec 003](../003-rediseno-emergencia-agente/spec.md).
+- Q: ¿Cuántos toques puede tomar llegar a la guía desde Inicio? → A: 3 o menos (antes 2), porque algunas situaciones tienen pregunta de seguimiento (SC-001 de la [spec 003](../003-rediseno-emergencia-agente/spec.md)).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hacer el diagnóstico y conocer mi nivel de riesgo (Priority: P1)
@@ -56,19 +62,16 @@ Una persona entra a Escudo, lee qué hace la web app y sus garantías de privaci
 
 ### User Story 2 - Pedir ayuda inmediata ante una emergencia (Priority: P1)
 
-Una persona que acaba de caer en una estafa abre Escudo y, sin aceptar nada ni hacer el diagnóstico, toca "Tengo una emergencia ahora". Ve un mensaje de calma, elige lo que le pasó y sigue una guía de pasos numerados. Puede ver las líneas oficiales de su banco y llamar con un toque, y saber cómo denunciar en Colombia.
+Una persona que acaba de caer en una estafa abre Escudo y, sin aceptar nada ni hacer el diagnóstico, toca "Tengo una emergencia ahora". Ve un mensaje de calma y un asistente guiado (solo con botones) le pregunta qué le pasó y le entrega la guía un paso a la vez. En cualquier momento puede ver las líneas oficiales de su banco y llamar con un toque, o saber cómo denunciar en Colombia, sin perder el paso (detalle en la [spec 003](../003-rediseno-emergencia-agente/spec.md)).
 
 **Why this priority**: Una víctima necesita ayuda inmediata; la constitución exige que esta sección esté disponible desde el inicio sin diagnóstico. Es independiente del resto de la web app.
 
-**Independent Test**: Desde la pantalla de inicio sin consentimiento marcado ni diagnóstico, tocar "Tengo una emergencia ahora" y recorrer las tres guías, la lista de líneas bancarias y los canales de denuncia.
+**Independent Test**: Desde la pantalla de inicio sin consentimiento marcado ni diagnóstico, tocar "Tengo una emergencia ahora" y recorrer el asistente guiado según la [spec 003](../003-rediseno-emergencia-agente/spec.md).
 
 **Acceptance Scenarios**:
 
 1. **Given** la pantalla de inicio (con o sin consentimiento marcado, con o sin diagnóstico), **When** el usuario toca "Tengo una emergencia ahora", **Then** llega a Primeros Auxilios Digitales.
-2. **Given** la pantalla de Primeros Auxilios, **When** se abre, **Then** muestra "Respira. Vamos paso a paso.", pide elegir lo que le pasó entre "Bloquear mis tarjetas", "Reportar fraude en WhatsApp" y "Fui víctima de phishing", y muestra el aviso "No borres nada" (guardar capturas, números y comprobantes como evidencia para el banco y la denuncia, Ley 1273 de 2009).
-3. **Given** el usuario elige una situación, **When** se muestra su guía, **Then** ve los pasos numerados de esa situación; en "Fui víctima de phishing" los pasos incluyen cambiar la contraseña comprometida y las que se repiten, llamar al banco si se entregaron datos financieros, guardar evidencia y denunciar.
-4. **Given** el usuario toca "Llamar a la línea de mi banco", **When** se muestra la lista de bancos, **Then** cada banco aparece con su línea oficial y al tocarlo el dispositivo inicia la llamada a ese número.
-5. **Given** el usuario toca "Cómo denunciar en Colombia", **When** se muestra la información, **Then** ve los canales oficiales de denuncia de delitos informáticos.
+2. **Given** la pantalla de Primeros Auxilios, **When** se abre y se usa, **Then** se comporta según los escenarios de las User Stories 1 y 2 de la [spec 003](../003-rediseno-emergencia-agente/spec.md), y muestra el aviso "No borres nada" (FR-032). *(Reemplaza los escenarios 2 a 5 anteriores: menú de 3 guías, guía numerada, lista de bancos y canales de denuncia; clarificación 2026-10-20.)*
 
 ---
 
@@ -192,11 +195,11 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 
 **Primeros auxilios digitales**
 
-- **FR-030**: La pantalla MUST abrir con el mensaje "Respira. Vamos paso a paso." y pedir al usuario que elija lo que le pasó.
-- **FR-031**: El sistema MUST ofrecer tres situaciones, cada una con su guía de pasos numerados definida en el archivo de contenido: "Bloquear mis tarjetas", "Reportar fraude en WhatsApp" y "Fui víctima de phishing" (esta última cubre cambiar la contraseña comprometida y las que se repiten, llamar al banco si se entregaron datos financieros, guardar evidencia y denunciar).
+- **FR-030**: *Reemplazado (2026-10-20)* por FR-004 a FR-007 de la [spec 003](../003-rediseno-emergencia-agente/spec.md): la pantalla abre con "Respira. Vamos paso a paso.", la presentación del asistente y su saludo con las 7 situaciones.
+- **FR-031**: *Reemplazado (2026-10-20)* por FR-008 a FR-013 de la [spec 003](../003-rediseno-emergencia-agente/spec.md): el menú de tres guías fijas se sustituye por una conversación guiada con 7 situaciones, pregunta de seguimiento cuando aplica y guías entregadas un paso a la vez ("Paso N de M"), con el contenido del archivo de emergencias.
 - **FR-032**: La pantalla MUST mostrar siempre el aviso "No borres nada": guardar capturas, números y comprobantes como evidencia para el banco y la denuncia (Ley 1273 de 2009).
-- **FR-033**: El botón "Llamar a la línea de mi banco" MUST mostrar la lista de líneas oficiales de los principales bancos de Colombia definida en el archivo de contenido; cada línea MUST mostrar el número visible y, al tocarla, abrir la llamada en el dispositivo.
-- **FR-034**: El botón "Cómo denunciar en Colombia" MUST mostrar los canales oficiales de denuncia de delitos informáticos definidos en el archivo de contenido.
+- **FR-033**: *Reemplazado (2026-10-20)* por FR-014, FR-015 y FR-017 de la [spec 003](../003-rediseno-emergencia-agente/spec.md): "Llamar a la línea de mi banco" es una acción rápida siempre visible que muestra las líneas oficiales (número visible y llamada al tocarlo) dentro de la conversación, sin perder el paso en curso.
+- **FR-034**: *Reemplazado (2026-10-20)* por FR-014, FR-016 y FR-017 de la [spec 003](../003-rediseno-emergencia-agente/spec.md): "Cómo denunciar en Colombia" es una acción rápida siempre visible que muestra los canales oficiales de denuncia dentro de la conversación, sin perder el paso en curso.
 
 **Navegación y presentación**
 
@@ -222,7 +225,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 - **Hábito de riesgo / Acción**: cada respuesta con puntaje mayor a cero. Atributos: número de pregunta, descripción corta, título de la acción, prioridad, puntos (y su equivalente en puntos porcentuales del riesgo total), "Qué hacer ahora", "Cómo prevenirlo", estado hecha / no hecha.
 - **Progreso del plan**: conjunto de acciones marcadas como hechas, asociado al diagnóstico vigente. Determina el riesgo actual y el contador "X de N hechas".
 - **Tip de estafa**: tarjeta con canal (SMS, Llamada, Correo, WhatsApp), tipo de ataque, título, cómo reconocerla y qué hacer. Contenido fijo.
-- **Guía de emergencia**: situación (bloquear tarjetas, fraude en WhatsApp, phishing) con sus pasos numerados. Contenido fijo.
+- **Guía de emergencia**: lista ordenada de pasos a la que lleva una situación (o una respuesta de seguimiento) del asistente guiado. Contenido fijo. Situaciones, preguntas de seguimiento y mensajes del asistente se definen en la [spec 003](../003-rediseno-emergencia-agente/spec.md).
 - **Línea bancaria**: nombre del banco y número oficial. Contenido fijo.
 - **Canal de denuncia**: entidad y forma de contacto oficial para denunciar delitos informáticos. Contenido fijo.
 
@@ -231,7 +234,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 ### Measurable Outcomes
 
 - **SC-001**: Un usuario nuevo completa el diagnóstico (desde la pantalla de inicio hasta ver su resultado) en menos de 5 minutos.
-- **SC-002**: Desde la pantalla de inicio, un usuario llega a la guía de pasos de su emergencia en 2 toques o menos, sin aceptar consentimiento ni hacer diagnóstico.
+- **SC-002**: Desde la pantalla de inicio, un usuario llega al primer paso de la guía de su emergencia en 4 toques o menos (botón de emergencia, "ver guías", situación y, si existe, respuesta de seguimiento; 3 sin conexión), sin aceptar consentimiento ni hacer diagnóstico (SC-001 de la [spec 003](../003-rediseno-emergencia-agente/spec.md); antes 2 y luego 3 toques, clarificaciones 2026-10-20).
 - **SC-003**: Para cualquier combinación de respuestas, el porcentaje total, los porcentajes por dimensión y el nivel del semáforo coinciden en el 100 % de los casos con el cálculo manual a partir del archivo de contenido, y repetir las mismas respuestas produce el mismo resultado.
 - **SC-004**: En una revisión de red durante el uso completo de la web app (diagnóstico, plan, tips y emergencia), no se envía ninguna respuesta, resultado ni progreso del usuario a ningún servidor, y no hay peticiones a servidores externos (incluidas fuentes tipográficas o íconos).
 - **SC-005**: Tras cerrar y volver a abrir la web app en el mismo navegador, el 100 % de los resultados y del progreso del plan se conservan.
@@ -242,7 +245,7 @@ Un usuario con diagnóstico guardado usa la barra inferior para moverse entre Re
 
 ## Assumptions
 
-- **Contenido fijo como dependencia**: los puntajes definitivos, las descripciones cortas de hábitos, los textos de acciones ("Qué hacer ahora" / "Cómo prevenirlo"), los textos de reconocimiento de cada tip, los pasos de las tres guías de emergencia, las líneas bancarias, los canales de denuncia y la política de privacidad serán entregados por el equipo del proyecto en los archivos de contenido. Esta especificación no inventa ni modifica ese contenido.
+- **Contenido fijo como dependencia**: los puntajes definitivos, las descripciones cortas de hábitos, los textos de acciones ("Qué hacer ahora" / "Cómo prevenirlo"), los textos de reconocimiento de cada tip, el contenido del asistente de emergencia (situaciones, preguntas de seguimiento, mensajes y pasos de las guías, ver [spec 003](../003-rediseno-emergencia-agente/spec.md)), las líneas bancarias, los canales de denuncia y la política de privacidad serán entregados por el equipo del proyecto en los archivos de contenido. Esta especificación no inventa ni modifica ese contenido.
 - Cada opción (a, b, c) tiene un nivel de criticidad definido en el archivo de contenido, de menor en "a" a mayor en "c"; ese nivel determina la prioridad mostrada. Los valores definitivos están pendientes del equipo.
 - **Puntajes provisionales (mock)**: hasta que el equipo los defina, todas las preguntas usan a = 0 (sin criticidad, no genera hábito), b = 1 (Importante) y c = 2 (Urgente). Puntaje máximo: 28 (8 por dimensión de 4 preguntas; 4 en Hábitos generales). Cambiarlos solo modifica el archivo de contenido.
 - **Banco de preguntas** (texto entregado por el equipo el 2026-10-16; se usa tal cual):

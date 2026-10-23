@@ -1,7 +1,7 @@
 import { Lock, ShieldCheck, Smartphone, TriangleAlert, User } from "lucide-react";
 import { useState } from "react";
 import Dialogo from "../components/Dialogo.jsx";
-import { BOTON_EMERGENCIA, BOTON_PRINCIPAL } from "../components/botones.js";
+import { BOTON_EMERGENCIA_ASISTENTE, BOTON_PRINCIPAL } from "../components/botones.js";
 import { POLITICA_PRIVACIDAD } from "../data/politica.js";
 
 const GARANTIAS = [
@@ -92,9 +92,12 @@ export default function Inicio({
         >
           Empezar diagnóstico
         </button>
-        <button type="button" className={BOTON_EMERGENCIA} onClick={onEmergencia}>
-          <TriangleAlert size={20} strokeWidth={2} aria-hidden="true" />
-          Tengo una emergencia ahora
+        <button type="button" className={BOTON_EMERGENCIA_ASISTENTE} onClick={onEmergencia}>
+          <TriangleAlert size={20} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+          <span className="flex flex-col text-left">
+            <span className="text-base font-bold">Tengo una emergencia ahora</span>
+            <span className="text-[13px] font-medium">Un asistente te guía paso a paso</span>
+          </span>
         </button>
       </div>
 

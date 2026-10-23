@@ -1,17 +1,22 @@
-// Valida /src/data contra specs/001-escudo-web-app/contracts/contenido.md.
+// Valida /src/data contra specs/001-escudo-web-app/contracts/contenido.md
+// (emergencias.js: specs/003-rediseno-emergencia-agente/contracts/contenido-emergencias.md).
 // Falla mientras el equipo no entregue el contenido real: es lo esperado.
 
 import { describe, expect, it } from "vitest";
 import { PREGUNTAS } from "../../src/data/preguntas.js";
+import { CONSENTIMIENTO_IA } from "../../src/data/asistenteIA.js";
 import { POLITICA_PRIVACIDAD } from "../../src/data/politica.js";
 import {
   AVISO_NO_BORRES,
   CANALES_DENUNCIA,
   GUIAS_EMERGENCIA,
   LINEAS_BANCARIAS,
+  MENSAJES_ASISTENTE,
+  SITUACIONES_EMERGENCIA,
 } from "../../src/data/emergencias.js";
 import { RECOMENDACIONES } from "../../src/data/recomendaciones.js";
 import { REGLA_DE_ORO, TIPS } from "../../src/data/tips.js";
+import { validarContenidoEmergencias } from "../../src/logic/ConversacionEmergencia.js";
 import { DIMENSIONES, OPCIONES_VALIDAS, TOTAL_PREGUNTAS } from "../../src/logic/constantes.js";
 
 const ORDEN_CRITICIDAD = { revisa: 1, importante: 2, urgente: 3 };
@@ -110,12 +115,28 @@ describe("politica.js", () => {
 });
 
 describe("emergencias.js", () => {
-  it("tiene exactamente las 3 guías con sus ids, títulos y pasos", () => {
-    expect(GUIAS_EMERGENCIA.map(({ id, titulo }) => ({ id, titulo }))).toEqual([
-      { id: "tarjetas", titulo: "Bloquear mis tarjetas" },
-      { id: "whatsapp", titulo: "Reportar fraude en WhatsApp" },
-      { id: "phishing", titulo: "Fui víctima de phishing" },
-    ]);
+  it("conserva las 3 guías originales con sus ids y títulos", () => {
+    expect(GUIAS_EMERGENCIA.map(({ id, titulo }) => ({ id, titulo }))).toEqual(
+      expect.arrayContaining([
+        { id: "tarjetas", titulo: "Bloquear mis tarjetas" },
+        { id: "whatsapp", titulo: "Reportar fraude en WhatsApp" },
+        { id: "phishing", titulo: "Fui víctima de phishing" },
+      ]),
+    );
+  });
+
+  it("la estructura del asistente no tiene errores (7 situaciones, guías existentes)", () => {
+    const contenido = {
+      mensajes: MENSAJES_ASISTENTE,
+      situaciones: SITUACIONES_EMERGENCIA,
+      guias: GUIAS_EMERGENCIA,
+      lineas: LINEAS_BANCARIAS,
+      canales: CANALES_DENUNCIA,
+    };
+    expect(validarContenidoEmergencias(contenido).errores).toEqual([]);
+  });
+
+  it("cada guía tiene pasos no vacíos", () => {
     GUIAS_EMERGENCIA.forEach(({ pasos }) => {
       expect(pasos.length).toBeGreaterThan(0);
       pasos.forEach((paso) => expect(esTextoNoVacio(paso)).toBe(true));
@@ -207,12 +228,23 @@ describe("tips.js", () => {
   });
 });
 
+describe("asistenteIA.js", () => {
+  it("CONSENTIMIENTO_IA tiene título y al menos 1 párrafo", () => {
+    expect(esTextoNoVacio(CONSENTIMIENTO_IA.titulo)).toBe(true);
+    expect(CONSENTIMIENTO_IA.parrafos.length).toBeGreaterThanOrEqual(1);
+    CONSENTIMIENTO_IA.parrafos.forEach((p) => expect(esTextoNoVacio(p)).toBe(true));
+  });
+});
+
 describe("prohibiciones (constitución I)", () => {
   it("ningún texto de contenido contiene <script ni http://", () => {
     const textos = recogerTextos({
       PREGUNTAS,
       POLITICA_PRIVACIDAD,
       GUIAS_EMERGENCIA,
+      MENSAJES_ASISTENTE,
+      SITUACIONES_EMERGENCIA,
+      CONSENTIMIENTO_IA,
       AVISO_NO_BORRES,
       LINEAS_BANCARIAS,
       CANALES_DENUNCIA,

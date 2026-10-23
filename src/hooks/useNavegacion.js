@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Navegación propia con la History API (R1): sin react-router y sin cambiar la URL.
- * El estado es { pantalla, pregunta?, vista? }.
+ * El estado es { pantalla, pregunta? }.
  * @param {object} inicial Estado con el que arranca la app.
  */
 export function useNavegacion(inicial) {
@@ -45,6 +45,19 @@ export function useNavegacion(inicial) {
     setEstado(destino);
   }, []);
 
+  /**
+   * Navega salvo que la pantalla actual lo intercepte con el mismo interceptor de "atrás"
+   * (por ejemplo, Emergencia pide confirmación antes de salir: spec 003, FR-041).
+   * @param {object} destino Estado al que se quiere ir.
+   */
+  const navegarConGuarda = useCallback(
+    (destino) => {
+      if (interceptorAtras.current?.(destino)) return;
+      navegar(destino);
+    },
+    [navegar],
+  );
+
   const registrarInterceptorAtras = useCallback((fn) => {
     interceptorAtras.current = fn;
     return () => {
@@ -52,5 +65,5 @@ export function useNavegacion(inicial) {
     };
   }, []);
 
-  return { estado, navegar, reemplazar, registrarInterceptorAtras };
+  return { estado, navegar, navegarConGuarda, reemplazar, registrarInterceptorAtras };
 }
