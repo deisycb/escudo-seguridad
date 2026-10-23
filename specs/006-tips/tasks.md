@@ -43,9 +43,9 @@ description: "Tareas de implementación: Tips de seguridad interactivos (006)"
 
 - [X] T006 [US1] Crear `src/components/FraseTrampa.jsx`: `span role="button"`, `tabIndex={0}`, Enter/Espacio, `aria-pressed`, punteado rojo / resaltado rojo al encontrarse, pop reiniciable sin perder el foco (research R6, R7).
 - [X] T007 [US1] Crear `src/components/MensajeEjemplo.jsx`: caja punteada `superficie`, "De:" o "Lo que te dicen:" (llamada), hora, "Ejemplo", burbuja `fondo` (esquinas iguales en llamada), segmentos con `FraseTrampa`, `overflow-wrap:anywhere`.
-- [ ] T008 [P] [US2] Crear `src/components/MiniReto.jsx`: caja `primario-suave`, pregunta en `primario-oscuro`, 3 opciones (44 px, ≥ 16 px), fallo → borde/fondo `peligro`, deshabilitada; acierto → borde/fondo `exito`, todas deshabilitadas; mensaje en `aria-live="polite"`.
-- [ ] T009 [P] [US2] Crear `src/components/BarraProgreso.jsx`: texto "X de 8 retos superados" + barra `pista`/`primario` con ancho `porcentaje`, `motion-reduce:transition-none`.
-- [ ] T010 [P] [US3] Crear `src/components/FiltrosCanal.jsx`: `role="group"` con `aria-label`, chips píldora 44 px, activo `primario` con texto blanco y `aria-pressed`.
+- [X] T008 [P] [US2] Crear `src/components/MiniReto.jsx`: caja `primario-suave`, pregunta en `primario-oscuro`, 3 opciones (44 px, ≥ 16 px), fallo → borde/fondo `peligro`, deshabilitada; acierto → borde/fondo `exito`, todas deshabilitadas; mensaje en `aria-live="polite"`.
+- [X] T009 [P] [US2] Crear `src/components/BarraProgreso.jsx`: texto "X de 8 retos superados" + barra `pista`/`primario` con ancho `porcentaje`, `motion-reduce:transition-none`.
+- [X] T010 [P] [US3] Crear `src/components/FiltrosCanal.jsx`: `role="group"` con `aria-label`, chips píldora 44 px, activo `primario` con texto blanco y `aria-pressed`.
 - [ ] T011 [US1] Reescribir `src/components/TarjetaTip.jsx`: cabecera (ícono de canal en cuadro de color: SMS `primario-suave`/`primario`, Llamada `peligro-suave`/`peligro`, Correo `advertencia-suave`/`advertencia`, WhatsApp `exito-suave`/`exito`; "Canal · Tipo"; "· Reto superado" en `exito`; título; ChevronDown que gira) con `aria-expanded`/`aria-controls`; cuerpo con "Así se ve" + contador, `MensajeEjemplo`, caja "Trampa:" en `aria-live`, ayuda, "Cómo reconocerla" (punto `peligro`), "Qué hacer" (círculo `primario` numerado), `MiniReto`, "Dato:".
 
 **Checkpoint**: piezas listas, sin textos escritos a mano.
