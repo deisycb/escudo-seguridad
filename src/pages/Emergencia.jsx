@@ -1,4 +1,4 @@
-import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
+/*import { ChevronLeft, FileText, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AccionesRapidas from "../components/AccionesRapidas.jsx";
 import Dialogo from "../components/Dialogo.jsx";
@@ -34,7 +34,7 @@ const ASISTENTE_IA = escrituraConfigurada(URL_ASISTENTE_IA)
   : null;
 
 /** Escritura con conexión; si no, las guías, que funcionan sin internet (spec 004 R6). */
-function iniciarConversacion() {
+/*function iniciarConversacion() {
   if (ASISTENTE_IA && navigator.onLine) return ConversacionEmergencia.iniciarEscritura(CONTENIDO);
   return ConversacionEmergencia.iniciar(CONTENIDO);
 }
@@ -79,7 +79,7 @@ const CONFIRMACIONES = {
  * Confirmación de salida (FR-041) o de "Empezar de nuevo" (FR-018). Un solo diálogo para ambas;
  * "Seguir aquí" es la opción segura.
  */
-function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
+/*function DialogoConfirmacion({ confirmacion, onSeguir, onConfirmar }) {
   const textos = CONFIRMACIONES[confirmacion?.tipo ?? "salir"];
   const refSeguir = useRef(null);
   return (
@@ -112,7 +112,7 @@ function quiereMenosMovimiento() {
  * Deja a la vista las opciones nuevas; si el mensaje nuevo es largo, prioriza su comienzo.
  * El margen de desplazamiento de `final` descuenta las acciones fijas y la barra inferior.
  */
-function desplazarALoNuevo(final, ultimoMensaje) {
+/*function desplazarALoNuevo(final, ultimoMensaje) {
   const behavior = quiereMenosMovimiento() ? "auto" : "smooth";
   final?.scrollIntoView({ block: "end", behavior });
   if (ultimoMensaje && ultimoMensaje.getBoundingClientRect().top < 0) {
@@ -124,7 +124,7 @@ function desplazarALoNuevo(final, ultimoMensaje) {
  * Pantalla de Emergencia: conversación guiada solo con botones (spec 003). La conversación vive
  * solo en este estado: no se guarda ni sale del dispositivo, y se descarta al salir.
  */
-export default function Emergencia({
+/*export default function Emergencia({
   hayDiagnostico,
   navegar,
   registrarInterceptorAtras,
@@ -166,7 +166,7 @@ export default function Emergencia({
    * dato sensible no sale nada (constitución I y II).
    * @returns {boolean} Si el mensaje se envió.
    */
-  function enviarMensaje(texto) {
+  /*function enviarMensaje(texto) {
     if (!consentimientoIA || detectarDatoSensible(texto)) return false;
     const conMensaje = conversacion.agregarMensajeEscrito(texto);
     if (conMensaje === conversacion) return false;
@@ -182,7 +182,7 @@ export default function Emergencia({
   }
 
   // Una sola guarda para "atrás", la barra inferior y "Volver al inicio" (research R7).
-  function interceptarSalida(destino) {
+  /*function interceptarSalida(destino) {
     // Ir a Emergencia estando en Emergencia no es salir: se ignora y la conversación sigue.
     if (destino.pantalla === "emergencia") return true;
     if (!conversacion.tieneProgreso()) return false;
@@ -279,6 +279,51 @@ export default function Emergencia({
         onSeguir={() => setConfirmacion(null)}
         onConfirmar={confirmar}
       />
+    </div>
+  );
+}
+*/
+
+import { useState } from "react";
+import { useEscudoChat } from "../hooks/useChatEmergencia.js";
+import { BOTON_ENLACE } from "../components/botones.js";
+
+export default function ChatEscudo({ onVolver }) {
+  const { mensajes, cargando, error, enviar } = useEscudoChat();
+  const [texto, setTexto] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    enviar(texto);
+    setTexto("");
+  };
+
+  return (
+    <div>
+      <button type="button" className={BOTON_ENLACE} onClick={onVolver}>
+        Volver al inicio
+      </button>
+      <div>
+        {mensajes.map((m) => (
+          <p key={m.id} className={m.rol}>
+            {m.texto}
+          </p>
+        ))}
+        {cargando && <p className="bot">Escribiendo...</p>}
+        {error && <p className="error">{error}</p>}
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          placeholder="Escribe tu mensaje..."
+          disabled={cargando}
+        />
+        <button type="submit" disabled={cargando || !texto.trim()}>
+          Enviar
+        </button>
+      </form>
     </div>
   );
 }
