@@ -4,6 +4,7 @@ import BarraNavegacion from "./components/BarraNavegacion.jsx";
 import { useEstadoEscudo } from "./hooks/useEstadoEscudo.js";
 import { useNavegacion } from "./hooks/useNavegacion.js";
 import { TOTAL_PREGUNTAS } from "./logic/constantes.js";
+import ChatEscudo from "./pages/ChatEscudo.jsx";
 import Diagnostico from "./pages/Diagnostico.jsx";
 import Emergencia from "./pages/Emergencia.jsx";
 import Inicio from "./pages/Inicio.jsx";
@@ -108,6 +109,8 @@ export default function App() {
             onVolverAlInicio={() => navegar({ pantalla: "inicio" })}
           />
         );
+      case "chat":
+        return <ChatEscudo onVolver={() => navegar({ pantalla: "inicio" })} />;
       default:
         return (
           <Inicio
@@ -115,6 +118,7 @@ export default function App() {
             onCambiarConsentimiento={setConsentimiento}
             onEmpezar={() => navegar({ pantalla: "diagnostico", pregunta: 1 })}
             onEmergencia={irAEmergencia}
+            onChat={() => navegar({ pantalla: "chat" })}
           />
         );
     }

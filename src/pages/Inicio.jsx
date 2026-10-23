@@ -1,7 +1,7 @@
 import { Lock, ShieldCheck, Smartphone, TriangleAlert, User } from "lucide-react";
 import { useState } from "react";
 import Dialogo from "../components/Dialogo.jsx";
-import { BOTON_EMERGENCIA_ASISTENTE, BOTON_PRINCIPAL } from "../components/botones.js";
+import { BOTON_EMERGENCIA_ASISTENTE, BOTON_ENLACE, BOTON_PRINCIPAL } from "../components/botones.js";
 import { POLITICA_PRIVACIDAD } from "../data/politica.js";
 
 const GARANTIAS = [
@@ -15,6 +15,7 @@ export default function Inicio({
   onCambiarConsentimiento,
   onEmpezar,
   onEmergencia,
+  onChat,
 }) {
   const [politicaAbierta, setPoliticaAbierta] = useState(false);
 
@@ -98,6 +99,10 @@ export default function Inicio({
             <span className="text-base font-bold">Tengo una emergencia ahora</span>
             <span className="text-[13px] font-medium">Un asistente te guía paso a paso</span>
           </span>
+        </button>
+        {/* Temporal: acceso para probar la conexión con n8n. */}
+        <button type="button" className={`${BOTON_ENLACE} self-center`} onClick={onChat}>
+          Probar chat Escudo (n8n)
         </button>
       </div>
 
