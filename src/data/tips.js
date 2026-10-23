@@ -24,6 +24,8 @@ export const TEXTOS_TIPS = {
   etiquetaRegla: "Regla de oro",
   filtrosAria: "Filtrar por canal",
   progreso: (superados, total) => `${superados} de ${total} retos superados`,
+  separador: " · ",
+  etiquetaCanal: (canal, tipo) => `${canal} · ${tipo}`,
   asiSeVe: "Así se ve",
   contadorTrampas: (encontradas, total) => `${encontradas} de ${total} trampas`,
   de: "De:",
