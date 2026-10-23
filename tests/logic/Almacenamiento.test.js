@@ -156,3 +156,70 @@ describe("Almacenamiento escrituras", () => {
     expect(() => almacenamiento.borrar()).not.toThrow();
   });
 });
+
+describe("Almacenamiento retos de Tips (spec 006)", () => {
+  const RETOS = ["sms-paquete", "correo-factura"];
+
+  it("cargarRetosSuperados devuelve [] si no hay registro o no tiene el campo", () => {
+    expect(new Almacenamiento(new AlmacenFalso()).cargarRetosSuperados()).toEqual([]);
+    expect(new Almacenamiento(conRegistro(registro())).cargarRetosSuperados()).toEqual([]);
+  });
+
+  it("cargarRetosSuperados devuelve los ids guardados", () => {
+    const almacen = conRegistro(registro({ retosSuperados: RETOS }));
+    expect(new Almacenamiento(almacen).cargarRetosSuperados()).toEqual(RETOS);
+  });
+
+  it("ignora un campo inválido sin volver corrupto el diagnóstico", () => {
+    const almacen = conRegistro(registro({ retosSuperados: "sms-paquete" }));
+    const almacenamiento = new Almacenamiento(almacen);
+    expect(almacenamiento.cargarRetosSuperados()).toEqual([]);
+    expect(almacenamiento.cargar(PREGUNTAS).estado).toBe("valido");
+  });
+
+  it("descarta elementos que no son texto y repetidos", () => {
+    const almacen = conRegistro(registro({ retosSuperados: [RETOS[0], 3, null, RETOS[0]] }));
+    expect(new Almacenamiento(almacen).cargarRetosSuperados()).toEqual([RETOS[0]]);
+  });
+
+  it("guardarRetosSuperados reescribe solo ese campo", () => {
+    const almacen = conRegistro(registro());
+    expect(new Almacenamiento(almacen).guardarRetosSuperados(RETOS)).toBe(true);
+    expect(leer(almacen)).toEqual(registro({ retosSuperados: RETOS }));
+  });
+
+  it("guardarRetosSuperados devuelve false si no hay registro", () => {
+    const almacen = new AlmacenFalso();
+    expect(new Almacenamiento(almacen).guardarRetosSuperados(RETOS)).toBe(false);
+    expect(almacen.getItem(CLAVE_ALMACENAMIENTO)).toBeNull();
+  });
+
+  it("con escritura bloqueada devuelve false sin lanzar", () => {
+    const almacen = conRegistro(registro());
+    almacen.fallarAlEscribir = true;
+    expect(new Almacenamiento(almacen).guardarRetosSuperados(RETOS)).toBe(false);
+  });
+
+  it("con lectura bloqueada carga [] sin lanzar", () => {
+    const almacen = conRegistro(registro({ retosSuperados: RETOS }));
+    almacen.fallarAlLeer = true;
+    expect(new Almacenamiento(almacen).cargarRetosSuperados()).toEqual([]);
+  });
+
+  it("sin localStorage carga [] y no guarda", () => {
+    const almacenamiento = new Almacenamiento(null);
+    expect(almacenamiento.cargarRetosSuperados()).toEqual([]);
+    expect(almacenamiento.guardarRetosSuperados(RETOS)).toBe(false);
+  });
+
+  it("repetir el diagnóstico conserva los retos superados", () => {
+    const almacen = conRegistro(registro({ retosSuperados: RETOS }));
+    new Almacenamiento(almacen).guardarDiagnostico(RESPUESTAS, FECHA);
+    expect(leer(almacen)).toEqual({
+      version: 1,
+      diagnostico: { respuestas: RESPUESTAS, fecha: FECHA },
+      accionesHechas: [],
+      retosSuperados: RETOS,
+    });
+  });
+});

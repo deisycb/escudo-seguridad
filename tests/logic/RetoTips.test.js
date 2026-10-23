@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { TIPS } from "../../src/data/tips.js";
+import { Almacenamiento } from "../../src/logic/Almacenamiento.js";
 import { RetoTips } from "../../src/logic/RetoTips.js";
 import { MENSAJE_FALLO, TOTAL_TRAMPAS_POR_TIP } from "../../src/logic/constantes.js";
+import { AlmacenFalso } from "../fixtures/contenidoPrueba.js";
 
 const ID_SMS = "sms-paquete";
 const ID_CORREO = "correo-suspension";
@@ -168,5 +170,18 @@ describe("RetoTips.tipsDelCanal", () => {
   it("un canal devuelve solo sus 2 tips", () => {
     const llamadas = reto.tipsDelCanal("llamada");
     expect(llamadas.map((t) => t.id)).toEqual(["llamada-banco", "llamada-tecnico"]);
+  });
+});
+
+describe("RetoTips con almacenamiento bloqueado", () => {
+  it("el juego funciona en memoria aunque no se pueda guardar", () => {
+    const almacenamiento = new Almacenamiento(
+      new AlmacenFalso({ fallarAlLeer: true, fallarAlEscribir: true }),
+    );
+    let reto = new RetoTips(TIPS, almacenamiento.cargarRetosSuperados());
+    reto = reto.marcarTrampa(ID_SMS, 0).responder(ID_SMS, OPCION_CORRECTA_SMS).reto;
+    expect(almacenamiento.guardarRetosSuperados(reto.retosSuperados())).toBe(false);
+    expect(reto.trampasEncontradas(ID_SMS)).toEqual([0]);
+    expect(reto.progreso().superados).toBe(1);
   });
 });

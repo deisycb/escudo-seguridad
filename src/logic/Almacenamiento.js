@@ -53,8 +53,8 @@ function esRegistroValido(registro, preguntas) {
 }
 
 /**
- * Guarda y recupera el diagnóstico y el progreso del plan en localStorage
- * (clave única "escudo.v1", ver contracts/almacenamiento.md).
+ * Guarda y recupera el diagnóstico, el progreso del plan y los retos de Tips en localStorage
+ * (clave única "escudo.v1", ver contracts/almacenamiento.md de las specs 001 y 006).
  * Ningún método lanza errores hacia la interfaz.
  */
 export class Almacenamiento {
@@ -108,11 +108,36 @@ export class Almacenamiento {
    * @returns {boolean} false si no se pudo guardar.
    */
   guardarDiagnostico(respuestas, fecha) {
+    // Los retos de Tips son aprendizaje, no parte del diagnóstico: se conservan (spec 006).
+    const retosSuperados = this.cargarRetosSuperados();
     return this.#escribir({
       version: VERSION_ALMACENAMIENTO,
       diagnostico: { respuestas: [...respuestas], fecha },
       accionesHechas: [],
+      ...(retosSuperados.length > 0 && { retosSuperados }),
     });
+  }
+
+  /**
+   * Lee los ids de retos de Tips superados. Lo inválido se ignora y nunca vuelve corrupto el
+   * registro (spec 006, contracts/almacenamiento.md).
+   * @returns {string[]} Ids únicos; [] si no hay o no se pueden leer. Nunca lanza error.
+   */
+  cargarRetosSuperados() {
+    const guardados = this.#leerRegistro()?.retosSuperados;
+    if (!Array.isArray(guardados)) return [];
+    return [...new Set(guardados.filter((id) => typeof id === "string"))];
+  }
+
+  /**
+   * Reescribe solo los retos superados del registro actual.
+   * @param {string[]} retosSuperados Ids de tip.
+   * @returns {boolean} false si no hay registro o no se pudo guardar.
+   */
+  guardarRetosSuperados(retosSuperados) {
+    const actual = this.#leerRegistro();
+    if (!actual) return false;
+    return this.#escribir({ ...actual, retosSuperados: [...retosSuperados] });
   }
 
   /**
