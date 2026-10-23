@@ -24,4 +24,4 @@ Referencia visual: `scripts/prototipos/prototipo-tips.html`. Diferencias permiti
 
 ## Textos (`TEXTOS_TIPS`)
 
-titulo, subtitulo, etiquetaRegla ("Regla de oro"), filtrosAria ("Filtrar por canal"), progreso(s, t), asiSeVe, contadorTrampas(n, t) ("n de t trampas"), de ("De"), loQueTeDicen ("Lo que te dicen"), ejemplo, ayudaTrampas, prefijoTrampa ("Trampa:"), todasEncontradas ("¡Las encontraste todas!"), comoReconocerla, queHacer, retoSuperado ("Reto superado"), prefijoDato ("Dato:"), emergenciaPregunta ("¿Ya caíste en una?"), emergenciaAccion ("Ve a Emergencia y sigue los primeros auxilios.").
+titulo, subtitulo, etiquetaRegla ("Regla de oro"), filtrosAria ("Filtrar por canal"), progreso(s, t), asiSeVe, contadorTrampas(n, t) ("n de t trampas"), de ("De:"), loQueTeDicen ("Lo que te dicen:"), ejemplo, ayudaTrampas, prefijoTrampa ("Trampa:"), todasEncontradas ("¡Las encontraste todas!"), comoReconocerla, queHacer, retoSuperado ("Reto superado"), prefijoDato ("Dato:"), emergenciaPregunta ("¿Ya caíste en una?"), emergenciaAccion ("Ve a Emergencia y sigue los primeros auxilios.").

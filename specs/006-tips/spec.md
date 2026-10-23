@@ -115,7 +115,7 @@ La persona filtra por canal con los chips Todos, SMS, Llamadas, Correo y WhatsAp
 
 **Tarjeta abierta**
 
-- **FR-008**: El bloque "Así se ve" MUST mostrar el contador "X de 3 trampas", la simulación del mensaje (encabezado "De:" con el remitente, o "Lo que te dicen:" en llamadas; la hora o estado; la etiqueta "Ejemplo"; la burbuja con el mensaje) y la zona de explicación.
+- **FR-008**: El bloque "Así se ve" MUST mostrar el contador "X de 3 trampas", la simulación del mensaje (encabezado "De:" con el remitente, o "Lo que te dicen:" en llamadas; la etiqueta "Ejemplo"; la burbuja con el mensaje). La hora existe en el contenido pero no se muestra, igual que en el prototipo y la zona de explicación.
 - **FR-009**: Las frases trampa MUST verse subrayadas con punteado rojo y ser activables con toque, clic, Enter y Espacio. Al activarlas MUST: quedar resaltadas en rojo, hacer la animación "pop", contarse una sola vez y mostrar debajo la caja "Trampa: <explicación>" con la explicación de esa frase.
 - **FR-010**: La ayuda "Toca las partes subrayadas en rojo para descubrir cada trampa." MUST verse mientras falten trampas; al encontrar las 3, MUST ocultarse y la caja MUST agregar "¡Las encontraste todas!".
 - **FR-011**: Las trampas encontradas MUST conservarse mientras la app esté abierta (al cerrar y abrir tarjetas, al filtrar o al ir a otra sección) y MUST reiniciarse al recargar.

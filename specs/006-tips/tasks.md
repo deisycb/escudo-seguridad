@@ -41,8 +41,8 @@ description: "Tareas de implementación: Tips de seguridad interactivos (006)"
 
 ## Phase 3: Componentes (de menor a mayor)
 
-- [ ] T006 [US1] Crear `src/components/FraseTrampa.jsx`: `span role="button"`, `tabIndex={0}`, Enter/Espacio, `aria-pressed`, punteado rojo / resaltado rojo al encontrarse, pop reiniciable sin perder el foco (research R6, R7).
-- [ ] T007 [US1] Crear `src/components/MensajeEjemplo.jsx`: caja punteada `superficie`, "De:" o "Lo que te dicen:" (llamada), hora, "Ejemplo", burbuja `fondo` (esquinas iguales en llamada), segmentos con `FraseTrampa`, `overflow-wrap:anywhere`.
+- [X] T006 [US1] Crear `src/components/FraseTrampa.jsx`: `span role="button"`, `tabIndex={0}`, Enter/Espacio, `aria-pressed`, punteado rojo / resaltado rojo al encontrarse, pop reiniciable sin perder el foco (research R6, R7).
+- [X] T007 [US1] Crear `src/components/MensajeEjemplo.jsx`: caja punteada `superficie`, "De:" o "Lo que te dicen:" (llamada), hora, "Ejemplo", burbuja `fondo` (esquinas iguales en llamada), segmentos con `FraseTrampa`, `overflow-wrap:anywhere`.
 - [ ] T008 [P] [US2] Crear `src/components/MiniReto.jsx`: caja `primario-suave`, pregunta en `primario-oscuro`, 3 opciones (44 px, ≥ 16 px), fallo → borde/fondo `peligro`, deshabilitada; acierto → borde/fondo `exito`, todas deshabilitadas; mensaje en `aria-live="polite"`.
 - [ ] T009 [P] [US2] Crear `src/components/BarraProgreso.jsx`: texto "X de 8 retos superados" + barra `pista`/`primario` con ancho `porcentaje`, `motion-reduce:transition-none`.
 - [ ] T010 [P] [US3] Crear `src/components/FiltrosCanal.jsx`: `role="group"` con `aria-label`, chips píldora 44 px, activo `primario` con texto blanco y `aria-pressed`.
