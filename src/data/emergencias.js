@@ -4,14 +4,29 @@
 // PROVISIONAL: texto y destino de las 7 situaciones (spec 003, FR-013, aclaración del 2026-10-20).
 // No se publica con contenido PENDIENTE ni PROVISIONAL.
 
+/**
+ * Textos fijos del asistente de emergencia.
+ * Tono: calmado, sin culpa, frases cortas, tuteo colombiano.
+ */
 export const MENSAJES_ASISTENTE = {
-  saludo: "", // PENDIENTE: lo entrega el equipo
-  cierreGuia: "", // PENDIENTE: lo entrega el equipo
-  despedida: "", // PENDIENTE: lo entrega el equipo
-  introLineasBancarias: "", // PENDIENTE: lo entrega el equipo
-  introCanalesDenuncia: "", // PENDIENTE: lo entrega el equipo
-  contenidoPendiente: "", // PENDIENTE: lo entrega el equipo
-};
+  saludo:
+    "Hola. Respira, esto le pasa a mucha gente y tiene solución. Vamos paso a paso: elige lo que te pasó.",
+
+  cierreGuia:
+    "Estos son los pasos más importantes. Hazlos en orden y sin afán. Si te pasó algo más, elige otra opción.",
+
+  despedida:
+    "Hiciste bien en actuar rápido. Guarda capturas y comprobantes, y recuerda: tu banco nunca te pedirá claves ni códigos. Cuídate.",
+
+  introLineasBancarias:
+    "Llama solo a la línea oficial de tu banco. Si no la ves aquí, búscala al respaldo de tu tarjeta o en la app oficial, nunca en un mensaje que te llegó.",
+
+  introCanalesDenuncia:
+    "Denunciar ayuda a que esto no le pase a otras personas. Puedes hacerlo por estos canales oficiales:",
+
+  contenidoPendiente:
+    "Todavía estamos preparando esta guía. Mientras tanto, llama a la línea oficial de tu banco o revisa cómo denunciar en Colombia.",
+};  
 
 export const SITUACIONES_EMERGENCIA = [
   {
