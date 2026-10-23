@@ -1,6 +1,7 @@
 // Forma fijada por specs/003-rediseno-emergencia-agente/contracts/contenido-emergencias.md.
-// PENDIENTE: mensajes del asistente, pasos de cada guía, texto del aviso, líneas bancarias y
-// canales de denuncia los entrega el equipo. No se inventan pasos, números ni canales.
+// PROVISIONAL: pasos de cada guía, texto del aviso, líneas bancarias y canales de denuncia son un
+// borrador para poder probar; pendientes de validar por el equipo. VERIFICAR cada número y enlace
+// en el sitio oficial de la entidad antes de publicar.
 // PROVISIONAL: texto y destino de las 7 situaciones (spec 003, FR-013, aclaración del 2026-10-20).
 // No se publica con contenido PENDIENTE ni PROVISIONAL.
 
@@ -26,7 +27,7 @@ export const MENSAJES_ASISTENTE = {
 
   contenidoPendiente:
     "Todavía estamos preparando esta guía. Mientras tanto, llama a la línea oficial de tu banco o revisa cómo denunciar en Colombia.",
-};  
+};
 
 export const SITUACIONES_EMERGENCIA = [
   {
@@ -54,16 +55,74 @@ export const SITUACIONES_EMERGENCIA = [
 ];
 
 export const GUIAS_EMERGENCIA = [
-  { id: "tarjetas", titulo: "Bloquear mis tarjetas", pasos: [] },
-  { id: "whatsapp", titulo: "Reportar fraude en WhatsApp", pasos: [] },
-  { id: "phishing", titulo: "Fui víctima de phishing", pasos: [] },
+  {
+    id: "tarjetas",
+    titulo: "Bloquear mis tarjetas",
+    pasos: [
+      "Bloquea tu tarjeta ya desde la app oficial de tu banco o llamando a su línea oficial.",
+      "Si no tienes la app a mano, usa el número que está al respaldo de tu tarjeta.",
+      "Pide que revisen tus últimos movimientos y reporta los que no reconozcas.",
+      "Si hiciste una transferencia a un estafador, dile al banco cuándo fue, el valor y la cuenta de destino.",
+      "Pide un número de radicado y guárdalo.",
+      "Cambia las claves de tu app y de tu banca en línea.",
+    ],
+  },
+  {
+    id: "whatsapp",
+    titulo: "Reportar fraude en WhatsApp",
+    pasos: [
+      "Nunca compartas el código de 6 dígitos que te llega por SMS, ni siquiera con conocidos.",
+      "Si perdiste tu cuenta, abre WhatsApp, pon tu número de nuevo y espera el código que te llega por SMS.",
+      "Activa la verificación en dos pasos en Ajustes, Cuenta.",
+      "Avisa a tus contactos por otro medio que no respondan mensajes ni envíen dinero en tu nombre.",
+      "Reporta y bloquea el número que te estafó desde el chat.",
+      "Si te están suplantando, escribe a soporte desde Ajustes, Ayuda, en la app oficial.",
+    ],
+  },
+  {
+    id: "phishing",
+    titulo: "Fui víctima de phishing",
+    pasos: [
+      "No escribas nada más en la página o el mensaje sospechoso y ciérralo.",
+      "Desde la app o el sitio oficial, no desde el enlace, cambia la clave de la cuenta afectada.",
+      "Si usas esa clave en otras cuentas, cámbiala también allí.",
+      "Si pusiste datos de tu tarjeta o tu banco, llama a la línea oficial de tu banco y bloquéala.",
+      "Activa la verificación en dos pasos en tu correo y tus redes sociales.",
+      "Guarda capturas del mensaje y del enlace para tu denuncia.",
+    ],
+  },
 ];
 
 export const AVISO_NO_BORRES = {
   titulo: "No borres nada",
-  texto: "",
+  texto:
+    "Guarda los mensajes, correos, capturas de pantalla, números y comprobantes de pago. Son la prueba que necesitas para denunciar el delito, según la Ley 1273 de 2009.",
 };
 
-export const LINEAS_BANCARIAS = [];
+export const LINEAS_BANCARIAS = [
+  { banco: "Bancolombia", numero: "01 8000 912 345" },
+  { banco: "Davivienda", numero: "01 8000 123 838" },
+];
 
-export const CANALES_DENUNCIA = [];
+export const CANALES_DENUNCIA = [
+  {
+    entidad: "Policía Nacional – CAI Virtual",
+    contacto: "Reporta en línea llamadas, mensajes, correos o páginas falsas.",
+    enlace: "https://caivirtual.policia.gov.co",
+  },
+  {
+    entidad: "A Denunciar (Policía y Fiscalía)",
+    contacto: "Pon la denuncia formal en la categoría de delitos informáticos.",
+    enlace: "https://adenunciar.policia.gov.co",
+  },
+  {
+    entidad: "Superintendencia Financiera",
+    contacto: "Queja si tu banco no te atiende el fraude como debe.",
+    enlace: "https://www.superfinanciera.gov.co",
+  },
+  {
+    entidad: "Superintendencia de Industria y Comercio",
+    contacto: "Reporta si están usando tus datos personales sin permiso.",
+    enlace: "https://www.sic.gov.co",
+  },
+];
