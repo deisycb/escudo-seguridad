@@ -105,7 +105,7 @@ La persona filtra por canal con los chips Todos, SMS, Llamadas, Correo y WhatsAp
 - **FR-002**: La tarjeta "Regla de oro" MUST tener fondo `primario`, texto blanco, el ícono ShieldCheck, la etiqueta "Regla de oro" y el texto "Tu banco nunca te pedirá claves, códigos ni el número completo de tu tarjeta. Ni por llamada, ni por mensaje, ni por correo." (reemplaza FR-025 de la spec 001).
 - **FR-003**: La barra de progreso MUST mostrar el texto "X de 8 retos superados" y una barra rellena en proporción X/8.
 - **FR-004**: Los filtros MUST ser los chips Todos, SMS, Llamadas, Correo y WhatsApp (Todos por defecto); el activo va con fondo `primario` y texto blanco y se marca como presionado. Al cambiar de filtro, la lista MUST mostrar solo los tips de ese canal y cerrar cualquier tarjeta abierta.
-- **FR-005**: La lista MUST funcionar como acordeón: como máximo una tarjeta abierta; al entrar a la pantalla la primera tarjeta está abierta.
+- **FR-005**: La lista MUST funcionar como acordeón: como máximo una tarjeta abierta. La primera vez que se entra a Tips en la sesión, la primera tarjeta está abierta; al volver desde otra sección se conservan el filtro y la tarjeta abierta que había.
 - **FR-006**: El acceso final MUST ser un botón con el ícono TriangleAlert y el texto "¿Ya caíste en una?" seguido de "Ve a Emergencia y sigue los primeros auxilios.", que lleva a la pantalla Emergencia (reemplaza FR-029 de la spec 001).
 
 **Tarjeta cerrada**
