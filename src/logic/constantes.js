@@ -60,3 +60,9 @@ export const CLAVE_ALMACENAMIENTO = "escudo.v1";
 
 /** Versión del esquema guardado en localStorage. */
 export const VERSION_ALMACENAMIENTO = 1;
+
+/** Frases trampa que tiene cada tip de seguridad (spec 006, FR-020). */
+export const TOTAL_TRAMPAS_POR_TIP = 3;
+
+/** Mensaje al elegir una opción incorrecta en el mini reto (spec 006, FR-014). */
+export const MENSAJE_FALLO = "Esa opción te deja expuesto. Intenta otra.";

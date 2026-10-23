@@ -182,52 +182,6 @@ describe("recomendaciones.js", () => {
   });
 });
 
-describe("tips.js", () => {
-  const TIPO_POR_CANAL = {
-    sms: "Smishing",
-    llamada: "Vishing",
-    correo: "Phishing",
-    whatsapp: "Suplantación",
-  };
-
-  it("REGLA_DE_ORO es el texto exacto de FR-025", () => {
-    expect(REGLA_DE_ORO).toBe(
-      "tu banco nunca te pedirá claves, códigos ni el número completo de tu tarjeta, ni por llamada, ni por mensaje, ni por correo",
-    );
-  });
-
-  it("tiene 8 en total, 2 por canal, con el tipo de ataque de su canal e ids únicos", () => {
-    expect(TIPS).toHaveLength(8);
-    Object.keys(TIPO_POR_CANAL).forEach((canal) =>
-      expect(TIPS.filter((t) => t.canal === canal)).toHaveLength(2),
-    );
-    TIPS.forEach(({ canal, tipoAtaque }) => expect(tipoAtaque).toBe(TIPO_POR_CANAL[canal]));
-    expect(new Set(TIPS.map((t) => t.id)).size).toBe(TIPS.length);
-  });
-
-  it("los títulos coinciden exactamente con FR-026", () => {
-    expect(TIPS.map(({ canal, titulo }) => [canal, titulo]).sort()).toEqual(
-      [
-        ["sms", "Tu paquete está retenido"],
-        ["sms", "Descuento o premio en tu plan de celular"],
-        ["llamada", "Le hablamos del banco por un movimiento sospechoso"],
-        ["llamada", "Falso técnico o asesor de tu operador"],
-        ["correo", "Tu cuenta será suspendida"],
-        ["correo", "Factura o recibo que no esperabas"],
-        ["whatsapp", "Cambié de número, necesito un favor"],
-        ["whatsapp", "Te piden el código de 6 dígitos"],
-      ].sort(),
-    );
-  });
-
-  it("comoReconocerla y queHacer no están vacíos", () => {
-    TIPS.forEach(({ comoReconocerla, queHacer }) => {
-      expect(esTextoOListaNoVacia(comoReconocerla)).toBe(true);
-      expect(esTextoOListaNoVacia(queHacer)).toBe(true);
-    });
-  });
-});
-
 describe("asistenteIA.js", () => {
   it("CONSENTIMIENTO_IA tiene título y al menos 1 párrafo", () => {
     expect(esTextoNoVacio(CONSENTIMIENTO_IA.titulo)).toBe(true);

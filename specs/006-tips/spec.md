@@ -23,6 +23,7 @@
 | Colores | Hexadecimales propios | Tokens de `tailwind.config.js` con el mismo papel (azul = `primario`, rojo = `peligro`, ámbar = `advertencia`, verde = `exito`); se agregan los tokens suaves que faltan (azul suave y verde suave) | Constitución §7.2. |
 | Texto de lectura | 14,5–15 px | Mínimo 16 px en mensaje, señales, pasos, opciones y resultados | Constitución §7.3. Etiquetas, contador, ayuda y "Dato" pueden ir más pequeños (≥ 12 px). |
 | Redondeo y relleno de tarjetas | 20 px / 16 px | 16 px / 20 px | Constitución §7.4. |
+| Tip "Te piden el código de 6 dígitos" | 3 explicaciones y solo 2 frases marcadas (no se podía llegar a 3 de 3) | El remitente "Laura (contacto)" es la trampa 1 ("Puede ser un contacto real cuya cuenta ya fue robada."); las otras dos siguen en el mensaje | Error de contenido detectado por la prueba de estructura; corrección aprobada por el equipo el 2026-10-23. |
 | Acceso a Emergencia | Caja no interactiva | Botón que lleva a Emergencia, con el texto del prototipo | Debe navegar (constitución §7.7: elementos interactivos reales). |
 
 ## User Scenarios & Testing *(mandatory)*
